@@ -8,8 +8,16 @@
 html {
 }
 body {
+  min-width: 350px;
 }
 
-body > main {
-  flex-grow: 1;
+main {
+  position: relative;
+  height: 100%;
+}
+/* 
+  페이지 헤더의 높이만큼 global.css에서 main의 padding-top 조절하기 (twailwind value * 4 = px)  
+*/
+main:not(#home) {
+  padding-top: 80px;
 }

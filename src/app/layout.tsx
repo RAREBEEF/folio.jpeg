@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import RecoilProvider from "./recoilProvider";
-import LayoutHeader from "./layouts/LayoutHeader";
-import LayoutFooter from "./layouts/LaytoutFooter";
-import LayoutContent from "./layouts/LayoutContent";
+import LayoutHeader from "./components/layouts/LayoutHeader";
+import LayoutFooter from "./components/layouts/LaytoutFooter";
+import LayoutContent from "./components/layouts/LayoutContent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <RecoilProvider>
         <body
-          className={inter.className + " bg-shark-950 flex min-h-lvh flex-col"}
+          className={inter.className + " flex min-h-lvh flex-col bg-shark-950"}
         >
           <LayoutHeader />
           <LayoutContent>{children}</LayoutContent>

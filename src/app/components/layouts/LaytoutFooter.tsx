@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { navState } from "./LayoutContent";
+import { navState } from "@/recoil/states";
 
 const LayoutFooter = () => {
   const nav = useRecoilValue(navState);
   return (
     <div
-      className={`bg-shark-950 text-shark-50 relative px-10 py-6 transition-all ${
+      className={`bg-shark-950 px-10 py-4 text-shark-50 transition-all ${
         nav.show ? "ml-[200px]" : "ml-[30px]"
       }`}
     >
-      <nav className="mx-auto mb-12 max-w-[1300px]">
+      <nav className="mx-auto mb-6 max-w-[1300px]">
         <ul className="flex gap-x-24 *:flex *:flex-col *:gap-2">
           <li>
-            <h4 className="text-base font-bold">DEVELOPER</h4>
-            <ul className="flex flex-col gap-2">
+            <h4 className="text-sm font-bold">DEVELOPER</h4>
+            <ul className="flex flex-col gap-2 text-xs">
               <li>
                 <Link
                   href="https://www.rarebeef.co.kr/"

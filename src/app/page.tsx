@@ -1,9 +1,9 @@
-import ImageGrid from "./components/ImageGrid";
+import HomeGrid from "./components/HomeImageList";
 
 export default function Home() {
   return (
-    <main className="relative flex flex-col">
-      <ImageGrid />
+    <main id="home">
+      <HomeGrid />
     </main>
   );
 }

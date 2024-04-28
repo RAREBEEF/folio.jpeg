@@ -7,7 +7,7 @@ import LinkedinSvg from "@/icons/linkedin.svg";
 import TiktokSvg from "@/icons/tiktok.svg";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
-import { navState } from "../layouts/LayoutContent";
+import { navState } from "@/recoil/states";
 
 const mySns: { [key in string]: string } = {
   github: "https://github.com/rarebeef",
