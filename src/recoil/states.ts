@@ -1,16 +1,43 @@
 import { atom, atomFamily } from "recoil";
-import { Grid, ImageDataPages, ImageItem } from "@/types";
+import { Comments, Grid, ImageDataPages, ImageItem } from "@/types";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
+// 네비게이션 상태
 export const navState = atom({
   key: "navState",
   default: { show: true },
 });
 
-// export const imageIdsState = atom({
-//   key: "imageIdsState",
-//   default: [] as Array<string>,
-// });
+// 이미지 상태
+export const imageDataPagesState = atom({
+  key: "photos",
+  default: [] as ImageDataPages,
+});
 
+export const imageItemState = atomFamily({
+  key: "imageItemState",
+  default: (id: string): ImageItem | null => {
+    return null;
+  },
+});
+
+// 댓글 상태
+export const commentsState = atomFamily({
+  key: "commentsState",
+  default: (imageId: string): Comments | null => {
+    return null;
+  },
+});
+
+export const lastVisibleState = atom<QueryDocumentSnapshot<
+  DocumentData,
+  DocumentData
+> | null>({
+  key: "lastVisibleState",
+  default: null,
+});
+
+// 그리드 상태
 export const gridState = atom<Grid>({
   key: "gridState",
   default: {
@@ -21,32 +48,7 @@ export const gridState = atom<Grid>({
     height: 0,
   },
 });
-export const imageDataPagesState = atom({
-  key: "photos",
-  default: [] as ImageDataPages,
-});
-
-export const imageItemState = atomFamily({
-  key: "ImageItemState",
-  default: (id: string): ImageItem => {
-    return {
-      id: id,
-      fileName: "",
-      height: 0,
-      x: 0,
-      y: 0,
-      createdAt: 0,
-      uid: "",
-      likes: [] as Array<string>,
-      tags: [] as Array<string>,
-      size: {
-        width: 0,
-        height: 0,
-      },
-      url: "",
-      page: 0,
-      originalName: "",
-      byte: 0,
-    };
-  },
+export const gridImageIdsState = atom<Array<string>>({
+  key: "gridImageIdsState",
+  default: [],
 });

@@ -1,22 +1,20 @@
 "use client";
 
-import { auth, db, storage } from "@/fb";
+import { auth, db } from "@/fb";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import Button from "./Button";
 import useInput from "@/hooks/useInput";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { ImageDocData } from "@/types";
-import { useRecoilState } from "recoil";
-import { imageItemState } from "@/recoil/states";
+import useSetImageData from "@/hooks/useSetImageItem";
+import useSetImageAndGetUrl from "@/hooks/useSetImageAndGetUrl";
 
 const Upload = () => {
-  const [imageItem, setImageItem] = useRecoilState(
-    imageItemState("fa8e9d61-bcd0-41f8-a82f-94a6d1f9c5ce"),
-  );
-  console.log(imageItem);
+  const setImageData = useSetImageData();
+  const setImageAndGetUrl = useSetImageAndGetUrl();
   const [userData, setUserData] = useState<User | null>(null);
   const [id, setId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -40,11 +38,7 @@ const Upload = () => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserData(user);
-      } else {
-        setUserData(null);
-      }
+      setUserData(user);
     });
   }, [setUserData]);
 
@@ -54,27 +48,6 @@ const Upload = () => {
       const file = fileList[0];
 
       setFile(file);
-
-      // file.arrayBuffer().then((buff: ArrayBuffer) => {
-      //   let x = new Uint8Array(buff); // x is your uInt8Array
-      //   // perform all required operations with x here.
-      //   setFile(x);
-      // });
-
-      // const blob = new Blob([file], { type: file.type });
-      // setFile(blob);
-
-      // const buffer = await file.arrayBuffer();
-      // setFile(buffer);
-
-      // const reader = new FileReader();
-      // reader.onloadend = (e: ProgressEvent<FileReader>) => {
-      //   const target = e.currentTarget as FileReader;
-      //   if (!target) return;
-      //   const { result } = target;
-      //   setFile(result);
-      // };
-      // reader.readAsDataURL(file);
 
       const previewImg = new Image();
       const _URL = window.URL || window.webkitURL;
@@ -99,6 +72,11 @@ const Upload = () => {
 
   const onUploadClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (!userData) {
+      window.alert("no userData");
+      return;
+    }
+
     if (
       !userData ||
       !id ||
@@ -112,24 +90,16 @@ const Upload = () => {
 
     // TODO:로딩 ui 출력
 
-    // const uploadImage = async () => {
-    // const result = await fetch("/api/upload-image", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     uid: userData.uid,
-    //     fileName,
-    //     file,
-    //   }),
+    // 이미지 업로드하고 다운로드url 얻기
+    // const storage = getStorage();
+    // const storageRef = ref(storage, `images/${userData.uid}/${fileName}`);
+    // const downloadURL = await uploadBytes(storageRef, file).then(async () => {
+    //   return await getDownloadURL(storageRef);
     // });
-    // return result;
 
-    const storage = getStorage();
-    const storageRef = ref(storage, `images/${userData.uid}/${fileName}`);
-    const downloadURL = await uploadBytes(storageRef, file).then(async () => {
-      return await getDownloadURL(storageRef);
-    });
+    const downloadURL = await setImageAndGetUrl(userData.uid, fileName, file);
 
+    // 다운로드 url을 포함한 이미지 데이터 업로드하기
     const data: ImageDocData = {
       createdAt: Date.now(),
       uid: userData.uid,
@@ -141,47 +111,14 @@ const Upload = () => {
       size,
       url: downloadURL,
       tags: [],
-      comments: [],
       likes: [],
     };
-    const imageDocRef = doc(db, "users", userData.uid, "images", id);
-    setDoc(imageDocRef, data);
+    // const imageDocRef = doc(db, "images", id);
+    // await setDoc(imageDocRef, data);
 
-    // const userImageDocRef = doc(db, "users", userData.uid, "images", id);
-    // setDoc(userImageDocRef, imageDocRef);
+    await setImageData(id, data);
 
-    // const storageRef = ref(storage, `images/${userData.uid}/${fileName}`);
-    // storageRef.put;
-    // await uploadString(storageRef, file, "data_url");
-    // };
-
-    // const uploadData = async () => {
-    //   // const result = await fetch("/api/upload-image-data", {
-    //   //   method: "POST",
-    //   //   headers: { "Content-Type": "application/json" },
-    //   //   body: JSON.stringify({
-    //   //     uid: userData.uid,
-    //   //     id,
-    //   //     title,
-    //   //     description: desc,
-    //   //     fileName,
-    //   //     originalName,
-    //   //     size,
-    //   //     byte,
-    //   //     tags: [],
-    //   //   }),
-    //   // });
-    //   // return result;
-    // };
-
-    // const result = await Promise.all([uploadImage(), uploadData()])
-    //   .then(() => {})
-    //   .catch(() => {
-    //     // TODO:예외처리
-    //   })
-    //   .finally(() => {
-    //     // TODO:로딩 ui 제거
-    //   });
+    // TODO: 로딩 ui 숨김
   };
 
   return (

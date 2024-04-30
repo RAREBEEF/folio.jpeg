@@ -30,11 +30,7 @@ const Upload = () => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserData(user);
-      } else {
-        setUserData(null);
-      }
+      setUserData(user);
     });
   }, [setUserData]);
 

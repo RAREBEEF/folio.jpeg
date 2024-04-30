@@ -1,3 +1,4 @@
+// 이미지 관련
 export interface ImageDocData {
   createdAt: number;
   uid: string;
@@ -12,15 +13,7 @@ export interface ImageDocData {
     height: number;
   };
   tags: Array<string>;
-  comments: Array<Comment>;
   likes: Array<string>;
-}
-
-export interface Comment {
-  content: string;
-  createdAt: number;
-  uid: string;
-  comments: Array<Comment>;
 }
 
 export interface ImageData extends ImageDocData {
@@ -29,33 +22,35 @@ export interface ImageData extends ImageDocData {
 
 export type ImageItem = {
   id: string;
-  page: number;
   fileName: string;
   originalName: string;
   title?: string;
   description?: string;
-  height: number;
-  x: number;
-  y: number;
   createdAt: number;
   uid: string;
   likes: Array<string>;
   tags: Array<string>;
+  byte: number;
+  url: string;
   size: {
     width: number;
     height: number;
   };
-  byte: number;
-  url: string;
+  grid: {
+    page: number;
+    height: number;
+    x: number;
+    y: number;
+  } | null;
 };
 
 export type ImageDataPages = Array<Array<ImageData>>;
 
+// 그리드
 export interface Column {
   items: Array<ImageItem>;
   height: number;
 }
-
 export interface Grid {
   cols: Array<Column>;
   colCount: number;
@@ -64,9 +59,13 @@ export interface Grid {
   height: number;
 }
 
+// 댓글
 export interface Comment {
-  uid: string;
-  createdAt: number;
+  id: string;
   content: string;
-  comments: Array<Comment>;
+  createdAt: number;
+  uid: string;
+  replies: Array<Comment>;
 }
+
+export type Comments = { [key in string]: Comment };

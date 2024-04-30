@@ -60,16 +60,19 @@ const ImageGrid = () => {
         // column에 추가할 아이템 (이미지, 위치와 높이 등)
         const curItem: ImageItem = {
           ...image,
-          page: i,
-          height: (gridConfig.colWidth * image.size.height) / image.size.width,
-          x: colIndex * gridConfig.colWidth + gridConfig.gap * (1 + colIndex),
-          y: currentCol.height + gridConfig.gap,
+          grid: {
+            page: i,
+            height:
+              (gridConfig.colWidth * image.size.height) / image.size.width,
+            x: colIndex * gridConfig.colWidth + gridConfig.gap * (1 + colIndex),
+            y: currentCol.height + gridConfig.gap,
+          },
         };
         // column에 아이템 추가
         currentCol.items.push(curItem);
 
         // column의 높이 업데이트
-        currentCol.height += curItem.height + gridConfig.gap;
+        currentCol.height += curItem.grid!.height + gridConfig.gap;
 
         // cols 업데이트
         cols[colIndex] = currentCol;
