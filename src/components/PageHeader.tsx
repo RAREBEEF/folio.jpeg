@@ -1,3 +1,5 @@
+"use client";
+
 const PageHeader = ({ header }: { header: string }) => {
   return (
     // 페이지 헤더의 높이만큼 global.css에서 main의 padding-top 조절하기 (twailwind value * 4 = px)
