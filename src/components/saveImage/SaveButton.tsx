@@ -80,7 +80,7 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
     }
 
     setSaved(isSaved);
-  }, [folders, imageItem.id]);
+  }, [authStatus.data, folders, imageItem.id]);
 
   // 저장 버튼 클릭
   const onSaveClick = async (e: MouseEvent<HTMLButtonElement>) => {
