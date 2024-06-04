@@ -1,22 +1,66 @@
 import { atom, atomFamily } from "recoil";
-import { Comments, Grid, ImageDataPages, ImageItem } from "@/types";
+import {
+  Alert,
+  AuthStatus,
+  Comments,
+  Folders,
+  Grid,
+  ImageDataPages,
+  ImageItem,
+  UserData,
+} from "@/types";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
-// 네비게이션 상태
+// user 상태
+export const authStatusState = atom({
+  key: "authStatusState",
+  default: { status: "pending", data: null } as AuthStatus,
+});
+export const pageUserDataState = atomFamily({
+  key: "pageUserDataState",
+  default: (displayId: string): UserData | null => {
+    return null;
+  },
+});
+export const usersDataState = atom({
+  key: "usersDataState",
+  default: {} as { [key in string]: UserData },
+});
+
+// ui 상태
+export const loginModalState = atom({
+  key: "loginModalState",
+  default: { show: false } as { show: boolean; showInit?: boolean },
+});
 export const navState = atom({
   key: "navState",
-  default: { show: true },
+  default: { show: false },
 });
 
-// 이미지 상태
-export const imageDataPagesState = atom({
-  key: "photos",
-  default: [] as ImageDataPages,
+// images 상태
+export const imageDataPagesState = atomFamily({
+  key: "imagePages",
+  default: (type: string): ImageDataPages => {
+    return [];
+  },
 });
-
+export const gridImageIdsState = atomFamily({
+  key: "gridImageIdsState",
+  default: (type: string): Array<string> => {
+    return [];
+  },
+});
 export const imageItemState = atomFamily({
   key: "imageItemState",
   default: (id: string): ImageItem | null => {
+    return null;
+  },
+});
+export const lastVisibleState = atomFamily({
+  key: "lastVisibleState",
+  default: (
+    type: string,
+  ): QueryDocumentSnapshot<DocumentData, DocumentData> | null => {
     return null;
   },
 });
@@ -29,26 +73,22 @@ export const commentsState = atomFamily({
   },
 });
 
-export const lastVisibleState = atom<QueryDocumentSnapshot<
-  DocumentData,
-  DocumentData
-> | null>({
-  key: "lastVisibleState",
+// 폴더 상태
+export const foldersState = atomFamily({
+  key: "commentsState",
+  default: (uid: string): Folders | null => {
+    return null;
+  },
+});
+
+// grid 상태
+export const gridState = atom<Grid>({
+  key: "gridState",
   default: null,
 });
 
-// 그리드 상태
-export const gridState = atom<Grid>({
-  key: "gridState",
-  default: {
-    cols: [],
-    gap: 15,
-    colCount: 3,
-    colWidth: 200,
-    height: 0,
-  },
-});
-export const gridImageIdsState = atom<Array<string>>({
-  key: "gridImageIdsState",
-  default: [],
+// alert
+export const alertState = atom<Alert>({
+  key: "alertState",
+  default: { text: null, createdAt: null, type: "default", show: false },
 });

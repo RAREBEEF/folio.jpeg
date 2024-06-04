@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import RecoilProvider from "./recoilProvider";
-import LayoutHeader from "./components/layouts/LayoutHeader";
-import LayoutFooter from "./components/layouts/LaytoutFooter";
-import LayoutContent from "./components/layouts/LayoutContent";
+import RecoilProvider from "@/recoil/recoilProvider";
+import LayoutHeader from "@/components/layouts/LayoutHeader";
+import LayoutFooter from "@/components/layouts/LaytoutFooter";
+import LayoutBody from "@/components/layouts/LayoutBody";
+import { Fragment } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,15 +21,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <RecoilProvider>
-        <body
-          className={inter.className + " flex min-h-lvh flex-col bg-shark-950"}
-        >
-          <LayoutHeader />
-          <LayoutContent>{children}</LayoutContent>
-          <LayoutFooter />
-        </body>
-      </RecoilProvider>
+      <body
+        className={inter.className + " flex min-h-lvh flex-col bg-shark-950"}
+      >
+        <RecoilProvider>
+          <Fragment>
+            <LayoutHeader />
+            <LayoutBody>{children}</LayoutBody>
+            <LayoutFooter />
+          </Fragment>
+        </RecoilProvider>
+      </body>
     </html>
   );
 }

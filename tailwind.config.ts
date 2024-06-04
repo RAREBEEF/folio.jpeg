@@ -8,11 +8,30 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      animation: {
+        "spin-slow": "spin 1.5s linear infinite",
+        "loading-dot-1": "loadingDot1 0.6s 0s linear infinite",
+        "loading-dot-2": "loadingDot1 0.6s 0.2s linear infinite",
+        "loading-dot-3": "loadingDot1 0.6s 0.4s linear infinite",
+      },
+      keyframes: {
+        loadingDot1: {
+          "0%": { transform: "translateY(0%)" },
+          "25%": { transform: "translateY(-25%)" },
+          "50%": { transform: "translateY(0%)" },
+          "75%": { transform: "translateY(25%)" },
+        },
+      },
       screens: {
         min: { max: "350px" },
         xs: {
-          min: "351px",
           max: "550px",
+        },
+        sm: {
+          max: "800px",
+        },
+        md: {
+          max: "1024px",
         },
       },
       backgroundImage: {
@@ -33,6 +52,19 @@ const config: Config = {
           "800": "#454545",
           "900": "#3d3d3d",
           "950": "#1f1f1f",
+        },
+        alto: {
+          "50": "#f6f6f6",
+          "100": "#ebebe9",
+          "200": "#dfdfdd",
+          "300": "#bbbbb6",
+          "400": "#9e9d99",
+          "500": "#8b8a84",
+          "600": "#7e7d78",
+          "700": "#6a6964",
+          "800": "#585754",
+          "900": "#494845",
+          "950": "#262524",
         },
         everglade: {
           "50": "#f3faf3",

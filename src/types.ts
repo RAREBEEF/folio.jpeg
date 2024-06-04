@@ -1,3 +1,37 @@
+import { User } from "firebase/auth";
+import { WhereFilterOp } from "firebase/firestore";
+
+// 필터
+// export type FilterWhere = [string, WhereFilterOp, string | Array<string>];
+export interface Filter {
+  orderBy?: ["createdAt" | "popular", "desc" | "asc"];
+  limit?: number;
+  where?: any;
+}
+
+// 유저
+export interface UserData extends User {
+  // 불러오기 전은 undefined, 불러왔지만 존재하지 않으면 null
+  displayId?: string | undefined | null;
+}
+export interface ExtraUserData {
+  displayId: string;
+  photoURL: string;
+}
+
+type AuthStatusUserData = {
+  pending: null;
+  noExtraData: UserData;
+  signedIn: UserData;
+  signedOut: null;
+  error: null;
+}[AuthStatus["status"]];
+
+export interface AuthStatus {
+  status: "pending" | "noExtraData" | "signedIn" | "signedOut" | "error";
+  data: AuthStatusUserData;
+}
+
 // 이미지 관련
 export interface ImageDocData {
   createdAt: number;
@@ -14,12 +48,11 @@ export interface ImageDocData {
   };
   tags: Array<string>;
   likes: Array<string>;
+  themeColor: string;
 }
-
 export interface ImageData extends ImageDocData {
   id: string;
 }
-
 export type ImageItem = {
   id: string;
   fileName: string;
@@ -32,32 +65,34 @@ export type ImageItem = {
   tags: Array<string>;
   byte: number;
   url: string;
+  themeColor: string;
   size: {
     width: number;
     height: number;
   };
-  grid: {
-    page: number;
-    height: number;
-    x: number;
-    y: number;
-  } | null;
 };
-
 export type ImageDataPages = Array<Array<ImageData>>;
 
 // 그리드
+export interface GridItem {
+  id: string;
+  page: number;
+  height: number;
+  x: number;
+  y: number;
+}
 export interface Column {
-  items: Array<ImageItem>;
+  items: Array<GridItem>;
   height: number;
 }
-export interface Grid {
+export type Grid = {
   cols: Array<Column>;
   colCount: number;
   colWidth: number;
   gap: number;
   height: number;
-}
+  page?: number;
+} | null;
 
 // 댓글
 export interface Comment {
@@ -67,5 +102,24 @@ export interface Comment {
   uid: string;
   replies: Array<Comment>;
 }
-
 export type Comments = { [key in string]: Comment };
+
+// 폴더
+export interface Folder {
+  id: string;
+  createdAt: number;
+  images: Array<string>;
+  isPrivate: boolean;
+  name: string;
+  uid: string;
+  updatedAt: number;
+}
+export type Folders = Array<Folder>;
+
+// alert
+export interface Alert {
+  text: string | null;
+  createdAt: number | null;
+  type: "default" | "success" | "warning";
+  show: boolean;
+}

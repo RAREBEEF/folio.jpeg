@@ -1,9 +1,9 @@
-import HomeGrid from "./components/HomeImageList";
+import HomeImageList from "@/components/imageList/HomeImageList";
 
 export default function Home() {
   return (
     <main id="home">
-      <HomeGrid />
+      <HomeImageList />
     </main>
   );
 }

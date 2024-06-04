@@ -1,14 +1,33 @@
 import { db } from "@/fb";
 import { ImageDocData } from "@/types";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
 
 const useSetImageData = () => {
-  const setImageData = async (id: string, data: ImageDocData) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const setImageData = async (
+    id: string,
+    data: ImageDocData,
+    update: boolean = false,
+  ) => {
+    setIsLoading(true);
+
     const docRef = doc(db, "images", id);
-    await setDoc(docRef, data);
+
+    if (update) {
+      const updateData: any = { ...data };
+      delete updateData.likes;
+      await updateDoc(docRef, { ...updateData }).then(() => {
+        setIsLoading(false);
+      });
+    } else {
+      await setDoc(docRef, data).then(() => {
+        setIsLoading(false);
+      });
+    }
   };
 
-  return setImageData;
+  return { setImageData, isLoading };
 };
 
 export default useSetImageData;

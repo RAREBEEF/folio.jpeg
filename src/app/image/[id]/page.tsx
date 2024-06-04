@@ -1,8 +1,8 @@
-import ImageDetail from "@/app/components/imageDetail/ImageDetail";
+import ImageDetail from "@/components/imageDetail/ImageDetail";
 
 const ImagePage = () => {
   return (
-    <main>
+    <main id="image-detail">
       <ImageDetail />
     </main>
   );

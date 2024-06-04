@@ -10,7 +10,7 @@ type ErrorProps = {
 
 const Error = ({ error, reset }: ErrorProps) => {
   const pathname = usePathname();
-  const { push, refresh } = useRouter();
+  const { replace } = useRouter();
 
   useEffect(() => {
     console.error(error);
@@ -21,7 +21,7 @@ const Error = ({ error, reset }: ErrorProps) => {
     if (pathname === "/") {
       reset();
     } else {
-      push("/");
+      replace("/");
     }
   };
 
