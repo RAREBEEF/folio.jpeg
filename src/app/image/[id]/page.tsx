@@ -1,3 +1,5 @@
+"use client";
+
 import ImageDetail from "@/components/imageDetail/ImageDetail";
 
 const ImagePage = () => {
