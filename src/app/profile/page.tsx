@@ -1,5 +1,3 @@
-"use client";
-
 import PageHeader from "@/components/PageHeader";
 import ProfileForm from "@/components/form/ProfileForm";
 

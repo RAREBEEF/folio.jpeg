@@ -1,5 +1,3 @@
-"use client";
-
 import PageHeader from "@/components/PageHeader";
 import UploadForm from "@/components/form/UploadForm";
 

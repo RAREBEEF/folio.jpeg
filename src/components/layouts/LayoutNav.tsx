@@ -15,7 +15,7 @@ const LayoutNav = () => {
   const [loginModal, setLoginModal] = useRecoilState(loginModalState);
   const authStatus = useRecoilValue(authStatusState);
   const [nav, setNav] = useRecoilState(navState);
-  const [innerWidth, setInnerWidth] = useState<number>(window.innerWidth);
+  const [innerWidth, setInnerWidth] = useState<number>(0);
 
   useEffect(() => {
     if (nav.show) {

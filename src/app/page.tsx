@@ -1,5 +1,3 @@
-"use client";
-
 import HomeImageList from "@/components/imageList/HomeImageList";
 
 export default function Home() {
