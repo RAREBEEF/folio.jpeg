@@ -12,10 +12,10 @@ import { Folders, UserData } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 
 const AddFolder = ({
-  pageUserData,
+  userData,
   closeModal,
 }: {
-  pageUserData: UserData;
+  userData: UserData;
   closeModal: Function;
 }) => {
   const authStatus = useRecoilValue(authStatusState);
@@ -40,7 +40,7 @@ const AddFolder = ({
     if (isLoading) {
       return;
       // 인증 상태가 유효하지 않으면
-    } else if (!authStatus.data || authStatus.data.uid !== pageUserData.uid) {
+    } else if (!authStatus.data || authStatus.data.uid !== userData.uid) {
       setAlert({
         show: true,
         type: "warning",

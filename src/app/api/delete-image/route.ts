@@ -3,9 +3,9 @@ import admin from "firebase-admin";
 
 export async function POST(req: Request) {
   const data = await req.json();
-  const { imageId } = data;
+  const { imageId, uid, fileName } = data;
 
-  if (!imageId) {
+  if (!imageId || !uid || !fileName) {
     return NextResponse.json({ data: "Missing image ID", status: 400 });
   }
 
@@ -18,12 +18,24 @@ export async function POST(req: Request) {
 
     if (!admin.apps.length) {
       admin.initializeApp({
+        storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
         credential: admin.credential.cert(serviceAccount),
       });
     }
 
-    const ref = admin.firestore().collection("images").doc(imageId);
-    await admin.firestore().recursiveDelete(ref);
+    // firestore
+    const firestoreRef = admin.firestore().collection("images").doc(imageId);
+    // storage
+    const storageRef = admin
+      .storage()
+      .bucket()
+      .file(`images/${uid}/${fileName}`);
+
+    // 삭제
+    await Promise.all([
+      admin.firestore().recursiveDelete(firestoreRef),
+      storageRef.delete(),
+    ]);
 
     return NextResponse.json({
       data: "Suscces",
@@ -31,7 +43,7 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     return NextResponse.json({
-      data: "Faild",
+      data: err,
       status: 500,
     });
   }

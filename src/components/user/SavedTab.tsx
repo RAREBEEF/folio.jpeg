@@ -9,11 +9,12 @@ import Loading from "../Loading";
 import SavedImageList from "../imageList/SavedImageList";
 import SavedFolderList from "./SavedFolderList";
 import useGetFolders from "@/hooks/useGetFolders";
+import PlusIcon from "@/icons/plus-solid.svg";
 
-const SavedTab = ({ pageUserData }: { pageUserData: UserData }) => {
+const SavedTab = ({ userData }: { userData: UserData }) => {
   const authStatus = useRecoilValue(authStatusState);
   const { getFolders } = useGetFolders();
-  const [folders, setFolders] = useRecoilState(foldersState(pageUserData.uid));
+  const [folders, setFolders] = useRecoilState(foldersState(userData.uid));
   const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
   const [defaultFolder, setDefaultFolder] = useState<Folder | null>(null);
   const [customFolders, setCustomFolders] = useState<Folders>([]);
@@ -22,14 +23,14 @@ const SavedTab = ({ pageUserData }: { pageUserData: UserData }) => {
   useEffect(() => {
     if (
       !folders &&
-      (!authStatus.data || authStatus.data.uid !== pageUserData.uid)
+      (!authStatus.data || authStatus.data.uid !== userData.uid)
     ) {
       (async () => {
-        const folders = await getFolders(pageUserData.uid);
+        const folders = await getFolders(userData.uid);
         setFolders(folders);
       })();
     }
-  }, [authStatus.data, folders, getFolders, pageUserData.uid, setFolders]);
+  }, [authStatus.data, folders, getFolders, userData.uid, setFolders]);
 
   // 기본 폴더와 커스텀 폴더를 구분하여 상태에 저장
   useEffect(() => {
@@ -60,39 +61,43 @@ const SavedTab = ({ pageUserData }: { pageUserData: UserData }) => {
 
   return (
     <div>
-      <ul className="">
-        {defaultFolder && (
-          <SavedImageList
-            type={"user-saved-" + pageUserData.uid + "-" + "_DEFAULT"}
-            folder={defaultFolder}
-          />
-        )}
-      </ul>
-      <ul className="sticky bottom-0 border-2 bg-shark-50">
-        <div className="flex items-center justify-between px-12 pt-4 xs:px-8">
-          <h4 className="font-semibold text-shark-950">폴더 목록</h4>
+      <ul className="mt-4 border-y-2 pb-6">
+        <div className="flex items-center justify-end px-8 pt-4">
+          {/* <h4 className="text-lg font-semibold text-shark-950">폴더 목록</h4> */}
           <div className="text-xs">
-            {authStatus.data && authStatus.data.uid === pageUserData.uid && (
-              <Button onClick={onAddFolderClick}>
-                <div>폴더 생성</div>
-              </Button>
-            )}
+            {/* {authStatus.data && authStatus.data.uid === userData.uid && ( */}
+            <Button onClick={onAddFolderClick}>
+              <div>폴더 생성</div>
+            </Button>
+            {/* )} */}
           </div>
         </div>
         {folders == null ? (
           <Loading />
         ) : customFolders.length <= 0 ? (
-          <p>폴더 없음</p>
+          <div className="m-auto flex gap-12 overflow-scroll px-8 py-4">
+            <div className="flex min-h-[150px] w-full items-center justify-center text-sm text-shark-500">
+              생성된 폴더가 없습니다.
+            </div>
+          </div>
         ) : (
-          <SavedFolderList
-            folders={customFolders}
-            pageUserData={pageUserData}
-          />
+          <SavedFolderList folders={customFolders} userData={userData} />
         )}
       </ul>
+      {defaultFolder && (
+        <ul className="mt-12">
+          <h4 className="text-center text-lg font-semibold text-shark-950">
+            미분류 이미지
+          </h4>
+          <SavedImageList
+            type={"user-saved-" + userData.uid + "-" + "_DEFAULT"}
+            folder={defaultFolder}
+          />
+        </ul>
+      )}
       {showAddFolderModal && (
         <Modal close={closeModal} title="폴더 생성">
-          <AddFolderModal closeModal={closeModal} pageUserData={pageUserData} />
+          <AddFolderModal closeModal={closeModal} userData={userData} />
         </Modal>
       )}
     </div>

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { MouseEvent } from "react";
-import Auth from "../Auth";
 import { auth } from "@/fb";
 import { useRecoilState } from "recoil";
 import { authStatusState, loginModalState } from "@/recoil/states";
@@ -45,7 +44,6 @@ const LayoutHeader = () => {
           <div className="text-shark-950">로그인</div>
         </button>
       )}
-      <Auth />
     </header>
   );
 };

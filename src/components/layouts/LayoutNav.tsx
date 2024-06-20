@@ -10,12 +10,17 @@ import _ from "lodash";
 import HomeSvg from "@/icons/house-solid.svg";
 import ImageSvg from "@/icons/image-solid.svg";
 import ProfileSvg from "@/icons/user-solid.svg";
+import NotificationSvg from "@/icons/bell-solid.svg";
+import Modal from "../Modal";
+import NotificationsModal from "../NotificationsModal";
 
 const LayoutNav = () => {
   const [loginModal, setLoginModal] = useRecoilState(loginModalState);
   const authStatus = useRecoilValue(authStatusState);
   const [nav, setNav] = useRecoilState(navState);
   const [innerWidth, setInnerWidth] = useState<number>(0);
+  const [showNotificationModal, setShowNotificationModal] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (nav.show) {
@@ -50,6 +55,24 @@ const LayoutNav = () => {
         showInit: authStatus.status === "noExtraData",
       });
     }
+  };
+
+  const onNotificationClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (authStatus.status === "pending") {
+      e.preventDefault();
+    } else if (authStatus.status !== "signedIn") {
+      e.preventDefault();
+      setLoginModal({
+        show: true,
+        showInit: authStatus.status === "noExtraData",
+      });
+    } else {
+      setShowNotificationModal(true);
+    }
+  };
+  const onCloseNotification = () => {
+    setShowNotificationModal(false);
   };
 
   const onNavOutsideClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -117,11 +140,25 @@ const LayoutNav = () => {
               )}
             </Link>
           </li>
+          <li className="w-full text-center">
+            <button
+              onClick={onNotificationClick}
+              className="m-auto flex h-[30px] w-fit items-center justify-center"
+            >
+              {nav.show ? (
+                <div>Notifications</div>
+              ) : (
+                <NotificationSvg className="aspect-square w-[30px] fill-shark-50" />
+              )}
+            </button>
+          </li>
         </ul>
-        {/* <div className="absolute bottom-0 right-[25px]">
-          <SnsLinks />
-        </div> */}
       </nav>
+      {showNotificationModal && (
+        <Modal close={onCloseNotification} title="알림">
+          <NotificationsModal close={onCloseNotification} />
+        </Modal>
+      )}
       <div
         style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         className="h-full w-full grow"

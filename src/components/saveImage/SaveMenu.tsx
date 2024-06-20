@@ -217,6 +217,9 @@ const SaveMenuModal = ({
 
       for (let page = 0; page <= newFolderImagePage.length; page++) {
         const images = newFolderImagePage[page];
+        if (!images) {
+          return prev;
+        }
         for (let i = 0; i <= images.length; i++) {
           const image = images[i];
           if (image.id === imageId) {
@@ -256,7 +259,6 @@ const SaveMenuModal = ({
     });
 
     // db 업데이트
-    // TODO:구현 후 새로고침시 저장 목록에서 아예 삭제되지 않는지 확인(없는 이미지 삭제하는 코드와 충돌하는지 여부)
     const prevFolderDocRef = doc(db, "users", uid, "folders", prevFolderId);
     const selectedFolderDocRef = doc(
       db,
@@ -283,6 +285,11 @@ const SaveMenuModal = ({
       })
       .catch((error) => {
         // 에러 시 백업 상태로 롤백
+        setFolders(prevFolders);
+        setPrevFolderImagePage(prevFolderImagePage);
+        setPrevFolderGridImageIds(prevFolderGridImageIds);
+        setSelectedFolderImagePage(selectedFolderImagePage);
+        setSelectedFolderGridImageIds(selectedFolderGridImageIds);
         setAlert({
           show: true,
           type: "warning",
@@ -313,7 +320,7 @@ const SaveMenuModal = ({
           <select
             onChange={onSelectedFolderChange}
             value={selectedFolderId}
-            className="rounded-lg"
+            className="rounded-lg outline-none"
             name="folder"
             id="folder-select"
           >

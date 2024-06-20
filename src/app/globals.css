@@ -16,9 +16,9 @@ main {
 /* 
   페이지 헤더의 높이만큼 global.css에서 main의 padding-top 조절하기 (twailwind value * 4 = px)  
 */
-/* main:not(#home, #image-detail) {
+main:not(#home, #image-detail, #user-detail) {
   padding-top: 80px;
-} */
+}
 
 * {
   box-sizing: border-box;

@@ -110,7 +110,6 @@ const SignInForm = () => {
   const onCovertSignInUpClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    setAlert({ show: true, type: "warning", createdAt: Date.now(), text: "" });
     setCreateAccount((prev) => !prev);
     setPwReset(false);
   };
@@ -118,7 +117,6 @@ const SignInForm = () => {
   const onConvertPwResetClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    setAlert({ show: true, type: "warning", createdAt: Date.now(), text: "" });
     setPwReset((prev) => {
       if (!prev) {
         setCreateAccount(false);

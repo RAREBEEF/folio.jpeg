@@ -3,8 +3,6 @@ import { ref } from "firebase/storage";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
-import Vibrant from "node-vibrant";
-import { Palette } from "node-vibrant/lib/color";
 
 /**
  * 이미지를 스토리지에 업로드하고 다운로드url을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
@@ -14,7 +12,6 @@ const useSetImageFile = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [gradient, setGradient] = useState<string>("");
   const [id, setId] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [originalName, setOriginalName] = useState<string | null>(null);
@@ -34,33 +31,13 @@ const useSetImageFile = () => {
     return compressedImage;
   };
 
-  const getGradient = async (targetImageUrl: string) => {
-    let gradientStyle = "";
-
-    const palette: Palette = await Vibrant.from(targetImageUrl).getPalette();
-
-    if (palette && palette.Vibrant && palette.Muted) {
-      let startColor = palette.LightVibrant
-        ? palette.LightVibrant.getRgb()
-        : palette.Vibrant.getRgb();
-      let endColor = palette.DarkVibrant
-        ? palette.DarkVibrant.getRgb()
-        : palette.Muted.getRgb();
-
-      gradientStyle = `linear-gradient(to right bottom, rgb(${startColor.join(
-        ", ",
-      )}), rgb(${endColor.join(", ")}))`;
-    }
-
-    return gradientStyle;
-  };
-
   // 첨부파일 선택
   const onFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     setError(null);
 
     const fileList = e.target.files;
     if (fileList && fileList?.length !== 0) {
+      // 상태 초기화
       setFile(null);
       setPreviewUrl(null);
       setId(null);
@@ -81,8 +58,8 @@ const useSetImageFile = () => {
         // @ts-ignore
         setSize({ width: this.width, height: this.height });
         setPreviewUrl(objectUrl);
-        const gradient = await getGradient(objectUrl);
-        setGradient(gradient);
+        // const gradient = await getGradient(objectUrl);
+        // setGradient(gradient);
       };
       previewImg.src = objectUrl;
 
@@ -102,13 +79,13 @@ const useSetImageFile = () => {
       setByte(compressedImage.size);
       setIsInputUploading(false);
     } else {
-      setFile(null);
-      setPreviewUrl(null);
-      setId(null);
-      setFileName(null);
-      setOriginalName(null);
-      setByte(null);
-      setSize(null);
+      // setFile(null);
+      // setPreviewUrl(null);
+      // setId(null);
+      // setFileName(null);
+      // setOriginalName(null);
+      // setByte(null);
+      // setSize(null);
     }
   };
 
@@ -119,6 +96,7 @@ const useSetImageFile = () => {
     if (error) return;
     setIsLoading(true);
 
+    // 업로드
     const storage = getStorage();
     const storageRef = ref(storage, `images/${uid}/${fileName}`);
     const downloadURL = await uploadBytes(storageRef, img).then(async () => {
@@ -153,7 +131,6 @@ const useSetImageFile = () => {
     size,
     error,
     reset,
-    gradient,
     isLoading,
   };
 };

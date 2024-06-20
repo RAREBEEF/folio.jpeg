@@ -39,7 +39,7 @@ const Modal = ({
       style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
       className={`pointer-events-all fixed bottom-0 left-0 right-0 top-0 z-50 m-auto flex min-w-[350px] items-center justify-center opacity-100`}
     >
-      <div className="xs:max-w-screen relative rounded-xl border-2 bg-shark-50 xs:aspect-auto">
+      <div className="relative rounded-xl border-2 bg-shark-50 xs:aspect-auto xs:min-w-[340px] xs:max-w-[95vw]">
         <button className="absolute right-4 top-4 h-5 w-5" onClick={closeModal}>
           <XSvg />
         </button>

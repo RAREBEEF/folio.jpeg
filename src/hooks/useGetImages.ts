@@ -15,7 +15,7 @@ import {
   query,
   startAfter,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import _ from "lodash";
 import { Filter } from "@/types";
@@ -31,6 +31,11 @@ const useGetImages = (type: string) => {
   > | null>(lastVisibleState(type));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [lastPage, setLastPage] = useState<boolean>(false);
+
+  // 다른 타입이 들어오면 lastPage를 초기화한다.
+  useEffect(() => {
+    setLastPage(false);
+  }, [type]);
 
   // 로딩에 딜레이 발생시키기
   const delay = (ms: number) => {

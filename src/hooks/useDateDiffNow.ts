@@ -48,6 +48,8 @@ const useDateDiffNow = () => {
       diffSummary = `${minutes}분 전`;
     } else if (seconds > 0) {
       diffSummary = `${seconds}초 전`;
+    } else {
+      diffSummary = "방금 전";
     }
 
     return { years, months, days, hours, minutes, seconds, diffSummary };

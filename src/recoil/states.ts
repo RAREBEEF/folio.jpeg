@@ -7,6 +7,7 @@ import {
   Grid,
   ImageDataPages,
   ImageItem,
+  InAppNotification,
   UserData,
 } from "@/types";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
@@ -16,8 +17,8 @@ export const authStatusState = atom({
   key: "authStatusState",
   default: { status: "pending", data: null } as AuthStatus,
 });
-export const pageUserDataState = atomFamily({
-  key: "pageUserDataState",
+export const userDataState = atomFamily({
+  key: "userDataState",
   default: (displayId: string): UserData | null => {
     return null;
   },
@@ -91,4 +92,24 @@ export const gridState = atom<Grid>({
 export const alertState = atom<Alert>({
   key: "alertState",
   default: { text: null, createdAt: null, type: "default", show: false },
+});
+
+export const inAppNotificationsState = atom<{
+  notifications: Array<InAppNotification>;
+}>({
+  key: "inAppNotifications",
+  default: {
+    notifications: [],
+  },
+});
+
+export const inAppNotificationHistoryState = atom<{
+  notificationHistory: Array<InAppNotification>;
+  lastPage: boolean;
+}>({
+  key: "inAppNotificationHistory",
+  default: {
+    notificationHistory: [],
+    lastPage: false,
+  },
 });

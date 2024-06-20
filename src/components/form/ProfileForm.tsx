@@ -3,20 +3,32 @@
 import Button from "../Button";
 import { updateProfile } from "firebase/auth";
 import { auth, db } from "@/fb";
-import { FormEvent, KeyboardEvent, useRef, useState } from "react";
+import {
+  FormEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Loading from "../Loading";
 import useInput from "@/hooks/useInput";
 import { useRecoilState } from "recoil";
 import _ from "lodash";
 import useSetImageFile from "@/hooks/useSetImageFile";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
 import useGetExtraUserData from "@/hooks/useGetExtraUserData";
 import ProfileImage from "../ProfileImage";
-import { alertState, authStatusState } from "@/recoil/states";
+import { alertState, authStatusState, userDataState } from "@/recoil/states";
+import { deleteObject, getStorage, ref } from "firebase/storage";
 
 const ProfileForm = () => {
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
+  const [userData, setUserData] = useRecoilState(
+    userDataState(authStatus.data?.displayId || ""),
+  );
   const [alert, setAlert] = useRecoilState(alertState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,12 +47,27 @@ const ProfileForm = () => {
     value: displayName,
     setValue: setDisplayName,
     onChange: onDisplayNameChange,
-  } = useInput("");
+  } = useInput(authStatus.data?.displayName || "");
   const {
     value: displayId,
     setValue: setDisplayId,
     onChange: onDisplayIdChange,
-  } = useInput("");
+  } = useInput(authStatus.data?.displayId || "");
+  const [defaultImg, setDefaultImg] = useState<boolean>(
+    authStatus.data?.photoURL ? false : true,
+  );
+
+  console.log(file);
+
+  // useEffect(() => {
+  //   const prevImg = authStatus.data?.photoURL
+  //    // 현재 프사가 있고,
+  //   // // 첨부도 없는데 기본도 아님
+  //   // //
+  //   // 현재 프사가 없고
+  //   // // 첨부 파일이없음
+  //   if ((prevImg && !file && !defaultImg) || (!prevImg && !file))
+  // }, [])
 
   // 등록
   const onSubmit = async (e: FormEvent) => {
@@ -95,6 +122,19 @@ const ProfileForm = () => {
         text: "사용자명은 2~16 글자 사이로 정해주세요.",
       });
       return;
+    } else if (
+      authStatus.data?.displayId === displayId &&
+      authStatus.data.displayName === displayName &&
+      ((authStatus.data.photoURL && !file && !defaultImg) ||
+        (!authStatus.data.photoURL && !file))
+    ) {
+      setAlert({
+        show: true,
+        type: "warning",
+        createdAt: Date.now(),
+        text: "변경사항이 존재하지 않습니다.",
+      });
+      return;
     }
 
     setIsLoading(true);
@@ -103,7 +143,7 @@ const ProfileForm = () => {
       // 사용자명 중복 체크
       const extraUserData = await getExtraUserData(displayId);
 
-      if (extraUserData) {
+      if (extraUserData && extraUserData.uid !== authStatus.data?.uid) {
         setAlert({
           show: true,
           type: "warning",
@@ -113,15 +153,37 @@ const ProfileForm = () => {
         return;
       }
 
-      let photoURL: string | null = null;
+      // let photoURL: string | null =
+      //   !defaultImg && authStatus.data?.photoURL
+      //     ? authStatus.data?.photoURL
+      //     : "";
+      let photoURL: string | null = authStatus.data?.photoURL
+        ? authStatus.data?.photoURL
+        : "";
 
-      // 프로필 이미지 업로드
+      // 새 프로필 이미지 업로드 및 이미지 url 불러오기
       if (file && imageId) {
         photoURL = (await setImageFile(user.uid, imageId, file)) || null;
       }
 
+      // 이전 프로필 이미지가 존재한데
+      // 기본 이미지로 바꾸거나 새 이미지를 업로드하는 경우
+      // 기존 프로필 이미지 삭제
+      if (authStatus.data?.photoURL && (defaultImg || file)) {
+        const regex = /images%2F([^?]+)/;
+        const prevImgPathMatch = authStatus.data.photoURL.match(regex);
+
+        if (prevImgPathMatch) {
+          const prevImgPath = prevImgPathMatch[1].replaceAll("%2F", "/");
+          const storage = getStorage();
+          const storageRef = ref(storage, `images/${prevImgPath}`);
+          await deleteObject(storageRef).catch((error) => {});
+        }
+      }
+
       // 오류시 복원할 이전 상태
       let prevAuthStatus: AuthStatus;
+      let prevuserData: UserData;
 
       // 유저 데이터 상태 업데이트
       setAuthStatus((prev) => {
@@ -138,14 +200,31 @@ const ProfileForm = () => {
           },
         };
       });
-
-      // 유저 데이터 db 업데이트
-      const docRef = doc(db, "users", user.uid);
-      await Promise.all([
-        setDoc(docRef, {
+      setUserData((prev) => {
+        if (!prev) return prev;
+        prevuserData = prev;
+        return {
+          ...prev,
+          displayName,
           displayId,
           photoURL,
-        }),
+        };
+      });
+
+      // 유저 데이터 db 업데이트 및 이전 프로필사진 삭제
+      const docRef = doc(db, "users", user.uid);
+      await Promise.all([
+        authStatus.data?.displayId
+          ? updateDoc(docRef, {
+              displayId,
+              photoURL,
+            })
+          : setDoc(docRef, {
+              displayId,
+              photoURL,
+              follower: [],
+              following: [],
+            }),
         updateProfile(user, {
           displayName,
           photoURL,
@@ -162,6 +241,7 @@ const ProfileForm = () => {
         .catch((error) => {
           // 오류시 상태 롤백
           setAuthStatus(prevAuthStatus);
+          setUserData(prevuserData);
         });
     } catch (error) {
       setAlert({
@@ -179,6 +259,20 @@ const ProfileForm = () => {
     if (e.key === "/" || e.key === "-" || e.key === " ") e.preventDefault();
   };
 
+  const onDefaultImgClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const fileInput = fileInputRef.current;
+    if (!fileInput) return;
+    fileInput.value = "";
+    reset();
+    setDefaultImg(true);
+  };
+
+  useEffect(() => {
+    if (file) setDefaultImg(false);
+  }, [file]);
+
   return (
     <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
       <div className="flex grow flex-col justify-between gap-12">
@@ -189,7 +283,15 @@ const ProfileForm = () => {
             }}
             className={`group relative m-auto w-[60%] cursor-pointer rounded-full`}
           >
-            <ProfileImage url={previewUrl} />
+            <ProfileImage
+              url={
+                previewUrl
+                  ? previewUrl
+                  : defaultImg
+                    ? ""
+                    : authStatus.data?.photoURL || ""
+              }
+            />
             <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-shark-100 px-2 py-1 text-shark-950 opacity-0 group-hover:opacity-80">
               이미지 변경
             </div>
@@ -203,14 +305,7 @@ const ProfileForm = () => {
             ></input>
           </label>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const fileInput = fileInputRef.current;
-              if (!fileInput) return;
-              fileInput.value = "";
-              reset();
-            }}
+            onClick={onDefaultImgClick}
             className="mb-4 text-xs text-shark-500 underline"
           >
             기본 이미지로

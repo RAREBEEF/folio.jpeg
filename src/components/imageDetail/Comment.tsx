@@ -12,7 +12,7 @@ import {
   alertState,
   authStatusState,
   commentsState,
-  pageUserDataState,
+  userDataState,
   usersDataState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -20,6 +20,7 @@ import ProfileCard from "./ProfileCard";
 import ProfileImage from "../ProfileImage";
 import Link from "next/link";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
+import useGetUserByUid from "@/hooks/useGetUserByUid";
 
 const Comment = ({
   imageId,
@@ -30,6 +31,7 @@ const Comment = ({
   comment: CommentType;
   parentId?: string | null;
 }) => {
+  const { getUserByUid } = useGetUserByUid();
   const [alert, setAlert] = useRecoilState(alertState);
   const [summaryText, setSummaryText] = useState<string>(
     comment.replies.length <= 0
@@ -38,13 +40,12 @@ const Comment = ({
   );
   const dateDiffNow = useDateDiffNow();
   const [displayId, setDisplayId] = useState<string>("");
-  const [pageUserData, setPageUserData] = useRecoilState(
-    pageUserDataState(displayId),
-  );
+  const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const authStatus = useRecoilValue(authStatusState);
   const setComments = useSetRecoilState(commentsState(imageId as string));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
+  const [isAuthorLoading, setIsAuthorLoading] = useState<boolean>(false);
 
   // 댓글 삭제
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -139,52 +140,32 @@ const Comment = ({
 
   // 작성자 상태 업데이트
   useEffect(() => {
-    if (!author) {
+    if (!author && !isAuthorLoading) {
       if (usersData[comment.uid]) {
         const data = usersData[comment.uid];
         setDisplayId(data.displayId || "");
         setAuthor(data);
       } else {
+        setIsAuthorLoading(true);
         console.log("작성자 상태 업데이트");
         const uid = comment.uid;
 
         (async () => {
-          let userData: UserData;
-          let extraUserData: ExtraUserData;
-
-          const docRef = doc(db, "users", uid);
-
-          await Promise.all([
-            fetch("/api/get-user", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ uid }),
-            }).then(async (response) => {
-              const { data } = await response.json();
-              userData = data;
-            }),
-            getDoc(docRef).then((doc) => {
-              extraUserData = doc.data() as ExtraUserData;
-            }),
-          ]).then(() => {
-            const data = { ...userData, ...extraUserData, uid };
-            setDisplayId(extraUserData.displayId);
-            setAuthor(data);
-            setUsersData((prev) => ({ ...prev, [uid]: data }));
-          });
+          const data = await getUserByUid(uid);
+          setDisplayId(data?.displayId || "");
+          setAuthor(data);
+          setIsAuthorLoading(false);
         })();
       }
     }
-  }, [author, usersData, setUsersData, comment.uid]);
+  }, [author, comment.uid, getUserByUid, isAuthorLoading, usersData]);
 
-  // page user data 전역 상태 업데이트
+  // user data 전역 상태 업데이트
   useEffect(() => {
     if (displayId && author) {
-      setPageUserData(author);
+      setUserData(author);
     }
-  }, [author, displayId, setPageUserData]);
+  }, [author, displayId, setUserData]);
 
   const onRepliesToggle = (e: ChangeEvent<HTMLDetailsElement>) => {
     if (e.target.open) {
@@ -260,23 +241,29 @@ const Comment = ({
                     {summaryText}
                   </div>
                 </summary>
-                <ol className="mt-2">
-                  {comment.replies.map((reply, j) => {
-                    return (
-                      <Comment
-                        imageId={imageId}
-                        comment={reply}
-                        key={j}
-                        parentId={comment.id}
-                      />
-                    );
-                  })}
-                </ol>
+                {author && summaryText === "닫기" && (
+                  <ol className="mt-2 flex flex-col gap-2">
+                    {comment.replies.map((reply, j) => {
+                      return (
+                        <Comment
+                          imageId={imageId}
+                          comment={reply}
+                          key={j}
+                          parentId={comment.id}
+                        />
+                      );
+                    })}
+                  </ol>
+                )}
               </Fragment>
             )}
 
             <div className="mt-4">
-              <CommentForm imageId={imageId} parentId={comment.id} />
+              <CommentForm
+                author={author}
+                imageId={imageId}
+                parentId={comment.id}
+              />
             </div>
           </details>
         )}

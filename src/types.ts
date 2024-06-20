@@ -13,10 +13,16 @@ export interface Filter {
 export interface UserData extends User {
   // 불러오기 전은 undefined, 불러왔지만 존재하지 않으면 null
   displayId?: string | undefined | null;
+  following?: Array<string>;
+  follower?: Array<string>;
+  fcmToken?: string | null;
 }
 export interface ExtraUserData {
   displayId: string;
   photoURL: string;
+  following: Array<string>;
+  follower: Array<string>;
+  fcmToken: string | null;
 }
 
 type AuthStatusUserData = {
@@ -48,6 +54,7 @@ export interface ImageDocData {
   };
   tags: Array<string>;
   likes: Array<string>;
+  likeCount: number;
   themeColor: string;
 }
 export interface ImageData extends ImageDocData {
@@ -62,6 +69,7 @@ export type ImageItem = {
   createdAt: number;
   uid: string;
   likes: Array<string>;
+  likeCount: number;
   tags: Array<string>;
   byte: number;
   url: string;
@@ -101,6 +109,7 @@ export interface Comment {
   createdAt: number;
   uid: string;
   replies: Array<Comment>;
+  fcmTokens: Array<string>;
 }
 export type Comments = { [key in string]: Comment };
 
@@ -122,4 +131,11 @@ export interface Alert {
   createdAt: number | null;
   type: "default" | "success" | "warning";
   show: boolean;
+}
+export interface InAppNotification {
+  title: string;
+  body: string | null;
+  createdAt: number;
+  image: string;
+  url: string;
 }

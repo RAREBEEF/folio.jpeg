@@ -2,23 +2,35 @@
 
 import {
   authStatusState,
-  pageUserDataState,
+  loginModalState,
+  userDataState,
   usersDataState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Loading from "../Loading";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import useGetExtraUserData from "@/hooks/useGetExtraUserData";
-import { UserData } from "@/types";
 import ProfileImage from "../ProfileImage";
 import Link from "next/link";
 import SavedTab from "./SavedTab";
 import UserImageList from "../imageList/UserImageList";
+import Button from "../Button";
+import { useRouter } from "next/navigation";
+import FollowBtn from "./FollowBtn";
+import Follow from "./Follow";
+import useGetUserBydisplayId from "@/hooks/useGetUserByDisplayId";
 
 const UserDetail = () => {
+  const { getUserByDisplayId } = useGetUserBydisplayId();
+  const { replace } = useRouter();
+  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
   const params = useSearchParams();
-  const { displayId } = useParams();
+  const { displayId: dpid } = useParams();
+  const displayId = useMemo(
+    (): string => JSON.stringify(dpid).replaceAll('"', ""),
+    [dpid],
+  );
   const tab = useMemo(
     () => (params.get("tab") === "uploaded" ? "uploaded" : "saved"),
     [params],
@@ -26,55 +38,75 @@ const UserDetail = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { getExtraUserData } = useGetExtraUserData();
   const authStatus = useRecoilValue(authStatusState);
-  const [pageUserData, setPageUserData] = useRecoilState(
-    pageUserDataState(JSON.stringify(displayId).replaceAll('"', "")),
-  );
+  const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
 
   useEffect(() => {
-    // displayId가 없거나 pageUserData가 이미 있거나 현재 불러오는 중이면 불러오지 않음
-    if (!displayId || pageUserData || isLoading) return;
+    // displayId가 없거나 userData가 이미 있거나 현재 불러오는 중이면 불러오지 않음
+    if (!displayId || userData || isLoading) return;
 
     setIsLoading(true);
 
     // url 파라미터에서 displayId 가져오기
-    const curDisplayId = JSON.stringify(displayId).replaceAll('"', "");
+    const curDisplayId = displayId;
 
-    // 현재 페이지가 내 페이지이면 지금 갖고있는 내 userData를 pageUserData 상태에 할당
+    // 현재 페이지가 내 페이지이면 지금 갖고있는 내 userData를 userData 상태에 할당
     if (
       authStatus.status === "signedIn" &&
       authStatus.data &&
       authStatus.data.displayId === curDisplayId
     ) {
-      setPageUserData(authStatus.data);
+      const myData = authStatus.data;
+      setUserData(myData);
+      setUsersData((prev) => ({ ...prev, [myData.uid]: myData }));
       setIsLoading(false);
     } else {
-      // 내 페이지가 아니면 해당 유저의 정보를 불러와서 pageUserData 상태에 할당
-      // 해당 유저의 displayId로 extraUserData 불러오기
-      (async () => {
-        await getExtraUserData(curDisplayId).then(async (extraUserData) => {
-          if (!extraUserData) return;
+      // 내 페이지가 아니면 해당 유저의 정보를 불러와서 userData 상태에 할당
+      // usersData에서 데이터 찾아보기
+      const users = Object.entries(usersData);
+      const userIndex = users.findIndex(([uid, userData]) => {
+        userData.displayId === displayId;
+      });
 
-          const { uid } = extraUserData;
+      // usersData에 데이터가 있으면
+      if (userIndex !== -1) {
+        const data = users[userIndex][1];
+        setUserData(data);
+        setIsLoading(false);
+      } else {
+        // usersData에 데이터가 없으면
+        // 해당 유저의 displayId로 extraUserData 불러오기
+        (async () => {
+          const data = await getUserByDisplayId(curDisplayId);
+          setUserData(data);
+          setIsLoading(false);
+          // await getExtraUserData(curDisplayId).then(async (extraUserData) => {
+          //   if (!extraUserData) {
+          //     replace("/");
+          //     return;
+          //   }
 
-          // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
-          await fetch("/api/get-user", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ uid }),
-          }).then(async (response) => {
-            const { data: userData } = await response.json();
+          //   const { uid } = extraUserData;
 
-            const data = { ...userData, ...extraUserData };
+          //   // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
+          //   await fetch("/api/get-user", {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //     },
+          //     body: JSON.stringify({ uid }),
+          //   }).then(async (response) => {
+          //     const { data: userData } = await response.json();
 
-            setUsersData((prev) => ({ ...prev, [uid]: data }));
-            setPageUserData(data);
-            setIsLoading(false);
-          });
-        });
-      })();
+          //     const data = { ...userData, ...extraUserData };
+
+          //     setUsersData((prev) => ({ ...prev, [uid]: data }));
+          //     setUserData(data);
+          //     setIsLoading(false);
+          //   });
+          // });
+        })();
+      }
     }
   }, [
     authStatus.data,
@@ -82,33 +114,52 @@ const UserDetail = () => {
     displayId,
     getExtraUserData,
     isLoading,
-    pageUserData,
-    setPageUserData,
+    userData,
+    replace,
+    setUserData,
     setUsersData,
+    usersData,
+    getUserByDisplayId,
   ]);
+
+  const onProfileEditClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLoginModal({ show: true, showInit: true });
+  };
 
   return (
     <div className="h-full bg-shark-50">
-      {!isLoading && pageUserData ? (
+      {!isLoading && userData ? (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col items-center gap-5 p-12">
+          <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">
+            {authStatus.data?.uid === userData.uid && (
+              <div className="absolute right-2 top-2 text-xs">
+                <Button onClick={onProfileEditClick}>
+                  <div>프로필 수정</div>
+                </Button>
+              </div>
+            )}
             <div className="w-[50%] max-w-72">
-              <ProfileImage url={pageUserData?.photoURL} />
+              <ProfileImage url={userData.photoURL} />
             </div>
             <h3 className="flex flex-col items-center">
               <span className="text-2xl font-bold text-shark-950">
-                {pageUserData.displayName}
+                {userData.displayName}
               </span>
               <span className="text-base text-shark-500">
-                @{pageUserData.displayId}
+                @{userData.displayId}
               </span>
             </h3>
-            {/* <h3>uid: {pageUserData.uid}</h3>
-            <h3>displayName: {pageUserData.displayName}</h3>
-            <h3>displayId: {pageUserData.displayId}</h3> */}
           </div>
 
-          {/* <hr className="border" /> */}
+          <div className="flex flex-col items-center justify-center gap-4 pb-8">
+            {authStatus.data && authStatus.data?.uid !== userData.uid && (
+              <div className="text-sm">
+                <FollowBtn userData={userData} />
+              </div>
+            )}
+            <Follow displayId={displayId} />
+          </div>
 
           <nav className="flex justify-center gap-12 text-lg font-semibold">
             <Link
@@ -124,11 +175,11 @@ const UserDetail = () => {
               저장한 이미지
             </Link>
           </nav>
-          <div className="">
+          <div>
             {tab === "uploaded" ? (
-              <UserImageList pageUserData={pageUserData} />
+              <UserImageList userData={userData} />
             ) : (
-              <SavedTab pageUserData={pageUserData} />
+              <SavedTab userData={userData} />
             )}
           </div>
         </div>

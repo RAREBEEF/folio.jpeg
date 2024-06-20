@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  imageItemState,
-  pageUserDataState,
-  usersDataState,
-} from "@/recoil/states";
+import { imageItemState, userDataState, usersDataState } from "@/recoil/states";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,15 +16,15 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { ExtraUserData, UserData } from "@/types";
 import ProfileCard from "./ProfileCard";
+import ManageImage from "./ManageImage";
 
 const ImageDetail = () => {
+  const { replace } = useRouter();
   const [displayId, setDisplayId] = useState<string>("");
   const { getImageItem, isLoading } = useGetImageItem();
   const { back } = useRouter();
   const { id } = useParams();
-  const [pageUserData, setPageUserData] = useRecoilState(
-    pageUserDataState(displayId),
-  );
+  const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
   const [imageItem, setImageItem] = useRecoilState(
@@ -40,10 +36,14 @@ const ImageDetail = () => {
     if (id && typeof id === "string" && !imageItem && !isLoading) {
       (async () => {
         const imageItem = await getImageItem(id);
-        setImageItem(imageItem);
+        if (imageItem) {
+          setImageItem(imageItem);
+        } else {
+          replace("/");
+        }
       })();
     }
-  }, [imageItem, id, getImageItem, setImageItem, isLoading]);
+  }, [imageItem, id, getImageItem, setImageItem, isLoading, replace]);
 
   // 작성자 상태 업데이트
   useEffect(() => {
@@ -90,9 +90,9 @@ const ImageDetail = () => {
   // page user data 전역 상태 업데이트
   useEffect(() => {
     if (displayId && author) {
-      setPageUserData(author);
+      setUserData(author);
     }
-  }, [author, displayId, setPageUserData]);
+  }, [author, displayId, setUserData]);
 
   return (
     <div className="relative h-full bg-shark-50 px-10 xs:px-4">
@@ -107,13 +107,12 @@ const ImageDetail = () => {
             >
               <ArrowIcon className="h-5 fill-shark-700 transition-all hover:fill-shark-500" />
             </button>
-            {/* <ManageImage id={JSON.stringify(id).replaceAll('"', "")} /> */}
           </nav>
 
           <div className="m-auto flex w-full max-w-[1440px] flex-col items-center rounded-lg p-10 shadow-lg xs:p-4">
             {imageItem && (
               <div className="relative flex w-full gap-8 sm:flex-col sm:gap-4">
-                <div className="z-20 shrink-0 basis-[50%] text-center">
+                <div className="z-10 shrink-0 basis-[50%] text-center">
                   <div
                     style={{
                       aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
@@ -134,7 +133,10 @@ const ImageDetail = () => {
                   </div>
                 </div>
                 <div className="basis-[50%] p-2">
-                  <div>{<ProfileCard profileData={author} />}</div>
+                  <div className="flex justify-between">
+                    {<ProfileCard profileData={author} />}
+                    <div className="">{<ManageImage id={imageItem.id} />}</div>
+                  </div>
 
                   <div className="z-20 my-4 break-keep text-shark-950">
                     <h2 className="text-xl font-semibold">{imageItem.title}</h2>
@@ -154,9 +156,9 @@ const ImageDetail = () => {
 
                   <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 py-4">
                     <div className="mb-4">
-                      <Like />
+                      <Like author={author} />
                     </div>
-                    <CommentForm imageId={imageItem.id} />
+                    <CommentForm imageId={imageItem.id} author={author} />
                   </div>
                 </div>
               </div>
@@ -165,7 +167,7 @@ const ImageDetail = () => {
 
           <div className="mt-12">
             <h3 className="text-center text-lg font-semibold text-shark-950">
-              비슷한 이미지
+              추천 이미지
             </h3>
             <RecommendImageList imageItem={imageItem} />
           </div>

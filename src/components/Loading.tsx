@@ -1,3 +1,4 @@
+"use client";
 import DotSvg from "@/icons/circle-solid.svg";
 import LoadingSvg from "@/icons/spinner-solid.svg";
 

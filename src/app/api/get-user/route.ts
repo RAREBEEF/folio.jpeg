@@ -18,6 +18,7 @@ export async function POST(req: Request) {
 
     if (!admin.apps.length) {
       admin.initializeApp({
+        storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
         credential: admin.credential.cert(serviceAccount),
       });
     }
@@ -33,7 +34,8 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     return NextResponse.json({
-      data: "Faild to get user data",
+      data: null,
+      error: err,
       status: 500,
     });
   }

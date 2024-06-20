@@ -14,8 +14,6 @@ const ImageGrid = ({ type }: { type: string }) => {
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  console.log(imageDataPages);
-
   // 컨테이너 너비가 바뀌면 그리드도 업데이트
   useEffect(() => {
     if (containerWidth === 0) return;

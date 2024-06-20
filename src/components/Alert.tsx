@@ -28,14 +28,14 @@ const Alert = () => {
 
   return (
     <div
-      className={`bg-alto-200 text-alto-900 pointer-events-none fixed bottom-24 left-0 right-0 z-50 m-auto flex min-h-12 w-fit select-none items-center justify-center gap-4 rounded-xl px-8 py-4 text-lg font-semibold shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
+      className={`pointer-events-none fixed bottom-24 left-0 right-0 z-50 m-auto flex min-h-12 w-fit select-none items-center justify-center gap-4 rounded-xl bg-alto-200 px-8 py-4 text-lg font-semibold text-alto-900 shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
     >
       {alert.type === "success" ? (
-        <CircleCheckIcon className="fill-alto-900 aspect-square h-8" />
+        <CircleCheckIcon className="aspect-square h-8 fill-alto-900" />
       ) : alert.type === "warning" ? (
-        <CircleExclamationIcon className="fill-alto-900 aspect-square h-8" />
+        <CircleExclamationIcon className="aspect-square h-8 fill-alto-900" />
       ) : null}
-      <div className="break-keep leading-tight">{alert.text}</div>
+      <div className="whitespace-pre-line leading-tight">{alert.text}</div>
     </div>
   );
 };

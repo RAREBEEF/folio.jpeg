@@ -8,6 +8,8 @@ import {
   authStatusState,
   foldersState,
   loginModalState,
+  userDataState,
+  usersDataState,
 } from "@/recoil/states";
 import _ from "lodash";
 import {
@@ -35,6 +37,10 @@ const Auth = () => {
   const [myFolders, setMyFolders] = useRecoilState(
     foldersState(authStatus.data?.uid || ""),
   );
+  const [userData, setUserData] = useRecoilState(
+    userDataState(authStatus.data?.displayId || ""),
+  );
+  const [usersData, setUsersData] = useRecoilState(usersDataState);
 
   // auth 변경 감지
   useEffect(() => {
@@ -43,7 +49,6 @@ const Auth = () => {
       // 인증 상태가 변경되면 새로운 유저데이터로 업데이트하고 extra user data와 folder 데이터를 불러올 수 있도록 상태 변경.
       if (data) {
         setAuthStatus({ data, status: "pending" });
-
         setMyFolders(null);
       } else {
         setAuthStatus({ data: null, status: "signedOut" });
@@ -51,17 +56,6 @@ const Auth = () => {
       }
     });
   }, [setAuthStatus, setMyFolders]);
-
-  // 로그인과 초기설정이 모두 완료된 경우 로그인 모달 닫기
-  useEffect(() => {
-    console.log(`
-      Auth Status: ${authStatus.status}
-      Auth Data: ${!!authStatus.data}
-      `);
-    if (authStatus.status === "signedIn") {
-      setLoginModal({ show: false });
-    }
-  }, [setLoginModal, authStatus]);
 
   // extraUserData 체크하고 불러오기
   useEffect(() => {
@@ -76,7 +70,7 @@ const Auth = () => {
 
         // db에 extraData 요청
         (async () => {
-          console.log("get extra user data");
+          // console.log("get extra user data");
           const docRef = doc(db, "users", uid);
           const docSnap = await getDoc(docRef);
           // db에 데이터가 없으면
@@ -142,7 +136,7 @@ const Auth = () => {
 
       // db에서 폴더 데이터를 불러온다.
       (async () => {
-        console.log("get folders");
+        // console.log("get folders");
         const foldersRef = collection(db, "users", uid, "folders");
         const q = query(foldersRef, orderBy("updatedAt", "desc"));
         const docSnap = await getDocs(q);
@@ -158,6 +152,20 @@ const Auth = () => {
       })();
     }
   }, [authStatus.data, folderPending, myFolders, setMyFolders]);
+
+  // 로그인과 초기설정이 모두 완료된 경우 로그인 모달을 닫고 유저 관련 상태에 내 데이터 추가
+  useEffect(() => {
+    // console.log(`
+    //     Auth Status: ${authStatus.status}
+    //     Auth Data: ${!!authStatus.data}
+    //     `);
+    if (authStatus.status === "signedIn") {
+      setLoginModal({ show: false });
+      const data = authStatus.data as UserData;
+      setUserData(data);
+      setUsersData((prev) => ({ [data.uid]: data, ...prev }));
+    }
+  }, [setLoginModal, authStatus, setUserData, setUsersData]);
 
   // 로그인 모달 닫는 함수
   const closeModal = () => {

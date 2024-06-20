@@ -17,11 +17,16 @@ const ManageImage = ({ id }: { id: string }) => {
   const authStatus = useRecoilValue(authStatusState);
   const resetUserGrid = useResetGrid("user-" + authStatus.data?.uid);
   const resetHomeGrid = useResetGrid("home");
+  const resetFollowingGrid = useResetGrid("following");
   const [imageItem, setImageItem] = useRecoilState(imageItemState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!imageItem || authStatus.data?.uid !== imageItem.uid) return;
+
+    const ok = window.confirm("이미지를 삭제하시겠습니까?");
+
+    if (!ok) return;
 
     setIsLoading(true);
 
@@ -30,11 +35,16 @@ const ManageImage = ({ id }: { id: string }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ imageId: id }),
+      body: JSON.stringify({
+        imageId: id,
+        uid: imageItem.uid,
+        fileName: imageItem.fileName,
+      }),
     })
       .then(() => {
         setImageItem(null);
         resetHomeGrid();
+        resetFollowingGrid();
         resetUserGrid();
         setAlert({
           show: true,
@@ -61,15 +71,15 @@ const ManageImage = ({ id }: { id: string }) => {
     imageItem &&
     authStatus.data &&
     imageItem.uid === authStatus.data.uid && (
-      <div className="flex gap-4 rounded-l bg-shark-50 p-2 pr-2 text-xs">
+      <div className="flex gap-2 rounded-l bg-shark-50 p-2 pr-2 text-xs">
         <Link href={`/edit/${imageItem.id}`}>
-          <PenIcon className="h-8 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+          <PenIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
         </Link>
         <button onClick={onDeleteClick} disabled={isLoading}>
           {isLoading ? (
             <Loading />
           ) : (
-            <TrashIcon className="h-8 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+            <TrashIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
           )}
         </button>
       </div>

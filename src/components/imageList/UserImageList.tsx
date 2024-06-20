@@ -8,18 +8,18 @@ import ImageInfiniteScroller from "./ImageInfiniteScroller";
 import { where } from "firebase/firestore";
 import { UserData } from "@/types";
 
-const UserImageList = ({ pageUserData }: { pageUserData: UserData }) => {
+const UserImageList = ({ userData }: { userData: UserData }) => {
   const grid = useRecoilValue(gridState);
 
   return (
     <div className="relative h-full bg-shark-50">
-      <ImageGrid type={"user-" + pageUserData.uid} />
+      <ImageGrid type={"user-" + userData.uid} />
       {grid && (
         <ImageInfiniteScroller
-          type={"user-" + pageUserData.uid}
+          type={"user-" + userData.uid}
           filter={{
             orderBy: ["createdAt", "desc"],
-            where: where("uid", "==", pageUserData.uid),
+            where: where("uid", "==", userData.uid),
             // limit: grid.colCount * 5,
             limit: 2,
           }}

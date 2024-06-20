@@ -6,6 +6,7 @@ import LayoutHeader from "@/components/layouts/LayoutHeader";
 import LayoutFooter from "@/components/layouts/LaytoutFooter";
 import LayoutBody from "@/components/layouts/LayoutBody";
 import { Fragment } from "react";
+import Init from "@/components/Init";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
             <LayoutHeader />
             <LayoutBody>{children}</LayoutBody>
             <LayoutFooter />
+            <Init />
           </Fragment>
         </RecoilProvider>
       </body>

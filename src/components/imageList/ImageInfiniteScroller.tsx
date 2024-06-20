@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect, useRef } from "react";
+import { Fragment, MouseEvent, useEffect, useRef, useState } from "react";
 import useGetImages from "@/hooks/useGetImages";
 import Loading from "../Loading";
 import { useRecoilValue } from "recoil";
@@ -28,6 +28,7 @@ const ImageInfiniteScroller = ({
     DocumentData
   > | null>(lastVisibleState(type));
   const gridImageIds = useRecoilValue(gridImageIdsState(type));
+  const [imageCount, setImageCount] = useState<number>(0);
 
   // 무한 스크롤에 사용할 옵저버 (뷰포트에 감지되면 다음 페이지 불러온다.)
   useEffect(() => {
@@ -54,6 +55,13 @@ const ImageInfiniteScroller = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // 이미지 수
+  useEffect(() => {
+    if (!grid) return;
+    const count = grid.cols.reduce((acc, cur) => cur.items.length + acc, 0);
+    setImageCount(count);
+  }, [grid]);
+
   return !lastPage ? (
     <div
       ref={loadRef}
@@ -64,12 +72,16 @@ const ImageInfiniteScroller = ({
   ) : (
     grid && (
       <div className="h-[168px] pb-24 pt-12 text-center text-sm text-shark-500">
-        <p>
-          {grid.cols.reduce((acc, cur) => cur.items.length + acc, 0)} 이미지.
-        </p>
-        <button className="mt-4" onClick={onScrollToTopClick}>
-          맨 위로
-        </button>
+        {imageCount > 0 ? (
+          <div className="flex flex-col">
+            <p>{imageCount} 이미지.</p>
+            <button className="mt-4" onClick={onScrollToTopClick}>
+              맨 위로
+            </button>
+          </div>
+        ) : (
+          <div>이미지가 존재하지 않습니다.</div>
+        )}
         {/* 저장된 이미지의 로딩이 모두 끝나면 존재하지 않는 이미지의 id를 추려서 삭제한다. */}
         {/* 이러한 처리는 백엔드에서 하는게 좋겠지만 당장은 구현이 힘드니 여기에 임시로 구현한다.  */}
         {folder && lastPage && (
