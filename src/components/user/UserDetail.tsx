@@ -7,19 +7,19 @@ import {
   usersDataState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import { useParams, useSearchParams } from "next/navigation";
 import { MouseEvent, useEffect, useMemo, useState } from "react";
-import useGetExtraUserData from "@/hooks/useGetExtraUserData";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "@/components/user/ProfileImage";
 import Link from "next/link";
-import SavedTab from "./SavedTab";
+import SavedTab from "@/components/saveImage/SavedTab";
 import UserImageList from "../imageList/UserImageList";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 import FollowBtn from "./FollowBtn";
 import Follow from "./Follow";
 import useGetUserBydisplayId from "@/hooks/useGetUserByDisplayId";
+import Feedback from "./Feedback";
 
 const UserDetail = () => {
   const { getUserByDisplayId } = useGetUserBydisplayId();
@@ -36,14 +36,14 @@ const UserDetail = () => {
     [params],
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { getExtraUserData } = useGetExtraUserData();
   const authStatus = useRecoilValue(authStatusState);
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
 
   useEffect(() => {
     // displayId가 없거나 userData가 이미 있거나 현재 불러오는 중이면 불러오지 않음
-    if (!displayId || userData || isLoading) return;
+    if (!displayId || userData || isLoading || authStatus.status === "pending")
+      return;
 
     setIsLoading(true);
 
@@ -80,31 +80,6 @@ const UserDetail = () => {
           const data = await getUserByDisplayId(curDisplayId);
           setUserData(data);
           setIsLoading(false);
-          // await getExtraUserData(curDisplayId).then(async (extraUserData) => {
-          //   if (!extraUserData) {
-          //     replace("/");
-          //     return;
-          //   }
-
-          //   const { uid } = extraUserData;
-
-          //   // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
-          //   await fetch("/api/get-user", {
-          //     method: "POST",
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //     },
-          //     body: JSON.stringify({ uid }),
-          //   }).then(async (response) => {
-          //     const { data: userData } = await response.json();
-
-          //     const data = { ...userData, ...extraUserData };
-
-          //     setUsersData((prev) => ({ ...prev, [uid]: data }));
-          //     setUserData(data);
-          //     setIsLoading(false);
-          //   });
-          // });
         })();
       }
     }
@@ -112,7 +87,6 @@ const UserDetail = () => {
     authStatus.data,
     authStatus.status,
     displayId,
-    getExtraUserData,
     isLoading,
     userData,
     replace,
@@ -130,7 +104,7 @@ const UserDetail = () => {
   return (
     <div className="h-full bg-shark-50">
       {!isLoading && userData ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 pb-12">
           <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">
             {authStatus.data?.uid === userData.uid && (
               <div className="absolute right-2 top-2 text-xs">
@@ -161,15 +135,19 @@ const UserDetail = () => {
             <Follow displayId={displayId} />
           </div>
 
+          <Feedback />
+
           <nav className="flex justify-center gap-12 text-lg font-semibold">
             <Link
               href={`/${displayId}?tab=uploaded`}
+              scroll={false}
               className={`border-shark-950 ${tab === "uploaded" && "border-b-2"}`}
             >
               업로드한 이미지
             </Link>
             <Link
               href={`/${displayId}?tab=saved`}
+              scroll={false}
               className={`border-shark-950 ${tab === "saved" && "border-b-2"}`}
             >
               저장한 이미지

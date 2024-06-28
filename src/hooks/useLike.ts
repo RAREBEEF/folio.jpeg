@@ -15,8 +15,10 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
+import useErrorAlert from "./useErrorAlert";
 
 const useLike = (imageId: string | Array<string>) => {
+  const showErrorAlert = useErrorAlert();
   const sendFcm = useSendFcm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const setLoginModal = useSetRecoilState(loginModalState);
@@ -65,7 +67,6 @@ const useLike = (imageId: string | Array<string>) => {
 
     await updateDoc(docRef, {
       likes: arrayUnion(authStatus.data.uid),
-      likeCount: increment(1),
     })
       .then(async () => {
         // 사진 게시자에게 푸시 알림 전송
@@ -87,6 +88,7 @@ const useLike = (imageId: string | Array<string>) => {
           if (prev === null) return null;
           return { ...prev, likes: [...prevLikes] };
         });
+        showErrorAlert();
       })
       .finally(() => {
         setIsLoading(false);
@@ -115,7 +117,6 @@ const useLike = (imageId: string | Array<string>) => {
 
     await updateDoc(docRef, {
       likes: arrayRemove(authStatus.data.uid),
-      likeCount: increment(-1),
     })
       .catch((error) => {
         // 에러 시 롤백
@@ -123,6 +124,7 @@ const useLike = (imageId: string | Array<string>) => {
           if (prev === null) return null;
           return { ...prev, likes: [...prevLikes] };
         });
+        showErrorAlert();
       })
       .finally(() => {
         setIsLoading(false);

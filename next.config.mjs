@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import createProxyMiddleware from "http-proxy-middleware";
+
 const nextConfig = {
   webpack(config) {
     config.module.rules.push({

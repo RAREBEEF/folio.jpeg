@@ -1,6 +1,6 @@
 "use client";
 
-import PageHeader from "@/components/PageHeader";
+import PageHeader from "@/components/layouts/PageHeader";
 import FolderDetail from "@/components/user/FolderDetail";
 import _ from "lodash";
 import { useRecoilState } from "recoil";
@@ -10,7 +10,6 @@ import { useEffect, useMemo, useState } from "react";
 import useGetExtraUserData from "@/hooks/useGetExtraUserData";
 import useGetFolders from "@/hooks/useGetFolders";
 import { Folder } from "@/types";
-import Loading from "@/components/Loading";
 
 const FolderDetailPage = () => {
   const { replace } = useRouter();
@@ -23,11 +22,15 @@ const FolderDetailPage = () => {
   const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
   const folderName = useMemo(
     (): string =>
-      JSON.stringify(folderNameParam).replaceAll('"', "").replaceAll("-", " "),
+      decodeURIComponent(
+        JSON.stringify(folderNameParam)
+          .replaceAll('"', "")
+          .replaceAll("-", " "),
+      ),
     [folderNameParam],
   );
   const displayId = useMemo(
-    (): string => JSON.stringify(dpid).replaceAll('"', ""),
+    (): string => decodeURIComponent(JSON.stringify(dpid).replaceAll('"', "")),
     [dpid],
   );
 
@@ -46,8 +49,8 @@ const FolderDetailPage = () => {
       if (!folders && !pageUid) {
         (async () => {
           const extraUserData = await getExtraUserData(displayId);
-          if (extraUserData) {
-            setPageUid(extraUserData.uid);
+          if (extraUserData?.data) {
+            setPageUid(extraUserData.data.uid);
           } else {
             // extraUserData 없으면 홈으로
             replace("/");
@@ -72,11 +75,10 @@ const FolderDetailPage = () => {
     if (!folders && pageUid) {
       // db에서 해당 유저의 폴더 목록 데이터 불러오기
       (async () => {
-        console.log("get folder");
         await getFolders(pageUid)
           .then((folders) => {
             // 폴더 목록 데이터가 존재하지 않거나 불러온 폴더의 uid와 현재 갖고 있는 uid가 일치하지 않으면
-            if (folders.length <= 0 || folders[0].uid !== pageUid) {
+            if (!folders || folders.length <= 0 || folders[0].uid !== pageUid) {
               // 홈으로 이동
               replace("/");
             } else {
@@ -84,7 +86,7 @@ const FolderDetailPage = () => {
               setFolders(folders);
             }
           })
-          .catch(() => {
+          .catch((error) => {
             replace("/");
           });
       })();

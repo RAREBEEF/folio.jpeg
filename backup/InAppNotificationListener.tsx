@@ -36,6 +36,7 @@ const InAppNotificationListener = () => {
       setInAppNotifications((prev) => ({
         ...prev,
         notifications: notifications.reverse(),
+        lastUpdate: Date.now(),
       }));
     });
 

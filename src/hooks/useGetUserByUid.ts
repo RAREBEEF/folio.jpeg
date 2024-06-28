@@ -5,8 +5,10 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import _ from "lodash";
 import { usersDataState } from "@/recoil/states";
+import useErrorAlert from "./useErrorAlert";
 
 const useGetUserByUid = () => {
+  const showErrorAlert = useErrorAlert();
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -42,12 +44,17 @@ const useGetUserByUid = () => {
   };
 
   const getUserByUid = async (uid: string): Promise<UserData | null> => {
-    if (isLoading) return null;
     setIsLoading(true);
-    console.log("load user");
-    const userData = fetchUser(uid);
-    setIsLoading(false);
-    return userData;
+    try {
+      const userData = fetchUser(uid);
+      setIsLoading(false);
+      return userData;
+    } catch (error) {
+      showErrorAlert();
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return { getUserByUid, isLoading };

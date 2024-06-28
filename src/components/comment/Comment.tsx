@@ -1,10 +1,5 @@
-import {
-  Comment as CommentType,
-  Comments,
-  ExtraUserData,
-  UserData,
-} from "@/types";
-import CommentForm from "../form/CommentForm";
+import { Comment as CommentType, Comments, UserData } from "@/types";
+import CommentForm from "@/components/comment/CommentForm";
 import { ChangeEvent, Fragment, MouseEvent, useEffect, useState } from "react";
 import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
@@ -16,8 +11,7 @@ import {
   usersDataState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import ProfileCard from "./ProfileCard";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "@/components/user/ProfileImage";
 import Link from "next/link";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
 import useGetUserByUid from "@/hooks/useGetUserByUid";
@@ -147,7 +141,6 @@ const Comment = ({
         setAuthor(data);
       } else {
         setIsAuthorLoading(true);
-        console.log("작성자 상태 업데이트");
         const uid = comment.uid;
 
         (async () => {

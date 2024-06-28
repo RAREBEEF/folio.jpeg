@@ -1,15 +1,15 @@
-import useGetUsers from "@/hooks/useGetUsers";
+import useGetUsersByUids from "@/hooks/useGetUsersByUids";
 import { userDataState, usersDataState } from "@/recoil/states";
 import { UserData } from "@/types";
 import _ from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
-import ProfileCard from "../imageDetail/ProfileCard";
-import Loading from "../Loading";
+import ProfileCard from "@/components/user/ProfileCard";
+import Loading from "@/components/loading/Loading";
 
 const FollowModal = ({ users }: { users: Array<string> }) => {
   const loadRef = useRef<HTMLDivElement>(null);
-  const { getUsers, isLoading } = useGetUsers();
+  const { getUsers, isLoading } = useGetUsersByUids();
   const [userStack, setUserStack] = useState<Array<string>>(users);
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [userList, setUserList] = useState<Array<UserData>>([]);
@@ -60,16 +60,18 @@ const FollowModal = ({ users }: { users: Array<string> }) => {
     };
   }, [loadUsers]);
 
-  console.log(userList);
-
   return (
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
       <ul className="flex flex-col gap-4 p-4 px-6">
-        {userList.map((user, i) => (
-          <li key={i}>
-            <ProfileCard profileData={user} />
-          </li>
-        ))}
+        {!isLoading && userList.length <= 0 ? (
+          <div className="text-center text-shark-700">목록이 비어있습니다.</div>
+        ) : (
+          userList.map((user, i) => (
+            <li key={i}>
+              <ProfileCard profileData={user} />
+            </li>
+          ))
+        )}
       </ul>
       {!isLoading && userStack.length > 0 && (
         <div

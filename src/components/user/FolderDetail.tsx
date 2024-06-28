@@ -1,15 +1,17 @@
 "use client";
 
 import _ from "lodash";
-import { Folder, Folders } from "@/types";
+import { Folder, Folders, UserData } from "@/types";
 import SavedImageList from "../imageList/SavedImageList";
 import Button from "../Button";
-import { Fragment, MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/fb";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { alertState, authStatusState, foldersState } from "@/recoil/states";
 import { useRouter } from "next/navigation";
+import Modal from "@/components/modal/Modal";
+import EditFolderModal from "@/components/modal/EditFolderModal";
 
 const FolderDetail = ({
   currentFolder,
@@ -20,6 +22,7 @@ const FolderDetail = ({
   pageUid: string;
   displayId: string;
 }) => {
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const { replace } = useRouter();
   const [folders, setFolders] = useRecoilState(foldersState(pageUid));
   const [alert, setAlert] = useRecoilState(alertState);
@@ -86,20 +89,52 @@ const FolderDetail = ({
         });
       });
   };
+
+  const onFolderEditClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (
+      authStatus.status !== "signedIn" ||
+      !authStatus.data ||
+      !currentFolder
+    ) {
+      return;
+    }
+
+    setShowEditModal(true);
+  };
+
+  const onCloseEditModal = () => {
+    setShowEditModal(false);
+  };
+
   return (
     <div className="relative h-full bg-shark-50">
       {currentFolder && (
         <div className="flex h-full flex-col">
-          <div className="flex w-full justify-end p-4">
-            <Button onClick={onDeleteFolderClick}>
-              <div className="text-xs">폴더 삭제</div>
-            </Button>
-          </div>
+          {authStatus.data?.uid === currentFolder.uid && (
+            <div className="flex w-full justify-end gap-2 p-4">
+              <Button onClick={onFolderEditClick}>
+                <div className="text-xs">폴더 수정</div>
+              </Button>
+              <Button onClick={onDeleteFolderClick}>
+                <div className="text-xs">폴더 삭제</div>
+              </Button>
+            </div>
+          )}
           <SavedImageList
             type={"user-saved-" + pageUid + "-" + currentFolder.id}
             folder={currentFolder}
           />
         </div>
+      )}
+      {showEditModal && (
+        <Modal close={onCloseEditModal} title="폴더 수정">
+          <EditFolderModal
+            currentFolder={currentFolder as Folder}
+            closeModal={onCloseEditModal}
+            userData={authStatus.data as UserData}
+          />
+        </Modal>
       )}
     </div>
   );

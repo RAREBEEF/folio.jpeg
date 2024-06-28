@@ -5,8 +5,10 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import _ from "lodash";
 import { usersDataState } from "@/recoil/states";
+import useErrorAlert from "./useErrorAlert";
 
-const useGetUsers = () => {
+const useGetUsersByUids = () => {
+  const showErrorAlert = useErrorAlert();
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -45,17 +47,20 @@ const useGetUsers = () => {
     if (uids.length <= 0 || isLoading) return [];
 
     setIsLoading(true);
+    try {
+      const fetches = uids.map((uid) => fetchUser(uid));
+      const results = await Promise.all(fetches);
 
-    console.log("load users");
-    const fetches = uids.map((uid) => fetchUser(uid));
-    const results = await Promise.all(fetches);
-
-    setIsLoading(false);
-
-    return results.filter((result) => result !== null) as Array<UserData>;
+      return results.filter((result) => result !== null) as Array<UserData>;
+    } catch (error) {
+      showErrorAlert();
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return { getUsers, isLoading };
 };
 
-export default useGetUsers;
+export default useGetUsersByUids;

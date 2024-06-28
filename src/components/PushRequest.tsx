@@ -1,5 +1,5 @@
 import { MouseEvent, useEffect, useState } from "react";
-import Modal from "./Modal";
+import Modal from "@/components/modal/Modal";
 import Button from "./Button";
 import { getMessaging, getToken } from "firebase/messaging";
 import { useRecoilState } from "recoil";
@@ -16,13 +16,18 @@ const PushRequest = () => {
   const [secondRequest, setSecondRequest] = useState<boolean>(false);
 
   useEffect(() => {
-    if (authStatus.status !== "signedIn") return;
+    if (authStatus.status !== "signedIn" || authStatus.data?.fcmToken) return;
 
     const requestHistory = localStorage.getItem("pushRequest");
     switch (requestHistory) {
       // 허용됨
       case "granted":
-        break;
+        if (!authStatus.data?.fcmToken) {
+          localStorage.setItem("pushRequest", "not now");
+        } else {
+          break;
+        }
+
       // 거절됨
       case "denied":
         break;
@@ -38,7 +43,7 @@ const PushRequest = () => {
         setShowPushRequestModal(true);
         break;
     }
-  }, [authStatus.status]);
+  }, [authStatus]);
 
   const onCloseModal = () => {
     setShowPushRequestModal(false);
@@ -60,13 +65,11 @@ const PushRequest = () => {
               localStorage.setItem("pushRequest", "not now");
             } else {
               if (!authStatus.data) return;
-              // 토큰을 받았다면 호다닥 서버에 저장
-
               // 먼저 상태 업데이트
               const docRef = doc(db, "users", authStatus.data.uid);
               await updateDoc(docRef, {
                 fcmToken: currentToken,
-              }).then(() => {
+              }).then(async () => {
                 // db 저장 완료 후 localStorage와 상태에 저장
                 localStorage.setItem("pushRequest", "granted");
                 setAuthStatus((prev) => {
@@ -92,7 +95,7 @@ const PushRequest = () => {
                   click_action: "",
                   fcmTokens: [currentToken],
                 };
-                fetch("/api/send-fcm", {
+                await fetch("/api/send-fcm", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

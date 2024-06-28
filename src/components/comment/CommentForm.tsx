@@ -12,7 +12,7 @@ import { FormEvent, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 import Button from "../Button";
-import Loading from "../Loading";
+import Loading from "@/components//loading/Loading";
 import useSendFcm from "@/hooks/useSendFcm";
 
 const CommentForm = ({

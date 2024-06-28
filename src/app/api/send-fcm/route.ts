@@ -70,9 +70,14 @@ export async function POST(req: Request) {
         .firestore()
         .collection("users")
         .doc(uid)
-        .collection("notifications")
-        .doc(notificationId)
-        .set(inappNotificationData);
+        .collection("notification")
+        .doc("data")
+        .update({
+          list: admin.firestore.FieldValue.arrayUnion(inappNotificationData),
+        });
+      // .collection("notifications")
+      // .doc(notificationId)
+      // .set(inappNotificationData);
     });
 
     //

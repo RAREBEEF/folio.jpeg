@@ -1,15 +1,14 @@
 import { MouseEvent, useEffect, useState } from "react";
 import Button from "../Button";
-import Modal from "../Modal";
-import AddFolderModal from "./AddFolderModal";
+import Modal from "@/components/modal/Modal";
+import AddFolderModal from "@/components/modal/AddFolderModal";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { authStatusState, foldersState } from "@/recoil/states";
 import { Folder, Folders, UserData } from "@/types";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import SavedImageList from "../imageList/SavedImageList";
 import SavedFolderList from "./SavedFolderList";
 import useGetFolders from "@/hooks/useGetFolders";
-import PlusIcon from "@/icons/plus-solid.svg";
 
 const SavedTab = ({ userData }: { userData: UserData }) => {
   const authStatus = useRecoilValue(authStatusState);

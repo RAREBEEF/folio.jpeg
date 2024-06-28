@@ -1,27 +1,39 @@
 "use client";
 
-import { imageItemState, userDataState, usersDataState } from "@/recoil/states";
+import {
+  commentsState,
+  imageItemState,
+  lastVisibleState,
+  userDataState,
+  usersDataState,
+} from "@/recoil/states";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
-import CommentList from "./CommentList";
+import { MouseEvent, useEffect, useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import CommentList from "@/components/comment/CommentList";
 import Like from "./Like";
-import useGetImageItem from "@/hooks/useGetImageItem";
-import Loading from "../Loading";
+import useGetImage from "@/hooks/useGetImage";
+import Loading from "@/components/loading/Loading";
 import RecommendImageList from "../imageList/RecommendImageList";
 import ArrowIcon from "@/icons/arrow-left-solid.svg";
-import CommentForm from "../form/CommentForm";
-import { doc, getDoc } from "firebase/firestore";
+import CommentForm from "@/components/comment/CommentForm";
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "@/fb";
 import { ExtraUserData, UserData } from "@/types";
-import ProfileCard from "./ProfileCard";
+import ProfileCard from "@/components/user/ProfileCard";
 import ManageImage from "./ManageImage";
+import RefreshIcon from "@/icons/rotate-right-solid.svg";
 
 const ImageDetail = () => {
   const { replace } = useRouter();
   const [displayId, setDisplayId] = useState<string>("");
-  const { getImageItem, isLoading } = useGetImageItem();
+  const { getImageItem, isLoading } = useGetImage();
   const { back } = useRouter();
   const { id } = useParams();
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
@@ -30,11 +42,17 @@ const ImageDetail = () => {
   const [imageItem, setImageItem] = useRecoilState(
     imageItemState(id as string),
   );
+  const setComments = useSetRecoilState(commentsState(id as string));
+  const setLastVisible = useSetRecoilState<QueryDocumentSnapshot<
+    DocumentData,
+    DocumentData
+  > | null>(lastVisibleState("comments-" + id));
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
     if (id && typeof id === "string" && !imageItem && !isLoading) {
       (async () => {
+        console.log("이미지 로딩");
         const imageItem = await getImageItem(id);
         if (imageItem) {
           setImageItem(imageItem);
@@ -53,7 +71,6 @@ const ImageDetail = () => {
         setDisplayId(data.displayId || "");
         setAuthor(data);
       } else {
-        console.log("작성자 상태 업데이트");
         const uid = imageItem.uid;
 
         (async () => {
@@ -93,6 +110,14 @@ const ImageDetail = () => {
       setUserData(author);
     }
   }, [author, displayId, setUserData]);
+
+  // 이미지 새로고침
+  const refreshImage = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setImageItem(null);
+    setLastVisible(null);
+    setComments(null);
+  };
 
   return (
     <div className="relative h-full bg-shark-50 px-10 xs:px-4">
@@ -135,7 +160,12 @@ const ImageDetail = () => {
                 <div className="basis-[50%] p-2">
                   <div className="flex justify-between">
                     {<ProfileCard profileData={author} />}
-                    <div className="">{<ManageImage id={imageItem.id} />}</div>
+                    <div className="flex">
+                      <button onClick={refreshImage}>
+                        <RefreshIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+                      </button>
+                      <ManageImage id={imageItem.id} />
+                    </div>
                   </div>
 
                   <div className="z-20 my-4 break-keep text-shark-950">
@@ -154,7 +184,7 @@ const ImageDetail = () => {
                     </div>
                   </div>
 
-                  <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 py-4">
+                  <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 px-4 pb-8 pt-4">
                     <div className="mb-4">
                       <Like author={author} />
                     </div>

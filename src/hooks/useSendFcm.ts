@@ -49,7 +49,9 @@ const useSendFcm = () => {
           myToken,
           myUid,
         }),
-      }).then(async (response) => {});
+      })
+        .then(async (response) => {})
+        .catch((error) => {});
     }
   };
 

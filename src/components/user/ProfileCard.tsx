@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "@/components/user/ProfileImage";
 import { UserData } from "@/types";
 
 const ProfileCard = ({ profileData }: { profileData: UserData | null }) => {

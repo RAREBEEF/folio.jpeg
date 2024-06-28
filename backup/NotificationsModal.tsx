@@ -30,7 +30,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
   const loadRef = useRef<HTMLDivElement>(null);
   const authStatus = useRecoilValue(authStatusState);
   //   const { notifications } = useListenNotifications(authStatus.data?.uid || "");
-  const { notifications } = useRecoilValue(inAppNotificationsState);
+  const { notifications, lastUpdate } = useRecoilValue(inAppNotificationsState);
   const [{ notificationHistory, lastPage }, setNotificationHistory] =
     useRecoilState(inAppNotificationHistoryState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -43,7 +43,6 @@ const NotificationsModal = ({ close }: { close: Function }) => {
     if (isLoading || !authStatus.data || lastPage) return;
     setIsLoading(true);
 
-    console.log("기록 로드");
     const q = query(
       collection(db, "users", authStatus.data.uid, "notifications"),
       orderBy("createdAt", "desc"),

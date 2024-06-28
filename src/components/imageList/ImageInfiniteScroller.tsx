@@ -1,6 +1,6 @@
 import { Fragment, MouseEvent, useEffect, useRef, useState } from "react";
 import useGetImages from "@/hooks/useGetImages";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import { useRecoilValue } from "recoil";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 import {

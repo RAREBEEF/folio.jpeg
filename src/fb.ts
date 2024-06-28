@@ -32,6 +32,7 @@ export const messaging = getMessaging(app);
 // const analytics = getAnalytics(app);
 
 if (process.env.NODE_ENV === "development") {
+  // @ts-ignore
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 

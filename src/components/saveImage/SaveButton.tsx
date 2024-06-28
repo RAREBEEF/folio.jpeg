@@ -38,22 +38,6 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
         "user-saved-" + (authStatus.data?.uid || "") + "-" + "_DEFAULT",
       ),
     );
-  // const [folderImagePage, setFolderImagePage] = useRecoilState(
-  //   imageDataPagesState(
-  //     "user-saved-" +
-  //       (authStatus.data?.uid || "") +
-  //       "-" +
-  //       (savedFolder?.id || ""),
-  //   ),
-  // );
-  // const [folderGridImageIds, setFolderGridImageIds] = useRecoilState(
-  //   gridImageIdsState(
-  //     "user-saved-" +
-  //       (authStatus.data?.uid || "") +
-  //       "-" +
-  //       (savedFolder?.id || ""),
-  //   ),
-  // );
 
   // 해당 이미지가 이미 저장되었는지 여부 확인
   useEffect(() => {

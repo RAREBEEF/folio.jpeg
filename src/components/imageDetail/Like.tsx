@@ -4,9 +4,8 @@ import { useParams } from "next/navigation";
 import { MouseEvent, useState } from "react";
 import { useRecoilValue } from "recoil";
 import FlashIcon from "@/icons/bolt-lightning-solid.svg";
-import BanIcon from "@/icons/ban-solid.svg";
-import Modal from "../Modal";
-import FollowModal from "../user/FollowModal";
+import Modal from "@/components/modal/Modal";
+import FollowModal from "@/components/modal/FollowModal";
 import { UserData } from "@/types";
 
 const Like = ({ author }: { author: UserData | null }) => {

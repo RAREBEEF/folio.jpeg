@@ -59,7 +59,14 @@ const HomeImageList = () => {
             listType === "following"
               ? {
                   orderBy: ["createdAt", "desc"],
-                  where: where("uid", "in", authStatus.data?.following || []),
+                  where: where(
+                    "uid",
+                    "in",
+                    authStatus.data?.following &&
+                      authStatus.data.following.length > 0
+                      ? authStatus.data.following
+                      : [""],
+                  ),
                   limit: 2,
                 }
               : {

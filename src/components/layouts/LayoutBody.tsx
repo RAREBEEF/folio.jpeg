@@ -3,7 +3,7 @@
 import { PropsWithChildren } from "react";
 import LayoutNav from "./LayoutNav";
 
-import Alert from "../Alert";
+import Alert from "@/components/background/Alert";
 
 const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
   return (

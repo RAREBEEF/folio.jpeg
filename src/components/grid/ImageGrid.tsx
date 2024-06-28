@@ -6,8 +6,10 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { Column, GridItem } from "@/types";
 import ImageGridCols from "./ImageGridCols";
 import { gridState, imageDataPagesState } from "@/recoil/states";
+import { usePathname } from "next/navigation";
 
 const ImageGrid = ({ type }: { type: string }) => {
+  const pathname = usePathname();
   const [gridInit, setGridInit] = useState<boolean>(false);
   const [grid, setGrid] = useRecoilState(gridState);
   const imageDataPages = useRecoilValue(imageDataPagesState(type));
@@ -38,17 +40,21 @@ const ImageGrid = ({ type }: { type: string }) => {
         };
 
         // 컨테이너 너비에 맞춰서 그리드 설정
-        initGrid.colCount = Math.floor(
-          containerWidth / (initGrid.colWidth + initGrid.gap * 2),
+        initGrid.colCount = Math.max(
+          Math.min(
+            Math.floor(containerWidth / (initGrid.colWidth + initGrid.gap * 2)),
+            4,
+          ),
+          2,
         );
         if (initGrid.colCount <= 2) {
-          if (containerWidth <= 450) {
-            initGrid.colCount = 1;
-            initGrid.colWidth = containerWidth - initGrid.gap * 2;
-          } else {
-            initGrid.colCount = 2;
-            initGrid.colWidth = containerWidth / 2 - initGrid.gap * 3;
-          }
+          // if (containerWidth <= 450) {
+          //   initGrid.colCount = 1;
+          //   initGrid.colWidth = containerWidth - initGrid.gap * 2;
+          // } else {
+          initGrid.colCount = 2;
+          initGrid.colWidth = containerWidth / 2 - initGrid.gap * 3;
+          // }
         }
         const cols: Array<Column> = Array.from(
           { length: initGrid.colCount },
@@ -138,6 +144,18 @@ const ImageGrid = ({ type }: { type: string }) => {
       resizeObserver.unobserve(container);
     };
   }, []);
+
+  // 스크롤 복원
+  useEffect(() => {
+    if (!gridInit || !grid) return;
+    const storedScrollY = sessionStorage.getItem(pathname);
+
+    if (storedScrollY) {
+      const scrollY = parseInt(storedScrollY);
+      window.scrollTo({ top: scrollY });
+      sessionStorage.removeItem(pathname);
+    }
+  }, [pathname, gridInit, grid]);
 
   return (
     <div className="pb-16 pt-8" ref={containerRef}>

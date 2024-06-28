@@ -21,10 +21,10 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
-import SignInForm from "./form/SignInForm";
-import ProfileForm from "./form/ProfileForm";
+import SignInForm from "../user/SignInForm";
+import ProfileForm from "../user/ProfileForm";
 import { AuthStatus, Folder, Folders, UserData } from "@/types";
-import Modal from "./Modal";
+import Modal from "../modal/Modal";
 
 const Auth = () => {
   // 로그인 모달창 state
@@ -70,23 +70,42 @@ const Auth = () => {
 
         // db에 extraData 요청
         (async () => {
-          // console.log("get extra user data");
           const docRef = doc(db, "users", uid);
           const docSnap = await getDoc(docRef);
           // db에 데이터가 없으면
           if (!docSnap.exists()) {
-            // 이미지를 저장할 기본 폴더를 생성
+            // 이미지를 저장할 기본 폴더와 알림을 저장할 컬렉션 문서 생성
             const now = Date.now();
-            const docRef = doc(db, "users", uid, "folders", "_DEFAULT");
-            await setDoc(docRef, {
-              createdAt: now,
-              id: "_DEFAULT",
-              images: [],
-              isPrivate: true,
-              title: "_DEFAULT",
+            const folderDocRef = doc(db, "users", uid, "folders", "_DEFAULT");
+            const notificationDocRef = doc(
+              db,
+              "users",
               uid,
-              updatedAt: now,
-            });
+              "notification",
+              "data",
+            );
+            const feedbackDocRef = doc(db, "users", uid, "feedback", "data");
+
+            await Promise.all([
+              setDoc(folderDocRef, {
+                createdAt: now,
+                id: "_DEFAULT",
+                images: [],
+                isPrivate: true,
+                title: "_DEFAULT",
+                uid,
+                updatedAt: now,
+              }),
+              setDoc(notificationDocRef, {
+                list: [],
+                lastCheck: 0,
+              }),
+              setDoc(feedbackDocRef, {
+                feedback: null,
+                createdAt: 0,
+              }),
+            ]);
+
             // 프로필 초기 설정창 띄움
             setLoginModal({ show: true, showInit: true });
             // auth 상태 업데이트
@@ -136,7 +155,6 @@ const Auth = () => {
 
       // db에서 폴더 데이터를 불러온다.
       (async () => {
-        // console.log("get folders");
         const foldersRef = collection(db, "users", uid, "folders");
         const q = query(foldersRef, orderBy("updatedAt", "desc"));
         const docSnap = await getDocs(q);
@@ -155,10 +173,6 @@ const Auth = () => {
 
   // 로그인과 초기설정이 모두 완료된 경우 로그인 모달을 닫고 유저 관련 상태에 내 데이터 추가
   useEffect(() => {
-    // console.log(`
-    //     Auth Status: ${authStatus.status}
-    //     Auth Data: ${!!authStatus.data}
-    //     `);
     if (authStatus.status === "signedIn") {
       setLoginModal({ show: false });
       const data = authStatus.data as UserData;

@@ -1,8 +1,8 @@
 import { userDataState } from "@/recoil/states";
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
-import Modal from "../Modal";
-import FollowModal from "./FollowModal";
+import Modal from "@/components/modal/Modal";
+import FollowModal from "@/components/modal/FollowModal";
 
 const Follow = ({ displayId }: { displayId: string }) => {
   const [userData, setUserData] = useRecoilState(userDataState(displayId));

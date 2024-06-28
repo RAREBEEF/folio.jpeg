@@ -52,9 +52,20 @@ export interface ImageDocData {
     width: number;
     height: number;
   };
-  tags: Array<string>;
+  tags: [
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+  ];
+  feedback: Feedback;
   likes: Array<string>;
-  likeCount: number;
   themeColor: string;
 }
 export interface ImageData extends ImageDocData {
@@ -69,8 +80,19 @@ export type ImageItem = {
   createdAt: number;
   uid: string;
   likes: Array<string>;
-  likeCount: number;
-  tags: Array<string>;
+  tags: [
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+  ];
+  feedback: Feedback;
   byte: number;
   url: string;
   themeColor: string;
@@ -138,4 +160,28 @@ export interface InAppNotification {
   createdAt: number;
   image: string;
   url: string;
+}
+
+export type AnalysisResult =
+  | {
+      tags: [
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+      ];
+      themeColor: string;
+      feedback: Feedback;
+    }
+  | "inappreciate";
+
+export interface Feedback {
+  detail: string;
+  summary: { good: string; improve: string };
 }

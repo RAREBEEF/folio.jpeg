@@ -11,14 +11,15 @@ import _ from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
+import useErrorAlert from "./useErrorAlert";
 
 const useFollow = (targetUid: string) => {
+  const showErrorAlert = useErrorAlert();
   const sendFcm = useSendFcm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const setLoginModal = useSetRecoilState(loginModalState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
   const [alreadyFollowing, setAlreadyFollowing] = useState<boolean>(false);
-
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [targetDisplayId, setTargetDisplayId] = useState<string>(
     usersData[targetUid]?.displayId || "",
@@ -50,9 +51,6 @@ const useFollow = (targetUid: string) => {
   useEffect(() => {
     checkAlreadyFollowing(targetUid);
   }, [checkAlreadyFollowing, targetUid, authStatus.data]);
-
-  // 업데이트 전 상태 백업
-  let prevLikes: Array<string>;
 
   const follow = async () => {
     if (
@@ -160,12 +158,12 @@ const useFollow = (targetUid: string) => {
       })
       .catch((error) => {
         // 에러 시 롤백
-        console.log(error);
         setAlreadyFollowing(false);
         setTargetuserData(prevTargetuserData);
         setMyuserData(prevMyuserData);
         setUsersData(prevUsersData);
         setAuthStatus(prevAuthStatus);
+        showErrorAlert();
       })
       .finally(() => {
         setIsLoading(false);
@@ -183,6 +181,7 @@ const useFollow = (targetUid: string) => {
     }
     const myUid = authStatus.data.uid;
     setIsLoading(true);
+    setAlreadyFollowing(false);
 
     let prevTargetuserData: UserData | null;
     let prevMyuserData: UserData | null;
@@ -261,10 +260,12 @@ const useFollow = (targetUid: string) => {
       })
       .catch((error) => {
         // 에러 시 롤백
-        console.log(error);
+        setAlreadyFollowing(true);
         setTargetuserData(prevTargetuserData);
         setMyuserData(prevMyuserData);
         setUsersData(prevUsersData);
+        setAuthStatus(prevAuthStatus);
+        showErrorAlert();
       })
       .finally(() => {
         setIsLoading(false);

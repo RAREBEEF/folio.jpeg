@@ -1,24 +1,32 @@
-import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
+import {
+  StorageReference,
+  getDownloadURL,
+  getStorage,
+  uploadBytes,
+} from "firebase/storage";
 import { ref } from "firebase/storage";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
+import useErrorAlert from "./useErrorAlert";
 
 /**
  * 이미지를 스토리지에 업로드하고 다운로드url을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
  */
 const useSetImageFile = () => {
+  const showErrorAlert = useErrorAlert();
   const [isInputUploading, setIsInputUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [id, setId] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [originalName, setOriginalName] = useState<string | null>(null);
-  const [byte, setByte] = useState<number | null>(null);
-  const [size, setSize] = useState<{ width: number; height: number } | null>(
-    null,
-  );
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [id, setId] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
+  const [originalName, setOriginalName] = useState<string>("");
+  const [byte, setByte] = useState<number>(0);
+  const [size, setSize] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
   const [error, setError] = useState<unknown>(null);
 
   // 이미지 압축
@@ -33,19 +41,10 @@ const useSetImageFile = () => {
 
   // 첨부파일 선택
   const onFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
-    setError(null);
-
     const fileList = e.target.files;
     if (fileList && fileList?.length !== 0) {
       // 상태 초기화
-      setFile(null);
-      setPreviewUrl(null);
-      setId(null);
-      setFileName(null);
-      setOriginalName(null);
-      setByte(null);
-      setSize(null);
-      setIsInputUploading(true);
+      reset();
 
       const compressedImage = await compressor(fileList[0]);
       setFile(compressedImage);
@@ -92,46 +91,52 @@ const useSetImageFile = () => {
   /**
    * 이미지를 스토리지에 업로드하고 다운로드url을 포함한 이미지 데이터를 반환하는 비동기 함수
    * */
-  const setImageFile = async (uid: string, fileName: string, img: File) => {
-    if (error) return;
+  const setImageFile = async (
+    uid: string,
+    fileName: string,
+    img: File,
+  ): Promise<string | null> => {
+    if (error || isLoading) return null;
     setIsLoading(true);
 
-    // 업로드
-    const storage = getStorage();
-    const storageRef = ref(storage, `images/${uid}/${fileName}`);
-    const downloadURL = await uploadBytes(storageRef, img).then(async () => {
-      return await getDownloadURL(storageRef);
-    });
+    try {
+      // 업로드
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${uid}/${fileName}`);
+      const downloadURL = await uploadBytes(storageRef, img).then(async () => {
+        return await getDownloadURL(storageRef);
+      });
 
-    setIsLoading(false);
-    return downloadURL;
+      setIsLoading(false);
+      return downloadURL;
+    } catch (error) {
+      showErrorAlert();
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 첨부파일 리셋 함수
   const reset = () => {
     setFile(null);
-    setPreviewUrl(null);
-    setId(null);
-    setFileName(null);
-    setOriginalName(null);
-    setByte(null);
-    setSize(null);
+    setPreviewUrl("");
+    setId("");
+    setFileName("");
+    setOriginalName("");
+    setByte(0);
+    setSize({ width: 0, height: 0 });
+    setError(null);
   };
 
   return {
     isInputUploading,
+    isLoading,
     setImageFile,
     onFileSelect,
-    file,
-    previewUrl,
-    id,
-    fileName,
-    originalName,
-    byte,
-    size,
-    error,
     reset,
-    isLoading,
+    error,
+    data: { file, previewUrl, id, fileName, originalName, byte, size },
   };
 };
 

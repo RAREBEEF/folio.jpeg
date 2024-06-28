@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { gridState, imageItemState } from "@/recoil/states";
 import Link from "next/link";
 import SaveButton from "../saveImage/SaveButton";
+import { usePathname } from "next/navigation";
 
 const ImageGridColsItem = ({
   gridItem,
@@ -13,6 +14,7 @@ const ImageGridColsItem = ({
   gridItem: GridItem;
   imageDataPages: ImageDataPages;
 }) => {
+  const pathname = usePathname();
   const [imageItem, setImageItem] = useRecoilState(imageItemState(gridItem.id));
   const grid = useRecoilValue(gridState);
 
@@ -30,6 +32,11 @@ const ImageGridColsItem = ({
     });
   }, [gridItem.id, gridItem.page, imageDataPages, setImageItem]);
 
+  // 스크롤 복원을 위해 스크롤 위치 저장
+  const onBeforeRouting = () => {
+    sessionStorage.setItem(pathname, window.scrollY.toString());
+  };
+
   return (
     <li
       className="group relative select-none"
@@ -38,7 +45,11 @@ const ImageGridColsItem = ({
       }}
     >
       {imageItem ? (
-        <Link className="relative" href={`/image/${imageItem.id}`}>
+        <Link
+          onClick={onBeforeRouting}
+          className="relative"
+          href={`/image/${imageItem.id}`}
+        >
           <Image
             style={{
               background: imageItem.themeColor,

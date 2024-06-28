@@ -13,7 +13,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/fb";
 import { FormEvent, MouseEvent, useState } from "react";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import useHandleAuthError from "@/hooks/useHandleAuthError";
 import { useRecoilState, useSetRecoilState } from "recoil";

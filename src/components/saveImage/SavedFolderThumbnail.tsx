@@ -22,8 +22,6 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
     null,
   ]);
 
-  console.log(folder.name, imageDataPages);
-
   // 썸네일에 사용할 이미지 불러오기
   useEffect(() => {
     if (isLoading || folder.images.length <= 0 || imageDataPages.length > 0)

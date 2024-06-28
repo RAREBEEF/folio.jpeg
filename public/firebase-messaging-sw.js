@@ -20,8 +20,6 @@ self.addEventListener("push", async function (event) {
   if (event.data) {
     const notification = await event.data.json().notification;
     const data = await event.data.json().data;
-    console.log(notification);
-    console.log(data);
 
     const options = {
       body: notification.body,

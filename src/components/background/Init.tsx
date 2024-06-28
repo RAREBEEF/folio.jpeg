@@ -2,7 +2,8 @@
 
 import { Fragment } from "react";
 import Auth from "./Auth";
-import PushRequest from "./PushRequest";
+import PushRequest from "../PushRequest";
+import ExtraUserDataListener from "./ExtraUserDataListener";
 import InAppNotificationListener from "./InAppNotificationListener";
 
 const Init = () => {
@@ -10,6 +11,7 @@ const Init = () => {
     <Fragment>
       <Auth />
       <PushRequest />
+      <ExtraUserDataListener />
       <InAppNotificationListener />
     </Fragment>
   );

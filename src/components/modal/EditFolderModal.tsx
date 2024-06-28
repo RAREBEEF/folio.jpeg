@@ -3,29 +3,35 @@
 import { ChangeEvent, KeyboardEvent, MouseEvent, useState } from "react";
 import Button from "../Button";
 import useInput from "@/hooks/useInput";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { alertState, authStatusState, foldersState } from "@/recoil/states";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
-import { Folders, UserData } from "@/types";
+import { Folder, Folders, UserData } from "@/types";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
 
-const AddFolder = ({
+const EditFolderModal = ({
   userData,
   closeModal,
+  currentFolder,
 }: {
   userData: UserData;
   closeModal: Function;
+  currentFolder: Folder;
 }) => {
+  const { replace } = useRouter();
   const authStatus = useRecoilValue(authStatusState);
   const [folders, setFolders] = useRecoilState(
     foldersState(authStatus.data!.uid),
   );
   const [alert, setAlert] = useRecoilState(alertState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { value: name, onChange: onnameChange } = useInput("");
-  const [isPrivate, setIsPrivate] = useState<"true" | "false">("false");
+  const { value: name, onChange: onnameChange } = useInput(currentFolder.name);
+  const [isPrivate, setIsPrivate] = useState<"true" | "false">(
+    `${currentFolder.isPrivate}`,
+  );
 
   // 공개 여부 input change 이벤트
   const onIsPrivateChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +51,7 @@ const AddFolder = ({
         show: true,
         type: "warning",
         createdAt: Date.now(),
-        text: "폴더 생성 권한이 없습니다.",
+        text: "폴더 수정 권한이 없습니다.",
       });
       return;
       // 폴더명 입력은 필수
@@ -66,8 +72,24 @@ const AddFolder = ({
         text: "폴더명에 사용할 수 없는 문자가 포함되어 있습니다. (-,/)",
       });
       return;
-      // 폴더명은 중복될 수 없다.
-    } else if (folders?.filter((folder) => folder.name === name).length !== 0) {
+    } else if (
+      currentFolder.name === name &&
+      `${currentFolder.isPrivate}` === isPrivate
+    ) {
+      setAlert({
+        show: true,
+        type: "warning",
+        createdAt: Date.now(),
+        text: "변경사항이 존재하지 않습니다.",
+      });
+      return;
+    }
+    // 폴더명은 중복될 수 없다.
+    else if (
+      folders?.filter(
+        (folder) => folder.name !== currentFolder.name && folder.name === name,
+      ).length !== 0
+    ) {
       setAlert({
         show: true,
         type: "warning",
@@ -81,21 +103,17 @@ const AddFolder = ({
     setIsLoading(true);
 
     const uid = authStatus.data.uid;
-    const folderId = uuidv4();
     const now = Date.now();
 
     const newFolder = {
-      id: folderId,
-      createdAt: now,
-      images: [],
+      ...currentFolder,
       isPrivate: isPrivate === "true" ? true : false,
       name,
-      uid,
       updatedAt: now,
     };
 
     (async () => {
-      const docRef = doc(db, "users", uid, "folders", folderId);
+      const docRef = doc(db, "users", uid, "folders", currentFolder.id);
 
       // 이전 상태 백업
       let prevFolders: Folders | null;
@@ -106,24 +124,35 @@ const AddFolder = ({
         if (!prev) {
           return [newFolder];
         } else {
-          return [newFolder, ...prev];
+          return [
+            newFolder,
+            ...prev.filter((folder) => folder.id !== currentFolder.id),
+          ];
         }
       });
 
       // db에 폴더 데이터 추가
-      await setDoc(docRef, newFolder)
+      await updateDoc(docRef, newFolder)
         .then(() => {
           closeModal();
           setAlert({
             show: true,
             type: "success",
             createdAt: Date.now(),
-            text: "폴더가 생성되었습니다.",
+            text: "폴더 수정이 완료되었습니다.",
           });
+          if (currentFolder.name !== name)
+            replace(`/${userData.displayId}/${name.replaceAll(" ", "-")}`);
         })
         .catch((error) => {
           // 에러 시 백업 상태로 롤백
           setFolders(prevFolders);
+          setAlert({
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "폴더 수정 중 문제가 발생하였습니다.",
+          });
         })
         .finally(() => {
           setIsLoading(false);
@@ -176,11 +205,11 @@ const AddFolder = ({
       </div>
       <div className="mt-4 flex flex-col gap-2">
         <Button onClick={onAddFolder} disabled={isLoading}>
-          <div>{isLoading ? <Loading height="24px" /> : "만들기"}</div>
+          <div>{isLoading ? <Loading height="24px" /> : "수정 완료"}</div>
         </Button>
       </div>
     </div>
   );
 };
 
-export default AddFolder;
+export default EditFolderModal;

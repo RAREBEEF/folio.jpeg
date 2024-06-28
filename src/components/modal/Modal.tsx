@@ -37,13 +37,14 @@ const Modal = ({
       id="modal-bg"
       onClick={onModalOutsideClick}
       style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      className={`pointer-events-all fixed bottom-0 left-0 right-0 top-0 z-50 m-auto flex min-w-[350px] items-center justify-center opacity-100`}
+      className={`pointer-events-all fixed bottom-0 left-0 right-0 top-0 z-50 z-50 m-auto flex min-w-[300px] items-center justify-center opacity-100`}
     >
-      <div className="relative rounded-xl border-2 bg-shark-50 xs:aspect-auto xs:min-w-[340px] xs:max-w-[95vw]">
+      <div className="relative max-h-[80vh] w-[400px] overflow-scroll rounded-xl border-2 bg-shark-50 xs:min-w-[250px] xs:max-w-[80vw]">
         <button className="absolute right-4 top-4 h-5 w-5" onClick={closeModal}>
           <XSvg />
         </button>
-        <div className="max-h-[90vh] w-[400px] min-w-[350px] overflow-scroll xs:aspect-auto xs:w-auto xs:overflow-scroll">
+        {/* max-h-[90vh] w-[400px] min-w-[250px] overflow-scroll xs:aspect-auto xs:w-auto xs:overflow-scroll */}
+        <div className="">
           <h2 className="mb-4 ml-8 mt-8 text-2xl font-bold text-shark-950">
             {title}
           </h2>

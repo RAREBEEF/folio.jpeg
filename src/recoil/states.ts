@@ -94,22 +94,13 @@ export const alertState = atom<Alert>({
   default: { text: null, createdAt: null, type: "default", show: false },
 });
 
-export const inAppNotificationsState = atom<{
-  notifications: Array<InAppNotification>;
+export const inAppNotificationState = atom<{
+  list: Array<InAppNotification>;
+  lastCheck: number;
 }>({
-  key: "inAppNotifications",
+  key: "inAppNotification",
   default: {
-    notifications: [],
-  },
-});
-
-export const inAppNotificationHistoryState = atom<{
-  notificationHistory: Array<InAppNotification>;
-  lastPage: boolean;
-}>({
-  key: "inAppNotificationHistory",
-  default: {
-    notificationHistory: [],
-    lastPage: false,
+    list: [],
+    lastCheck: 0,
   },
 });

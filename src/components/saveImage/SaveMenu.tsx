@@ -1,22 +1,8 @@
 import XSvg from "@/icons/xmark-solid.svg";
 import Button from "../Button";
 import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
-import {
-  AuthStatus,
-  Folder,
-  Folders,
-  ImageDataPages,
-  ImageItem,
-  UserData,
-} from "@/types";
-import {
-  ChangeEvent,
-  FormEvent,
-  MouseEvent,
-  MouseEventHandler,
-  useEffect,
-  useState,
-} from "react";
+import { Folder, Folders, ImageDataPages, ImageItem } from "@/types";
+import { ChangeEvent, MouseEvent, useState } from "react";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import _ from "lodash";

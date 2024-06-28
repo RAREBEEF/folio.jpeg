@@ -8,11 +8,10 @@ import {
   KeyboardEvent,
   MouseEvent,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import Loading from "../Loading";
+import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import { useRecoilState } from "recoil";
 import _ from "lodash";
@@ -20,7 +19,7 @@ import useSetImageFile from "@/hooks/useSetImageFile";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
 import useGetExtraUserData from "@/hooks/useGetExtraUserData";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "@/components/user/ProfileImage";
 import { alertState, authStatusState, userDataState } from "@/recoil/states";
 import { deleteObject, getStorage, ref } from "firebase/storage";
 
@@ -56,18 +55,6 @@ const ProfileForm = () => {
   const [defaultImg, setDefaultImg] = useState<boolean>(
     authStatus.data?.photoURL ? false : true,
   );
-
-  console.log(file);
-
-  // useEffect(() => {
-  //   const prevImg = authStatus.data?.photoURL
-  //    // 현재 프사가 있고,
-  //   // // 첨부도 없는데 기본도 아님
-  //   // //
-  //   // 현재 프사가 없고
-  //   // // 첨부 파일이없음
-  //   if ((prevImg && !file && !defaultImg) || (!prevImg && !file))
-  // }, [])
 
   // 등록
   const onSubmit = async (e: FormEvent) => {
@@ -105,13 +92,14 @@ const ProfileForm = () => {
     } else if (
       displayId.includes(" ") ||
       displayId.includes("/") ||
-      displayId.includes("-")
+      displayId.includes("-") ||
+      ["edit", "image", "upload"].includes(displayId)
     ) {
       setAlert({
         show: true,
         type: "warning",
         createdAt: Date.now(),
-        text: "사용자명에 사용할 수 없는 문자가 포함되어 있습니다. (공백 또는 /,-)",
+        text: "사용자명에 사용할 수 없는 문자가 포함되어 있습니다. (예약어, 공백 또는 /,- 등)",
       });
       return;
     } else if (displayId.length < 2 || displayId.length > 16) {
@@ -143,7 +131,12 @@ const ProfileForm = () => {
       // 사용자명 중복 체크
       const extraUserData = await getExtraUserData(displayId);
 
-      if (extraUserData && extraUserData.uid !== authStatus.data?.uid) {
+      if (extraUserData?.status === "error") {
+        return;
+      } else if (
+        extraUserData?.status === "success" &&
+        extraUserData.data?.uid !== authStatus.data?.uid
+      ) {
         setAlert({
           show: true,
           type: "warning",
@@ -224,6 +217,7 @@ const ProfileForm = () => {
               photoURL,
               follower: [],
               following: [],
+              fcmToken: "",
             }),
         updateProfile(user, {
           displayName,
@@ -274,14 +268,17 @@ const ProfileForm = () => {
   }, [file]);
 
   return (
-    <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
+    <div className="m-auto flex h-full w-fit flex-col px-4 pb-12 pt-6">
       <div className="flex grow flex-col justify-between gap-12">
-        <form className="flex w-72 flex-col gap-y-4" onSubmit={onSubmit}>
+        <form
+          className="flex w-[50vw] min-w-52 max-w-72 flex-col gap-y-4"
+          onSubmit={onSubmit}
+        >
           <label
             onClick={(e) => {
               e.stopPropagation();
             }}
-            className={`group relative m-auto w-[60%] cursor-pointer rounded-full`}
+            className={`group relative m-auto w-[60%] cursor-pointer rounded-full xs:w-[80%]`}
           >
             <ProfileImage
               url={

@@ -4,15 +4,20 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import Angles from "@/icons/angles-solid.svg";
 import Link from "next/link";
 import SnsLinks from "@/components/SnsLinks";
-import { authStatusState, loginModalState, navState } from "@/recoil/states";
+import {
+  authStatusState,
+  inAppNotificationState,
+  loginModalState,
+  navState,
+} from "@/recoil/states";
 import { MouseEvent, useEffect, useState } from "react";
 import _ from "lodash";
 import HomeSvg from "@/icons/house-solid.svg";
 import ImageSvg from "@/icons/image-solid.svg";
 import ProfileSvg from "@/icons/user-solid.svg";
 import NotificationSvg from "@/icons/bell-solid.svg";
-import Modal from "../Modal";
-import NotificationsModal from "../NotificationsModal";
+import Modal from "@/components/modal/Modal";
+import NotificationsModal from "@/components/modal/NotificationsModal";
 
 const LayoutNav = () => {
   const [loginModal, setLoginModal] = useRecoilState(loginModalState);
@@ -21,6 +26,8 @@ const LayoutNav = () => {
   const [innerWidth, setInnerWidth] = useState<number>(0);
   const [showNotificationModal, setShowNotificationModal] =
     useState<boolean>(false);
+  const notification = useRecoilValue(inAppNotificationState);
+  const [notificationCount, setNotificationCount] = useState<number>(0);
 
   useEffect(() => {
     if (nav.show) {
@@ -80,6 +87,17 @@ const LayoutNav = () => {
     setNav({ show: false });
   };
 
+  // 안읽은 알림 카운트
+  useEffect(() => {
+    const notifications = notification.list || [];
+    const lastCheck = notification.lastCheck || 0;
+
+    setNotificationCount(
+      notifications.filter((notification) => notification.createdAt > lastCheck)
+        .length,
+    );
+  }, [notification.lastCheck, notification.list]);
+
   return (
     <div
       className={`fixed top-0 z-40 flex h-full pt-16 ${nav.show ? "w-full" : "w-[50px]"}`}
@@ -100,7 +118,7 @@ const LayoutNav = () => {
         </button>
 
         <ul
-          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-6 text-end text-lg font-bold`}
+          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-6 pb-16 text-end text-lg font-bold`}
         >
           <li className="w-full text-center">
             <Link
@@ -143,13 +161,18 @@ const LayoutNav = () => {
           <li className="w-full text-center">
             <button
               onClick={onNotificationClick}
-              className="m-auto flex h-[30px] w-fit items-center justify-center"
+              className="relative m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
                 <div>Notifications</div>
               ) : (
                 <NotificationSvg className="aspect-square w-[30px] fill-shark-50" />
               )}
+              <div
+                className={`absolute text-center ${nav.show ? "left-full" : "right-0"} top-0 aspect-square w-4 rounded-full bg-[firebrick] text-xs tracking-tighter`}
+              >
+                {Math.min(notificationCount, 99)}
+              </div>
             </button>
           </li>
         </ul>

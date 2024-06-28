@@ -6,7 +6,7 @@ import LayoutHeader from "@/components/layouts/LayoutHeader";
 import LayoutFooter from "@/components/layouts/LaytoutFooter";
 import LayoutBody from "@/components/layouts/LayoutBody";
 import { Fragment } from "react";
-import Init from "@/components/Init";
+import Init from "@/components/background/Init";
 
 const inter = Inter({ subsets: ["latin"] });
 
