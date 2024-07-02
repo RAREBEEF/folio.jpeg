@@ -23,6 +23,17 @@ export const storage = getStorage(app);
 export const auth = getAuth(app);
 
 if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
+  const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(
+      process.env.NEXT_PUBLIC_APP_CHECK_SITE_KEY || "",
+    ),
+    isTokenAutoRefreshEnabled: true,
+  });
+  if (process.env.NODE_ENV === "development") {
+    // @ts-ignore
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
   const userAgent = navigator?.userAgent?.toLowerCase();
   const isIos =
     userAgent?.indexOf("iphone") !== -1 || userAgent?.indexOf("ipad") !== -1;
@@ -40,18 +51,6 @@ if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
     }
   }
 }
-
-if (process.env.NODE_ENV === "development") {
-  // @ts-ignore
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-}
-
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider(
-    process.env.NEXT_PUBLIC_APP_CHECK_SITE_KEY || "",
-  ),
-  isTokenAutoRefreshEnabled: true,
-});
 
 // Initialize the Vertex AI service
 const vertexAI = getVertexAI(app);

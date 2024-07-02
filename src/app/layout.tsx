@@ -7,6 +7,7 @@ import LayoutFooter from "@/components/layouts/LaytoutFooter";
 import LayoutBody from "@/components/layouts/LayoutBody";
 import { Fragment } from "react";
 import Init from "@/components/background/Init";
+import logo from "@/images/logo.png";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,8 +40,7 @@ export const metadata: Metadata = {
     siteName: "folio.JPEG",
     images: [
       {
-        // TODO: 이미지 url 추가하기
-        url: "",
+        url: logo.src,
       },
     ],
   },
@@ -49,8 +49,7 @@ export const metadata: Metadata = {
     title: "folio.JPEG",
     description:
       "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
-    // TODO: 이미지 url 추가하기
-    images: "",
+    images: logo.src,
   },
   appleWebApp: {
     capable: true,
@@ -65,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body
         className={inter.className + " flex min-h-lvh flex-col bg-shark-950"}
       >

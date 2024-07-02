@@ -1,17 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useRecoilValue } from "recoil";
-import { navState } from "@/recoil/states";
 
 const LayoutFooter = () => {
-  const nav = useRecoilValue(navState);
   return (
-    // <div
-    //   className={`bg-shark-950 px-10 py-4 text-shark-50 transition-all ${
-    //     nav.show ? "ml-[200px]" : "ml-[50px]"
-    //   }`}
-    // >
     <div
       className={`ml-[50px] bg-shark-950 px-10 py-4 text-shark-50 transition-all xs:mb-[60px] xs:ml-0`}
     >
