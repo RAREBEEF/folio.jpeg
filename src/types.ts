@@ -1,5 +1,4 @@
 import { User } from "firebase/auth";
-import { WhereFilterOp } from "firebase/firestore";
 
 // 필터
 // export type FilterWhere = [string, WhereFilterOp, string | Array<string>];
@@ -47,7 +46,7 @@ export interface ImageDocData {
   title?: string;
   description?: string;
   byte: number;
-  url: string;
+  URL: string;
   size: {
     width: number;
     height: number;
@@ -94,7 +93,7 @@ export type ImageItem = {
   ];
   feedback: Feedback;
   byte: number;
-  url: string;
+  URL: string;
   themeColor: string;
   size: {
     width: number;
@@ -159,7 +158,7 @@ export interface InAppNotification {
   body: string | null;
   createdAt: number;
   image: string;
-  url: string;
+  URL: string;
 }
 
 export type AnalysisResult =
@@ -184,4 +183,9 @@ export type AnalysisResult =
 export interface Feedback {
   detail: string;
   summary: { good: string; improve: string };
+}
+
+export interface UserFeedback {
+  createdAt: number;
+  feedback: Feedback | null;
 }

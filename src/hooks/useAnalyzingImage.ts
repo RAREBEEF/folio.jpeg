@@ -7,9 +7,11 @@ const useAnalyzingImage = () => {
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const analyzingImage = async (
-    targetImage: File,
-  ): Promise<AnalysisResult | null> => {
+  const analyzingImage = async ({
+    targetImage,
+  }: {
+    targetImage: File;
+  }): Promise<AnalysisResult | null> => {
     setIsLoading(true);
 
     try {

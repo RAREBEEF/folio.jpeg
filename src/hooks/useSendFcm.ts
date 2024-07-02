@@ -1,8 +1,8 @@
 import { authStatusState } from "@/recoil/states";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import logoImage from "@/images/favicon-96x96.png";
-import logoIcon from "@/images/favicon-96x96.png";
+import logoImage from "@/images/logo.png";
+import logoIcon from "@/icons/favicon.ico";
 
 const useSendFcm = () => {
   const authStatus = useRecoilValue(authStatusState);

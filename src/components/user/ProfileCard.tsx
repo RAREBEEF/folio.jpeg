@@ -14,7 +14,7 @@ const ProfileCard = ({ profileData }: { profileData: UserData | null }) => {
       className="flex w-fit items-center gap-2"
     >
       <div className="w-10">
-        <ProfileImage url={profileData?.photoURL || null} />
+        <ProfileImage URL={profileData?.photoURL || null} />
       </div>
       <div className="font-bold">{profileData?.displayName || ""}</div>
     </Link>

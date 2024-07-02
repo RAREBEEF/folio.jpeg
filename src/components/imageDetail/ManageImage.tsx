@@ -14,9 +14,11 @@ const ManageImage = ({ id }: { id: string }) => {
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
-  const resetUserGrid = useResetGrid("user-" + authStatus.data?.uid);
-  const resetHomeGrid = useResetGrid("home");
-  const resetFollowingGrid = useResetGrid("following");
+  const resetUserGrid = useResetGrid({
+    gridType: "user-" + authStatus.data?.uid,
+  });
+  const resetHomeGrid = useResetGrid({ gridType: "home" });
+  const resetFollowingGrid = useResetGrid({ gridType: "following" });
   const [imageItem, setImageItem] = useRecoilState(imageItemState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {

@@ -12,7 +12,11 @@ const useGetUsersByUids = () => {
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const fetchUser = async (uid: string): Promise<UserData | null> => {
+  const fetchUser = async ({
+    uid,
+  }: {
+    uid: string;
+  }): Promise<UserData | null> => {
     const docRef = doc(db, "users", uid);
 
     const [userData, extraUserData]: [{ data: UserData }, ExtraUserData] =
@@ -43,12 +47,16 @@ const useGetUsersByUids = () => {
     }
   };
 
-  const getUsers = async (uids: Array<string>): Promise<Array<UserData>> => {
+  const getUsersByUid = async ({
+    uids,
+  }: {
+    uids: Array<string>;
+  }): Promise<Array<UserData>> => {
     if (uids.length <= 0 || isLoading) return [];
 
     setIsLoading(true);
     try {
-      const fetches = uids.map((uid) => fetchUser(uid));
+      const fetches = uids.map((uid) => fetchUser({ uid }));
       const results = await Promise.all(fetches);
 
       return results.filter((result) => result !== null) as Array<UserData>;
@@ -60,7 +68,7 @@ const useGetUsersByUids = () => {
     }
   };
 
-  return { getUsers, isLoading };
+  return { getUsersByUid, isLoading };
 };
 
 export default useGetUsersByUids;

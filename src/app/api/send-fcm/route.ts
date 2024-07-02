@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   try {
     const serviceAccount = {
       projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      privateKey: process.env.PRIVATE_KEY,
+      privateKey: process.env.NEXT_PUBLIC_PRIVATE_KEY,
       clientEmail: process.env.NEXT_PUBLIC_CLIENT_EMAIL,
     };
 
@@ -53,14 +53,13 @@ export async function POST(req: Request) {
     //
     // 인앱 notification 보내기
     //
-    const notificationId = uuidv4();
     const createdAt = Date.now();
     const inappNotificationData = {
       title,
       body,
       createdAt,
       image: image,
-      url: click_action,
+      URL: click_action,
     };
 
     const uidList = uids ? uids.filter((uid) => uid !== myUid) : [];
@@ -75,9 +74,6 @@ export async function POST(req: Request) {
         .update({
           list: admin.firestore.FieldValue.arrayUnion(inappNotificationData),
         });
-      // .collection("notifications")
-      // .doc(notificationId)
-      // .set(inappNotificationData);
     });
 
     //

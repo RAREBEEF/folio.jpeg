@@ -1,4 +1,4 @@
-import { Fragment, MouseEvent, useEffect, useRef, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import useGetImages from "@/hooks/useGetImages";
 import Loading from "@/components/loading/Loading";
 import { useRecoilValue } from "recoil";
@@ -22,7 +22,7 @@ const ImageInfiniteScroller = ({
 }) => {
   const loadRef = useRef<HTMLDivElement>(null);
   const grid = useRecoilValue(gridState);
-  const { getImages, isLoading, lastPage } = useGetImages(type);
+  const { getImages, isLoading, lastPage } = useGetImages({ gridType: type });
   const lastVisible = useRecoilValue<QueryDocumentSnapshot<
     DocumentData,
     DocumentData
@@ -83,7 +83,7 @@ const ImageInfiniteScroller = ({
           <div>이미지가 존재하지 않습니다.</div>
         )}
         {/* 저장된 이미지의 로딩이 모두 끝나면 존재하지 않는 이미지의 id를 추려서 삭제한다. */}
-        {/* 이러한 처리는 백엔드에서 하는게 좋겠지만 당장은 구현이 힘드니 여기에 임시로 구현한다.  */}
+        {/* 백엔드에서 구현하면 좋겠지만 지금은 프론트에서 처리  */}
         {folder && lastPage && (
           <HandleDeletedImage folder={folder} loadedImgIds={gridImageIds} />
         )}

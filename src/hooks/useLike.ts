@@ -5,19 +5,13 @@ import {
   loginModalState,
 } from "@/recoil/states";
 import { ImageDocData, ImageItem } from "@/types";
-import {
-  arrayRemove,
-  arrayUnion,
-  doc,
-  increment,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
 import useErrorAlert from "./useErrorAlert";
 
-const useLike = (imageId: string | Array<string>) => {
+const useLike = ({ imageId }: { imageId: string }) => {
   const showErrorAlert = useErrorAlert();
   const sendFcm = useSendFcm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -45,7 +39,7 @@ const useLike = (imageId: string | Array<string>) => {
   let prevLikes: Array<string>;
 
   // 좋아요
-  const like = async (tokens?: Array<string>) => {
+  const like = async (tokens: Array<string> | null) => {
     if (typeof imageId !== "string" || isLoading) return;
 
     if (authStatus.status !== "signedIn" || !authStatus.data) {
@@ -74,7 +68,7 @@ const useLike = (imageId: string | Array<string>) => {
           data: {
             title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
             body: null,
-            image: imageItem?.url,
+            image: imageItem?.URL,
             click_action: `/image/${imageId}`,
             fcmTokens: tokens ? tokens : null,
             tokenPath: tokens ? null : `users/${imageItem?.uid}`,

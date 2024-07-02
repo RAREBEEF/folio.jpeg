@@ -1,7 +1,7 @@
 import useLike from "@/hooks/useLike";
 import { imageItemState } from "@/recoil/states";
 import { useParams } from "next/navigation";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import FlashIcon from "@/icons/bolt-lightning-solid.svg";
 import Modal from "@/components/modal/Modal";
@@ -10,16 +10,20 @@ import { UserData } from "@/types";
 
 const Like = ({ author }: { author: UserData | null }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const { id: imageId } = useParams();
-  const { like, dislike, alreadyLiked, isLoading } = useLike(imageId);
+  const { id: imageIdParam } = useParams();
+  const imageId = useMemo(
+    () => JSON.stringify(imageIdParam).replaceAll('"', ""),
+    [imageIdParam],
+  );
   const imageItem = useRecoilValue(imageItemState(imageId as string));
+  const { like, dislike, alreadyLiked, isLoading } = useLike({ imageId });
 
   // 좋아용
   const onLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (imageId && typeof imageId === "string" && imageItem && !isLoading)
+    if (imageId && imageItem && !isLoading)
       !alreadyLiked
-        ? like(author?.fcmToken ? [author.fcmToken] : undefined)
+        ? like(author?.fcmToken ? [author.fcmToken] : null)
         : dislike();
   };
 

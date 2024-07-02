@@ -99,18 +99,24 @@ const LayoutNav = () => {
   }, [notification.lastCheck, notification.list]);
 
   return (
+    // <div
+    //   className={`fixed top-0 z-40 flex h-full pt-16 ${nav.show ? "w-full" : "w-[50px]"}`}
+    // >
+    //   <nav
+    //     className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-shark-950 pb-24 text-shark-50 transition-all transition-all ${nav.show ? "w-[200px]" : "w-[50px]"}`}
+    //   >
     <div
-      className={`fixed top-0 z-40 flex h-full pt-16 ${nav.show ? "w-full" : "w-[50px]"}`}
+      className={`fixed bottom-0 top-0 z-40 flex h-full pt-16 xs:top-auto xs:h-[60px] xs:w-screen xs:border-t xs:border-shark-500 xs:bg-shark-950 xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-shark-950 pb-24 text-shark-50 transition-all transition-all ${nav.show ? "w-[200px]" : "w-[50px]"}`}
+        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-shark-950 text-shark-50 transition-all xs:h-[50px] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
         <button
           onClick={(e) => {
             e.preventDefault();
             setNav((prev) => ({ show: !prev.show }));
           }}
-          className={`absolute right-[10px] top-[5px] h-[30px] w-[30px] transition-all ${
+          className={`absolute right-[10px] top-[5px] h-[30px] w-[30px] transition-all xs:hidden ${
             nav.show ? "scale-x-[-100%]" : "scale-x-100"
           }`}
         >
@@ -118,7 +124,7 @@ const LayoutNav = () => {
         </button>
 
         <ul
-          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-6 pb-16 text-end text-lg font-bold`}
+          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-6 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
           <li className="w-full text-center">
             <Link

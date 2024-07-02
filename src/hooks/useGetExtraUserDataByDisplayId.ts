@@ -7,15 +7,17 @@ import useErrorAlert from "./useErrorAlert";
 /**
  * 유저의 추가 정보를 불러오는 함수를 반환하는 커스텀 훅
  */
-const useGetExtraUserData = () => {
+const useGetExtraUserDataByDisplayId = () => {
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   /**
    * 유저의 추가 정보를 불러오는 비동기 함수
    */
-  const getExtraUserData = async (
-    displayId: string,
-  ): Promise<null | {
+  const getExtraUserDataByDisplayId = async ({
+    displayId,
+  }: {
+    displayId: string;
+  }): Promise<null | {
     status: "success" | "notFound" | "error";
     data: null | { uid: string; displayId: string; photoURL: string };
   }> => {
@@ -46,6 +48,7 @@ const useGetExtraUserData = () => {
             },
           };
     } catch (error) {
+      console.log("에러용");
       showErrorAlert();
       return { status: "error", data: null };
     } finally {
@@ -53,7 +56,10 @@ const useGetExtraUserData = () => {
     }
   };
 
-  return { getExtraUserData, isLoading };
+  return {
+    getExtraUserDataByDisplayId: getExtraUserDataByDisplayId,
+    isLoading,
+  };
 };
 
-export default useGetExtraUserData;
+export default useGetExtraUserDataByDisplayId;

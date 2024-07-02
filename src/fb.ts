@@ -1,6 +1,4 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
@@ -8,11 +6,6 @@ import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getVertexAI, getGenerativeModel } from "firebase/vertexai-preview";
 import { getMessaging } from "firebase/messaging";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
@@ -28,21 +21,35 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
-export const messaging = getMessaging(app);
-// const analytics = getAnalytics(app);
+
+if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
+  const userAgent = navigator?.userAgent?.toLowerCase();
+  const isIos =
+    userAgent?.indexOf("iphone") !== -1 || userAgent?.indexOf("ipad") !== -1;
+  const isStandalone = window?.matchMedia("(display-mode: standalone)").matches;
+
+  // ios이면서 스탠드얼론이 아니면 푸시를 보낼 수 없다.
+  if (!(isIos && !isStandalone)) {
+    try {
+      const messaging = getMessaging(app);
+      if (localStorage.getItem("pushRequest") === "unsupport")
+        localStorage.removeItem("pushRequest");
+    } catch (error) {
+      console.log(error);
+      localStorage.setItem("pushRequest", "unsupport");
+    }
+  }
+}
 
 if (process.env.NODE_ENV === "development") {
   // @ts-ignore
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 
-const appCheck = initializeAppCheck(app, {
+export const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(
     process.env.NEXT_PUBLIC_APP_CHECK_SITE_KEY || "",
   ),
-
-  // Optional argument. If true, the SDK automatically refreshes App Check
-  // tokens as needed.
   isTokenAutoRefreshEnabled: true,
 });
 

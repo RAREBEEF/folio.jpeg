@@ -9,7 +9,7 @@ import {
 } from "@/recoil/states";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import CommentList from "@/components/comment/CommentList";
 import Like from "./Like";
@@ -36,24 +36,23 @@ const ImageDetail = () => {
   const { getImageItem, isLoading } = useGetImage();
   const { back } = useRouter();
   const { id } = useParams();
+  const imageId = useMemo(() => JSON.stringify(id).replaceAll('"', ""), [id]);
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
-  const [imageItem, setImageItem] = useRecoilState(
-    imageItemState(id as string),
-  );
-  const setComments = useSetRecoilState(commentsState(id as string));
+  const [imageItem, setImageItem] = useRecoilState(imageItemState(imageId));
+  const setComments = useSetRecoilState(commentsState(imageId));
   const setLastVisible = useSetRecoilState<QueryDocumentSnapshot<
     DocumentData,
     DocumentData
-  > | null>(lastVisibleState("comments-" + id));
+  > | null>(lastVisibleState("comments-" + imageId));
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
-    if (id && typeof id === "string" && !imageItem && !isLoading) {
+    if (imageId && !imageItem && !isLoading) {
       (async () => {
         console.log("이미지 로딩");
-        const imageItem = await getImageItem(id);
+        const imageItem = await getImageItem({ imageId: imageId });
         if (imageItem) {
           setImageItem(imageItem);
         } else {
@@ -61,7 +60,7 @@ const ImageDetail = () => {
         }
       })();
     }
-  }, [imageItem, id, getImageItem, setImageItem, isLoading, replace]);
+  }, [imageItem, imageId, getImageItem, setImageItem, isLoading, replace]);
 
   // 작성자 상태 업데이트
   useEffect(() => {
@@ -150,7 +149,7 @@ const ImageDetail = () => {
                       placeholder="empty"
                       style={{ background: imageItem.themeColor }}
                       className={`rounded-xl`}
-                      src={imageItem.url}
+                      src={imageItem.URL}
                       alt={imageItem.title || imageItem.fileName}
                       layout="fill"
                       objectFit="contain"

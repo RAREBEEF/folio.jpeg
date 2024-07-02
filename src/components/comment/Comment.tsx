@@ -144,7 +144,7 @@ const Comment = ({
         const uid = comment.uid;
 
         (async () => {
-          const data = await getUserByUid(uid);
+          const data = await getUserByUid({ uid });
           setDisplayId(data?.displayId || "");
           setAuthor(data);
           setIsAuthorLoading(false);
@@ -184,7 +184,7 @@ const Comment = ({
           href={`/${author?.displayId}`}
           className="w-8 shrink-0"
         >
-          <ProfileImage url={author?.photoURL || null} />
+          <ProfileImage URL={author?.photoURL || null} />
         </Link>
         <div className="pt-1 md:text-sm">
           <Link

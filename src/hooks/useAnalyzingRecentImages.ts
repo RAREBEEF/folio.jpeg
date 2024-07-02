@@ -1,6 +1,6 @@
 import { db, model } from "@/fb";
 import { authStatusState } from "@/recoil/states";
-import { Feedback, ImageData } from "@/types";
+import { Feedback, ImageData, UserFeedback } from "@/types";
 import {
   collection,
   doc,
@@ -20,9 +20,11 @@ const useAnalyzingRecentImages = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
 
-  const analyzingRecentImages = async (
-    lastFeedbackAt: number,
-  ): Promise<Feedback | "Less than 5 new images" | null> => {
+  const analyzingRecentImages = async ({
+    prevFeedback,
+  }: {
+    prevFeedback: UserFeedback;
+  }): Promise<Feedback | "Less than 5 new images" | null> => {
     if (!authStatus.data?.uid || isLoading) return null;
     setIsLoading(true);
 
@@ -44,7 +46,7 @@ const useAnalyzingRecentImages = () => {
       });
 
       const uploadAfterLastFeedback = recentImageDatas.filter(
-        (imageData) => imageData.createdAt > lastFeedbackAt,
+        (imageData) => imageData.createdAt > prevFeedback.createdAt,
       );
 
       if (uploadAfterLastFeedback.length < 5) {
@@ -84,12 +86,12 @@ const useAnalyzingRecentImages = () => {
 };
 
 const imageDataToFile = async (imageData: ImageData): Promise<File | null> => {
-  const { fileName, url } = imageData;
+  const { fileName, URL } = imageData;
   const mimeType = getMimeType(fileName);
 
-  if (!fileName || !url || !mimeType) return null;
+  if (!fileName || !URL || !mimeType) return null;
   const response = await fetch(
-    `/api/proxy/${url.replace("https://firebasestorage.googleapis.com/", "")}`,
+    `/api/proxy/${URL.replace("https://firebasestorage.googleapis.com/", "")}`,
   );
 
   const blob = await response.blob();

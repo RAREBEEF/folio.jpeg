@@ -12,7 +12,7 @@ const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
       <LayoutNav />
       <div
         style={{ minHeight: "calc(100lvh - 64px)" }}
-        className={`ml-[50px] w-full min-w-[300px] transition-all`}
+        className={`ml-[50px] w-full min-w-[300px] transition-all xs:ml-0`}
       >
         {children}
       </div>

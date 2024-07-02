@@ -11,7 +11,7 @@ const useGetFolders = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
 
-  const getFolders = async (uid: string) => {
+  const getFolders = async ({ uid }: { uid: string }) => {
     setIsLoading(true);
     try {
       const foldersRef = collection(db, "users", uid, "folders");

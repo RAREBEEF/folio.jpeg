@@ -1,4 +1,4 @@
-import { authStatusState, inAppNotificationsState } from "@/recoil/states";
+import { authStatusState, inAppNotificationState } from "@/recoil/states";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { db } from "@/fb";
 import { InAppNotification } from "@/types";
@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 
 const InAppNotificationListener = () => {
   const authStatus = useRecoilValue(authStatusState);
-  const [inAppNotifications, setInAppNotifications] = useRecoilState(
-    inAppNotificationsState,
+  const [inAppNotification, setInAppNotification] = useRecoilState(
+    inAppNotificationState,
   );
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const InAppNotificationListener = () => {
         notifications.push(doc.data() as InAppNotification);
       });
 
-      setInAppNotifications((prev) => ({
+      setInAppNotification((prev) => ({
         ...prev,
         notifications: notifications.reverse(),
         lastUpdate: Date.now(),
@@ -43,7 +43,7 @@ const InAppNotificationListener = () => {
     return () => {
       unsub();
     };
-  }, [authStatus.data?.uid, setInAppNotifications]);
+  }, [authStatus.data?.uid, setInAppNotification]);
 
   return <div></div>;
 };

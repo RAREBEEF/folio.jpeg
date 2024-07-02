@@ -57,7 +57,7 @@ const ImageGridColsItem = ({
             className="overflow-hidden rounded-xl"
             priority
             quality={50}
-            src={imageItem.url}
+            src={imageItem.URL}
             alt={imageItem.fileName}
             width={grid!.colWidth}
             height={gridItem.height}

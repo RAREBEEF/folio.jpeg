@@ -13,45 +13,37 @@ import {
 } from "react";
 import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import _ from "lodash";
 import useSetImageFile from "@/hooks/useSetImageFile";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
-import useGetExtraUserData from "@/hooks/useGetExtraUserData";
+import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
 import ProfileImage from "@/components/user/ProfileImage";
 import { alertState, authStatusState, userDataState } from "@/recoil/states";
 import { deleteObject, getStorage, ref } from "firebase/storage";
 
 const ProfileForm = () => {
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
-  const [userData, setUserData] = useRecoilState(
+  const setUserData = useSetRecoilState(
     userDataState(authStatus.data?.displayId || ""),
   );
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { getExtraUserData } = useGetExtraUserData();
+  const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
   const {
     reset,
     setImageFile,
     onFileSelect,
-    file,
-    previewUrl,
-    id: imageId,
-    fileName,
-    error,
+    data: { file, previewURL, id: imageId },
   } = useSetImageFile();
-  const {
-    value: displayName,
-    setValue: setDisplayName,
-    onChange: onDisplayNameChange,
-  } = useInput(authStatus.data?.displayName || "");
-  const {
-    value: displayId,
-    setValue: setDisplayId,
-    onChange: onDisplayIdChange,
-  } = useInput(authStatus.data?.displayId || "");
+  const { value: displayName, onChange: onDisplayNameChange } = useInput(
+    authStatus.data?.displayName || "",
+  );
+  const { value: displayId, onChange: onDisplayIdChange } = useInput(
+    authStatus.data?.displayId || "",
+  );
   const [defaultImg, setDefaultImg] = useState<boolean>(
     authStatus.data?.photoURL ? false : true,
   );
@@ -129,7 +121,7 @@ const ProfileForm = () => {
 
     try {
       // 사용자명 중복 체크
-      const extraUserData = await getExtraUserData(displayId);
+      const extraUserData = await getExtraUserDataByDisplayId({ displayId });
 
       if (extraUserData?.status === "error") {
         return;
@@ -154,9 +146,14 @@ const ProfileForm = () => {
         ? authStatus.data?.photoURL
         : "";
 
-      // 새 프로필 이미지 업로드 및 이미지 url 불러오기
+      // 새 프로필 이미지 업로드 및 이미지 URL 불러오기
       if (file && imageId) {
-        photoURL = (await setImageFile(user.uid, imageId, file)) || null;
+        photoURL =
+          (await setImageFile({
+            uid: user.uid,
+            fileName: imageId,
+            img: file,
+          })) || "";
       }
 
       // 이전 프로필 이미지가 존재한데
@@ -167,6 +164,7 @@ const ProfileForm = () => {
         const prevImgPathMatch = authStatus.data.photoURL.match(regex);
 
         if (prevImgPathMatch) {
+          photoURL = "";
           const prevImgPath = prevImgPathMatch[1].replaceAll("%2F", "/");
           const storage = getStorage();
           const storageRef = ref(storage, `images/${prevImgPath}`);
@@ -281,9 +279,9 @@ const ProfileForm = () => {
             className={`group relative m-auto w-[60%] cursor-pointer rounded-full xs:w-[80%]`}
           >
             <ProfileImage
-              url={
-                previewUrl
-                  ? previewUrl
+              URL={
+                previewURL
+                  ? previewURL
                   : defaultImg
                     ? ""
                     : authStatus.data?.photoURL || ""

@@ -9,11 +9,15 @@ const useSetImageData = () => {
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const setImageData = async (
-    id: string,
-    data: ImageDocData,
-    update: boolean = false,
-  ): Promise<"success" | "error"> => {
+  const setImageData = async ({
+    id,
+    data,
+    update = false,
+  }: {
+    id: string;
+    data: ImageDocData;
+    update: boolean;
+  }): Promise<"success" | "error"> => {
     setIsLoading(true);
 
     try {

@@ -106,7 +106,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
         {notifications.concat(notificationHistory).map((notification, i) => (
           <li key={i}>
             <Link
-              href={notification.url}
+              href={notification.URL}
               className="block rounded-lg p-2 shadow"
               onClick={() => {
                 close();

@@ -42,7 +42,7 @@ self.addEventListener("notificationclick", function (event) {
   event.preventDefault();
   event.notification.close();
 
-  const urlToOpen = event.notification.data.click_action;
+  const URLToOpen = event.notification.data.click_action;
 
   const promiseChain = clients
     .matchAll({
@@ -54,7 +54,7 @@ self.addEventListener("notificationclick", function (event) {
 
       for (let i = 0; i < windowClients.length; i++) {
         const windowClient = windowClients[i];
-        if (windowClient.url.includes(urlToOpen)) {
+        if (windowClient.url.includes(URLToOpen)) {
           matchingClient = windowClient;
           break;
         }
@@ -63,7 +63,7 @@ self.addEventListener("notificationclick", function (event) {
       if (matchingClient) {
         return matchingClient.focus();
       } else {
-        return clients.openWindow(urlToOpen);
+        return clients.openWindow(URLToOpen);
       }
     });
 

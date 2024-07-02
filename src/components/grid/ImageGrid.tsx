@@ -53,7 +53,7 @@ const ImageGrid = ({ type }: { type: string }) => {
           //   initGrid.colWidth = containerWidth - initGrid.gap * 2;
           // } else {
           initGrid.colCount = 2;
-          initGrid.colWidth = containerWidth / 2 - initGrid.gap * 3;
+          initGrid.colWidth = containerWidth / 2 - initGrid.gap * 2;
           // }
         }
         const cols: Array<Column> = Array.from(
@@ -209,7 +209,7 @@ export default ImageGrid;
 //       likes: [],
 //       tags: [],
 //       byte: 0,
-//       url: "",
+//       URL: "",
 //       grid: {
 //         page: 0,
 //         height: diffLongest - gridConfig.gap,

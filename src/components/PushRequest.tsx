@@ -37,6 +37,9 @@ const PushRequest = () => {
         setSecondRequest(true);
         setShowPushRequestModal(true);
         break;
+      // 지원 안함
+      case "unsupport":
+        break;
       // 최초 요청
       // 최초 요청은 허용 안함 버튼 출력 안함
       default:

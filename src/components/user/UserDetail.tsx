@@ -6,7 +6,7 @@ import {
   userDataState,
   usersDataState,
 } from "@/recoil/states";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Loading from "@/components/loading/Loading";
 import { useParams, useSearchParams } from "next/navigation";
 import { MouseEvent, useEffect, useMemo, useState } from "react";
@@ -24,7 +24,7 @@ import Feedback from "./Feedback";
 const UserDetail = () => {
   const { getUserByDisplayId } = useGetUserBydisplayId();
   const { replace } = useRouter();
-  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
+  const setLoginModal = useSetRecoilState(loginModalState);
   const params = useSearchParams();
   const { displayId: dpid } = useParams();
   const displayId = useMemo(
@@ -47,7 +47,7 @@ const UserDetail = () => {
 
     setIsLoading(true);
 
-    // url 파라미터에서 displayId 가져오기
+    // URL 파라미터에서 displayId 가져오기
     const curDisplayId = displayId;
 
     // 현재 페이지가 내 페이지이면 지금 갖고있는 내 userData를 userData 상태에 할당
@@ -77,9 +77,13 @@ const UserDetail = () => {
         // usersData에 데이터가 없으면
         // 해당 유저의 displayId로 extraUserData 불러오기
         (async () => {
-          const data = await getUserByDisplayId(curDisplayId);
-          setUserData(data);
-          setIsLoading(false);
+          const data = await getUserByDisplayId({ displayId: curDisplayId });
+          if (!data) {
+            replace("/");
+          } else {
+            setUserData(data);
+            setIsLoading(false);
+          }
         })();
       }
     }
@@ -114,7 +118,7 @@ const UserDetail = () => {
               </div>
             )}
             <div className="w-[50%] max-w-72">
-              <ProfileImage url={userData.photoURL} />
+              <ProfileImage URL={userData.photoURL} />
             </div>
             <h3 className="flex flex-col items-center">
               <span className="text-2xl font-bold text-shark-950">

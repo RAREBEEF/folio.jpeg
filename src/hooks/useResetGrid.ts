@@ -5,10 +5,12 @@ import {
 } from "@/recoil/states";
 import { useResetRecoilState } from "recoil";
 
-const useResetGrid = (type: string) => {
-  const resetImageDataPages = useResetRecoilState(imageDataPagesState(type));
-  const resetLastVisible = useResetRecoilState(lastVisibleState(type));
-  const resetGridImageIds = useResetRecoilState(gridImageIdsState(type));
+const useResetGrid = ({ gridType }: { gridType: string }) => {
+  const resetImageDataPages = useResetRecoilState(
+    imageDataPagesState(gridType),
+  );
+  const resetLastVisible = useResetRecoilState(lastVisibleState(gridType));
+  const resetGridImageIds = useResetRecoilState(gridImageIdsState(gridType));
 
   const reset = () => {
     resetImageDataPages();

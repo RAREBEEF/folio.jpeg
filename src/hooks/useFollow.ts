@@ -1,4 +1,4 @@
-import { auth, db } from "@/fb";
+import { db } from "@/fb";
 import {
   authStatusState,
   loginModalState,
@@ -13,7 +13,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
 import useErrorAlert from "./useErrorAlert";
 
-const useFollow = (targetUid: string) => {
+const useFollow = ({ targetUid }: { targetUid: string }) => {
   const showErrorAlert = useErrorAlert();
   const sendFcm = useSendFcm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,7 +27,7 @@ const useFollow = (targetUid: string) => {
   const [targetuserData, setTargetuserData] = useRecoilState(
     userDataState(targetDisplayId),
   );
-  const [myuserData, setMyuserData] = useRecoilState(
+  const setMyuserData = useSetRecoilState(
     userDataState(authStatus.data?.displayId || ""),
   );
 

@@ -11,14 +11,14 @@ import imageCompression from "browser-image-compression";
 import useErrorAlert from "./useErrorAlert";
 
 /**
- * 이미지를 스토리지에 업로드하고 다운로드url을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
+ * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
  */
 const useSetImageFile = () => {
   const showErrorAlert = useErrorAlert();
   const [isInputUploading, setIsInputUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewURL, setPreviewURL] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
   const [originalName, setOriginalName] = useState<string>("");
@@ -30,7 +30,7 @@ const useSetImageFile = () => {
   const [error, setError] = useState<unknown>(null);
 
   // 이미지 압축
-  const compressor = async (targetImage: File) => {
+  const compressor = async ({ targetImage }: { targetImage: File }) => {
     const compressedImage = await imageCompression(targetImage, {
       maxSizeMB: 10,
       maxWidthOrHeight: 1920,
@@ -46,21 +46,21 @@ const useSetImageFile = () => {
       // 상태 초기화
       reset();
 
-      const compressedImage = await compressor(fileList[0]);
+      const compressedImage = await compressor({ targetImage: fileList[0] });
       setFile(compressedImage);
 
       // 미리보기 이미지 경로
       const previewImg = new Image();
       const _URL = window.URL || window.webkitURL;
-      const objectUrl = _URL.createObjectURL(compressedImage);
+      const objectURL = _URL.createObjectURL(compressedImage);
       previewImg.onload = async function () {
         // @ts-ignore
         setSize({ width: this.width, height: this.height });
-        setPreviewUrl(objectUrl);
-        // const gradient = await getGradient(objectUrl);
+        setPreviewURL(objectURL);
+        // const gradient = await getGradient(objectURL);
         // setGradient(gradient);
       };
-      previewImg.src = objectUrl;
+      previewImg.src = objectURL;
 
       // 파일 형식 체크
       const fileType = compressedImage.type.replace("image/", "");
@@ -79,7 +79,7 @@ const useSetImageFile = () => {
       setIsInputUploading(false);
     } else {
       // setFile(null);
-      // setPreviewUrl(null);
+      // setPreviewURL(null);
       // setId(null);
       // setFileName(null);
       // setOriginalName(null);
@@ -89,13 +89,17 @@ const useSetImageFile = () => {
   };
 
   /**
-   * 이미지를 스토리지에 업로드하고 다운로드url을 포함한 이미지 데이터를 반환하는 비동기 함수
+   * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수
    * */
-  const setImageFile = async (
-    uid: string,
-    fileName: string,
-    img: File,
-  ): Promise<string | null> => {
+  const setImageFile = async ({
+    uid,
+    fileName,
+    img,
+  }: {
+    uid: string;
+    fileName: string;
+    img: File;
+  }): Promise<string | null> => {
     if (error || isLoading) return null;
     setIsLoading(true);
 
@@ -120,7 +124,7 @@ const useSetImageFile = () => {
   // 첨부파일 리셋 함수
   const reset = () => {
     setFile(null);
-    setPreviewUrl("");
+    setPreviewURL("");
     setId("");
     setFileName("");
     setOriginalName("");
@@ -136,7 +140,7 @@ const useSetImageFile = () => {
     onFileSelect,
     reset,
     error,
-    data: { file, previewUrl, id, fileName, originalName, byte, size },
+    data: { file, previewURL, id, fileName, originalName, byte, size },
   };
 };
 

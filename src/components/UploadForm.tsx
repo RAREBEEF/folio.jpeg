@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
 import useInput from "@/hooks/useInput";
 import { AnalysisResult, ImageData, ImageItem } from "@/types";
@@ -26,8 +26,13 @@ const UploadForm = () => {
     null,
   );
   const { replace, push } = useRouter();
-  const { id: paramId } = useParams();
-  const isEdit = !!paramId;
+  const { id: imageIdParam } = useParams();
+  const currentImageId = useMemo(
+    () =>
+      imageIdParam ? JSON.stringify(imageIdParam).replaceAll('"', "") : "",
+    [imageIdParam],
+  );
+  const isEdit = !!currentImageId;
   const { getImageItem, isLoading: isImageLoading } = useGetImage();
   const { setImageData } = useSetImageData();
   const [init, setInit] = useState<boolean>(false);
@@ -37,18 +42,20 @@ const UploadForm = () => {
   );
   const authStatus = useRecoilValue(authStatusState);
   const [imageItem, setImageItem] = useRecoilState(
-    imageItemState(paramId as string),
+    imageItemState(currentImageId),
   );
-  const resetHomeGrid = useResetGrid("home");
-  const resetFollowingGrid = useResetGrid("following");
-  const resetUserGrid = useResetGrid("user-" + authStatus.data?.uid);
+  const resetHomeGrid = useResetGrid({ gridType: "home" });
+  const resetFollowingGrid = useResetGrid({ gridType: "following" });
+  const resetUserGrid = useResetGrid({
+    gridType: "user-" + authStatus.data?.uid,
+  });
   const {
     setImageFile,
     onFileSelect,
     error,
     reset,
     isInputUploading,
-    data: { file, previewUrl, id, fileName, originalName, byte, size },
+    data: { file, previewURL, id, fileName, originalName, byte, size },
   } = useSetImageFile();
   const {
     value: title,
@@ -61,7 +68,7 @@ const UploadForm = () => {
     onChange: onDescChange,
   } = useInput(imageItem?.description || "");
   const [alert, setAlert] = useRecoilState(alertState);
-  const [imgUrl, setImgUrl] = useState<string | null | undefined>(null);
+  const [imgURL, setImgURL] = useState<string | null>(null);
   const [imgSize, setImgSize] = useState<{
     width: number;
     height: number;
@@ -86,9 +93,9 @@ const UploadForm = () => {
         if (!imageItem) {
           (async () => {
             console.log("불러오기");
-            const data = await getImageItem(
-              JSON.stringify(paramId).replaceAll('"', ""),
-            );
+            const data = await getImageItem({
+              imageId: currentImageId,
+            });
             if (!data) {
               replace("/");
             } else {
@@ -114,7 +121,7 @@ const UploadForm = () => {
     init,
     isEdit,
     isImageLoading,
-    paramId,
+    currentImageId,
     replace,
     setDesc,
     setImageItem,
@@ -220,7 +227,7 @@ const UploadForm = () => {
     if (!isEdit) {
       setCurrentWork("analyzing");
 
-      analysisResult = await analyzingImage(file as File);
+      analysisResult = await analyzingImage({ targetImage: file as File });
 
       if (!analysisResult) {
         return;
@@ -260,17 +267,17 @@ const UploadForm = () => {
     // 신규 이미지는 업로드 후 id와 url 얻어오기 / 기존 이미지는 기존 데이터 유지
     const imageId = isEdit ? imageItem!.id : (id as string);
     const downloadURL = isEdit
-      ? (imageItem!.url as string)
-      : await setImageFile(
-          authStatus.data.uid,
-          fileName as string,
-          file as File,
-        );
+      ? (imageItem!.URL as string)
+      : await setImageFile({
+          uid: authStatus.data.uid,
+          fileName: fileName as string,
+          img: file as File,
+        });
 
     if (!downloadURL) return;
 
     // 업로드 후 분석 결과에 이미지 띄울 때 필요한 정보
-    setImgUrl(downloadURL);
+    setImgURL(downloadURL);
     setImgSize(size);
 
     const data: ImageData = {
@@ -283,7 +290,7 @@ const UploadForm = () => {
       description: isEdit ? imageItem?.description : desc.trim(),
       byte: isEdit && imageItem ? imageItem.byte : byte,
       size: isEdit && imageItem ? imageItem.size : size,
-      url: downloadURL,
+      URL: downloadURL,
       themeColor: analysisResult.themeColor,
       tags: analysisResult.tags,
       feedback: analysisResult.feedback,
@@ -307,7 +314,11 @@ const UploadForm = () => {
       });
     }
 
-    const response = await setImageData(imageId, data, isEdit);
+    const response = await setImageData({
+      id: imageId,
+      data: data,
+      update: isEdit,
+    });
 
     if (response === "success") {
       if (isEdit) {
@@ -353,7 +364,7 @@ const UploadForm = () => {
           <label
             className={`relative h-auto max-w-[500px] grow overflow-hidden rounded-xl bg-gradient-to-br from-shark-100 to-shark-300 sm:w-full sm:grow-0 ${isEdit ? " cursor-default" : "cursor-pointer"}`}
           >
-            {(previewUrl || (isEdit && imageItem && imageItem.url)) &&
+            {(previewURL || (isEdit && imageItem && imageItem.URL)) &&
             !isInputUploading ? (
               <div
                 style={{
@@ -364,7 +375,7 @@ const UploadForm = () => {
                 <NextImage
                   layout="fill"
                   src={
-                    (isEdit && imageItem ? imageItem.url : previewUrl) as string
+                    (isEdit && imageItem ? imageItem.URL : previewURL) as string
                   }
                   alt={fileName || ""}
                 />
@@ -459,7 +470,7 @@ const UploadForm = () => {
           <Modal close={onCloseResultModal} title="AI 분석 결과">
             <AnalysisResultModal
               result={analysisResult}
-              imgUrl={imgUrl}
+              imgURL={imgURL}
               imgSize={imgSize}
             />
           </Modal>

@@ -20,24 +20,26 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import _ from "lodash";
 import { Filter } from "@/types";
 import useErrorAlert from "./useErrorAlert";
+import useSettleImageItemState from "@/hooks/useSettleImageItemState";
 
-const useGetImages = (type: string) => {
+const useGetImages = ({ gridType }: { gridType: string }) => {
+  const { settleImageItemState } = useSettleImageItemState();
   const showErrorAlert = useErrorAlert();
-  const setImageDataPages = useSetRecoilState(imageDataPagesState(type));
+  const setImageDataPages = useSetRecoilState(imageDataPagesState(gridType));
   const [gridImageIds, setGridImageIds] = useRecoilState(
-    gridImageIdsState(type),
+    gridImageIdsState(gridType),
   );
   const [lastVisible, setLastVisible] = useRecoilState<QueryDocumentSnapshot<
     DocumentData,
     DocumentData
-  > | null>(lastVisibleState(type));
+  > | null>(lastVisibleState(gridType));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [lastPage, setLastPage] = useState<boolean>(false);
 
   // 다른 타입이 들어오면 lastPage를 초기화한다.
   useEffect(() => {
     setLastPage(false);
-  }, [type]);
+  }, [gridType]);
 
   // 로딩에 딜레이 발생시키기
   const delay = (ms: number) => {
@@ -79,7 +81,7 @@ const useGetImages = (type: string) => {
       const documentSnapshots = await getDocs(q);
 
       // 딜레이를 적용해 이미지 데이터 불러오기
-      await Promise.all([delay(delayMs), documentSnapshots]);
+      // await Promise.all([delay(delayMs), documentSnapshots]);
 
       // 불러온 문서가 없으면 마지막 페이지임
       if (documentSnapshots.empty) {
@@ -91,9 +93,11 @@ const useGetImages = (type: string) => {
         // id 목록에서 이미지 중복 체크 후 목록 업데이트
         documentSnapshots.forEach((doc) => {
           const id = doc.id;
+          const data = { ...(doc.data() as ImageDocData), id: doc.id };
+          settleImageItemState({ image: data });
           if (!gridImageIds.includes(id)) {
             setGridImageIds((prev) => [...prev, id]);
-            imgs.push({ ...(doc.data() as ImageDocData), id: doc.id });
+            imgs.push(data);
           }
         });
 

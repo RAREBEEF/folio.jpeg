@@ -13,7 +13,7 @@ const LayoutFooter = () => {
     //   }`}
     // >
     <div
-      className={`ml-[50px] bg-shark-950 px-10 py-4 text-shark-50 transition-all`}
+      className={`ml-[50px] bg-shark-950 px-10 py-4 text-shark-50 transition-all xs:mb-[60px] xs:ml-0`}
     >
       <nav className="mx-auto mb-6 max-w-[1300px]">
         <ul className="flex gap-x-24 *:flex *:flex-col *:gap-2">

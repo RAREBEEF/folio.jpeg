@@ -9,9 +9,9 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
-  const { getImages, isLoading } = useGetImages(
-    "user-saved-" + folder.uid + "-" + folder.id,
-  );
+  const { getImages, isLoading } = useGetImages({
+    gridType: "user-saved-" + folder.uid + "-" + folder.id,
+  });
   const imageDataPages = useRecoilValue(
     imageDataPagesState("user-saved-" + folder.uid + "-" + folder.id),
   );
@@ -65,7 +65,7 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
             >
               {img && (
                 <Image
-                  src={img.url}
+                  src={img.URL}
                   alt={img.id}
                   layout="fill"
                   objectFit="cover"

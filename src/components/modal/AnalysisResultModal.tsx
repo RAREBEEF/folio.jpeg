@@ -3,23 +3,23 @@ import Image from "next/image";
 
 const AnalysisResultModal = ({
   result,
-  imgUrl,
+  imgURL,
   imgSize,
 }: {
   result: AnalysisResult;
-  imgUrl: string | null | undefined;
+  imgURL: string | null | undefined;
   imgSize: { width: number; height: number } | null;
 }) => {
   return result === "inappreciate" ? null : (
     <div className="flex flex-col gap-8 break-keep px-8 pb-4">
-      {imgUrl && (
+      {imgURL && (
         <div
           style={{
             aspectRatio: `${imgSize?.width || 0}/${imgSize?.height || 0}`,
           }}
           className={`group relative rounded-xl p-4`}
         >
-          <Image layout="fill" src={imgUrl} alt={"target image"} />
+          <Image layout="fill" src={imgURL} alt={"target image"} />
         </div>
       )}
       <div>

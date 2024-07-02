@@ -9,7 +9,7 @@ import Loading from "@/components/loading/Loading";
 
 const FollowModal = ({ users }: { users: Array<string> }) => {
   const loadRef = useRef<HTMLDivElement>(null);
-  const { getUsers, isLoading } = useGetUsersByUids();
+  const { getUsersByUid, isLoading } = useGetUsersByUids();
   const [userStack, setUserStack] = useState<Array<string>>(users);
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [userList, setUserList] = useState<Array<UserData>>([]);
@@ -34,12 +34,12 @@ const FollowModal = ({ users }: { users: Array<string> }) => {
     });
 
     // 포함 안된 인원은 불러온다.
-    const notLoadedUsersData = await getUsers(notLoadedUsers);
+    const notLoadedUsersData = await getUsersByUid({ uids: notLoadedUsers });
     const loadedUsersData = loadedUsers.map((uid) => usersData[uid]);
 
     // 모두 불러와지면 목록에 추가
     setUserList((prev) => [...prev, ...notLoadedUsersData, ...loadedUsersData]);
-  }, [getUsers, userStack, usersData]);
+  }, [getUsersByUid, userStack, usersData]);
 
   // 무한 스크롤에 사용할 옵저버 (뷰포트에 감지되면 다음 페이지 불러온다.)
   useEffect(() => {

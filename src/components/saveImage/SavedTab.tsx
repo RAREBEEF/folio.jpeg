@@ -25,7 +25,7 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
       (!authStatus.data || authStatus.data.uid !== userData.uid)
     ) {
       (async () => {
-        const folders = await getFolders(userData.uid);
+        const folders = await getFolders({ uid: userData.uid });
         setFolders(folders);
       })();
     }

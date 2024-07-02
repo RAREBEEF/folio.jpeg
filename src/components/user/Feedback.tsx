@@ -1,9 +1,7 @@
 import useAnalyzingRecentImages from "@/hooks/useAnalyzingRecentImages";
-import { Feedback as FeedbackType } from "@/types";
+import { Feedback as FeedbackType, UserFeedback } from "@/types";
 import { MouseEvent, useEffect, useState } from "react";
 import Button from "../Button";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/fb";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { alertState, authStatusState } from "@/recoil/states";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
@@ -12,6 +10,7 @@ import Image from "next/image";
 import InformationSvg from "@/icons/circle-question-regular.svg";
 import Modal from "@/components/modal/Modal";
 import UploadLoading from "@/components/loading/UploadLoading";
+import useGetFeedback from "@/hooks/useGetFeedback";
 
 const Feedback = () => {
   const [showInformationModal, setShowInformationModal] =
@@ -19,17 +18,15 @@ const Feedback = () => {
   const setAlert = useSetRecoilState(alertState);
   const dateDiffNow = useDateDiffNow();
   const authStatus = useRecoilValue(authStatusState);
-  const { analyzingRecentImages, isLoading } = useAnalyzingRecentImages();
+  const { analyzingRecentImages, isLoading: isAnalyzing } =
+    useAnalyzingRecentImages();
   const [feedback, setFeedback] = useState<FeedbackType | null>(null);
-  const [prevFeedback, setPrevFeedback] = useState<{
-    feedback: FeedbackType | null;
-    createdAt: number;
-  } | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [prevFeedback, setPrevFeedback] = useState<UserFeedback | null>(null);
+  const { isLoading: isFeedbackLoading, getFeedback } = useGetFeedback();
 
   const onAnalyzingStartClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (isLoading || !prevFeedback) return;
+    if (isAnalyzing || !prevFeedback) return;
 
     // 이전 분석이 1일 전인지 확인
     const { days: diffDays } = dateDiffNow(prevFeedback.createdAt);
@@ -45,8 +42,7 @@ const Feedback = () => {
     } else if (
       window.confirm("분석은 1일 1회로 제한됩니다. 지금 분석하시겠습니까?")
     ) {
-      setIsAnalyzing(true);
-      const result = await analyzingRecentImages(prevFeedback.createdAt);
+      const result = await analyzingRecentImages({ prevFeedback });
       // 신규 이미지가 5장보다 적으면
       if (result === "Less than 5 new images") {
         setAlert({
@@ -58,29 +54,18 @@ const Feedback = () => {
       } else {
         setFeedback(result);
       }
-      setIsAnalyzing(false);
     }
   };
 
   useEffect(() => {
-    if (!authStatus.data || prevFeedback) return;
+    if (!authStatus.data || prevFeedback || isFeedbackLoading) return;
     const uid = authStatus.data.uid;
-
     (async () => {
-      console.log("이전 분석 불러오기");
-      const docRef = doc(db, "users", uid, "feedback", "data");
-      const docSnap = await getDoc(docRef);
-      const data = docSnap.data() as {
-        feedback: FeedbackType | null;
-        createdAt: number;
-      };
-      if (!data.feedback || Object.keys(data.feedback).length <= 0) {
-        setPrevFeedback({ ...data, feedback: null });
-      } else {
-        setPrevFeedback(data);
-      }
+      const feedback = await getFeedback({ uid });
+      if (!feedback) return;
+      setPrevFeedback(feedback);
     })();
-  }, [authStatus.data, prevFeedback]);
+  }, [authStatus.data, getFeedback, isFeedbackLoading, prevFeedback]);
 
   const onImformationClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

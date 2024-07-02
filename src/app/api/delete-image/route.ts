@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   try {
     const serviceAccount = {
       projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      privateKey: process.env.PRIVATE_KEY,
+      privateKey: process.env.NEXT_PUBLIC_PRIVATE_KEY,
       clientEmail: process.env.NEXT_PUBLIC_CLIENT_EMAIL,
     };
 

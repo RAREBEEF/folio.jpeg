@@ -13,11 +13,15 @@ const useGetImage = () => {
   /**
    * imageId로 db에서 이미지 데이터를 불러오는 비동기 함수
    * */
-  const getImageItem = async (id: string): Promise<ImageItem | null> => {
+  const getImageItem = async ({
+    imageId,
+  }: {
+    imageId: string;
+  }): Promise<ImageItem | null> => {
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, "images", id);
+      const docRef = doc(db, "images", imageId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
