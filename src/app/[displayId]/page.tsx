@@ -3,6 +3,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import admin from "firebase-admin";
 import { ExtraUserData } from "@/types";
 import logo from "@/images/logo.png";
+import { Suspense } from "react";
 
 type Props = {
   params: { displayId: string };
@@ -94,9 +95,11 @@ export async function generateMetadata(
 
 const UserPage = () => {
   return (
-    <main id="user-detail">
-      <UserDetail />
-    </main>
+    <Suspense>
+      <main id="user-detail">
+        <UserDetail />
+      </main>
+    </Suspense>
   );
 };
 

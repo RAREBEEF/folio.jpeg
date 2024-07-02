@@ -1,9 +1,4 @@
-import {
-  StorageReference,
-  getDownloadURL,
-  getStorage,
-  uploadBytes,
-} from "firebase/storage";
+import { getDownloadURL, getStorage, uploadBytes } from "firebase/storage";
 import { ref } from "firebase/storage";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
