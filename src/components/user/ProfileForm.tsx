@@ -20,7 +20,12 @@ import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
 import ProfileImage from "@/components/user/ProfileImage";
-import { alertState, authStatusState, userDataState } from "@/recoil/states";
+import {
+  alertState,
+  authStatusState,
+  userDataState,
+  usersDataState,
+} from "@/recoil/states";
 import { deleteObject, getStorage, ref } from "firebase/storage";
 
 const ProfileForm = () => {
@@ -28,6 +33,7 @@ const ProfileForm = () => {
   const setUserData = useSetRecoilState(
     userDataState(authStatus.data?.displayId || ""),
   );
+  const setUsersData = useSetRecoilState(usersDataState);
   const setAlert = useSetRecoilState(alertState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -174,7 +180,8 @@ const ProfileForm = () => {
 
       // 오류시 복원할 이전 상태
       let prevAuthStatus: AuthStatus;
-      let prevuserData: UserData;
+      let prevUserData: UserData;
+      let prevUsersData: { [key in string]: UserData };
 
       // 유저 데이터 상태 업데이트
       setAuthStatus((prev) => {
@@ -193,12 +200,20 @@ const ProfileForm = () => {
       });
       setUserData((prev) => {
         if (!prev) return prev;
-        prevuserData = prev;
+        prevUserData = prev;
         return {
           ...prev,
           displayName,
           displayId,
           photoURL,
+        };
+      });
+      setUsersData((prev) => {
+        if (!prev) return prev;
+        prevUsersData = prev;
+        return {
+          ...prev,
+          [user.uid]: { ...prev[user.uid], displayName, displayId, photoURL },
         };
       });
 
@@ -233,7 +248,8 @@ const ProfileForm = () => {
         .catch((error) => {
           // 오류시 상태 롤백
           setAuthStatus(prevAuthStatus);
-          setUserData(prevuserData);
+          setUserData(prevUserData);
+          setUsersData(prevUsersData);
         });
     } catch (error) {
       setAlert({

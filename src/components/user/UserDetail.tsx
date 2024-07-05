@@ -19,10 +19,10 @@ import { useRouter } from "next/navigation";
 import FollowBtn from "./FollowBtn";
 import Follow from "./Follow";
 import useGetUserBydisplayId from "@/hooks/useGetUserByDisplayId";
-import Feedback from "./Feedback";
+import AiFeedback from "./AiFeedback";
 
 const UserDetail = () => {
-  const { getUserByDisplayId } = useGetUserBydisplayId();
+  const { getUserByDisplayId, isLoading } = useGetUserBydisplayId();
   const { replace } = useRouter();
   const setLoginModal = useSetRecoilState(loginModalState);
   const params = useSearchParams();
@@ -35,7 +35,6 @@ const UserDetail = () => {
     () => (params.get("tab") === "uploaded" ? "uploaded" : "saved"),
     [params],
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
@@ -44,8 +43,6 @@ const UserDetail = () => {
     // displayId가 없거나 userData가 이미 있거나 현재 불러오는 중이면 불러오지 않음
     if (!displayId || userData || isLoading || authStatus.status === "pending")
       return;
-
-    setIsLoading(true);
 
     // URL 파라미터에서 displayId 가져오기
     const curDisplayId = displayId;
@@ -59,7 +56,6 @@ const UserDetail = () => {
       const myData = authStatus.data;
       setUserData(myData);
       setUsersData((prev) => ({ ...prev, [myData.uid]: myData }));
-      setIsLoading(false);
     } else {
       // 내 페이지가 아니면 해당 유저의 정보를 불러와서 userData 상태에 할당
       // usersData에서 데이터 찾아보기
@@ -72,7 +68,6 @@ const UserDetail = () => {
       if (userIndex !== -1) {
         const data = users[userIndex][1];
         setUserData(data);
-        setIsLoading(false);
       } else {
         // usersData에 데이터가 없으면
         // 해당 유저의 displayId로 extraUserData 불러오기
@@ -82,7 +77,6 @@ const UserDetail = () => {
             replace("/");
           } else {
             setUserData(data);
-            setIsLoading(false);
           }
         })();
       }
@@ -139,7 +133,7 @@ const UserDetail = () => {
             <Follow displayId={displayId} />
           </div>
 
-          <Feedback />
+          <AiFeedback userData={userData} />
 
           <nav className="flex justify-center gap-12 text-lg font-semibold">
             <Link

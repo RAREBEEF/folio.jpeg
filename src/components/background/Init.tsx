@@ -5,6 +5,7 @@ import Auth from "./Auth";
 import PushRequest from "../PushRequest";
 import ExtraUserDataListener from "./ExtraUserDataListener";
 import InAppNotificationListener from "./InAppNotificationListener";
+import SaveImageListener from "./SaveImageListener";
 
 const Init = () => {
   return (
@@ -13,6 +14,7 @@ const Init = () => {
       <PushRequest />
       <ExtraUserDataListener />
       <InAppNotificationListener />
+      <SaveImageListener />
     </Fragment>
   );
 };

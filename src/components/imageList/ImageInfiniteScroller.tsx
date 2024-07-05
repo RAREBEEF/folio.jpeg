@@ -22,7 +22,9 @@ const ImageInfiniteScroller = ({
 }) => {
   const loadRef = useRef<HTMLDivElement>(null);
   const grid = useRecoilValue(gridState);
-  const { getImages, isLoading, lastPage } = useGetImages({ gridType: type });
+  const { getImages, isLoading, lastPage, isError } = useGetImages({
+    gridType: type,
+  });
   const lastVisible = useRecoilValue<QueryDocumentSnapshot<
     DocumentData,
     DocumentData
@@ -47,7 +49,7 @@ const ImageInfiniteScroller = ({
     return () => {
       observer.unobserve(loadBtn);
     };
-  }, [getImages, isLoading, grid, filter]);
+  }, [getImages, grid, filter]);
 
   // toTop 버튼
   const onScrollToTopClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -62,7 +64,7 @@ const ImageInfiniteScroller = ({
     setImageCount(count);
   }, [grid]);
 
-  return !lastPage ? (
+  return !lastPage && !isError ? (
     <div
       ref={loadRef}
       className="pb-24 pt-12 text-center text-sm text-shark-500"

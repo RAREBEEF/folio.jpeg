@@ -6,8 +6,10 @@ import { useRecoilState } from "recoil";
 import _ from "lodash";
 import { usersDataState } from "@/recoil/states";
 import useErrorAlert from "./useErrorAlert";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 const useGetUsersByUids = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -47,6 +49,16 @@ const useGetUsersByUids = () => {
     }
   };
 
+  const getUsersByUidAsync = async ({
+    uids,
+  }: {
+    uids: Array<string>;
+  }): Promise<Array<UserData>> => {
+    const fetches = uids.map((uid) => fetchUser({ uid }));
+    const results = await Promise.all(fetches);
+    return results.filter((result) => result !== null) as Array<UserData>;
+  };
+
   const getUsersByUid = async ({
     uids,
   }: {
@@ -56,10 +68,10 @@ const useGetUsersByUids = () => {
 
     setIsLoading(true);
     try {
-      const fetches = uids.map((uid) => fetchUser({ uid }));
-      const results = await Promise.all(fetches);
-
-      return results.filter((result) => result !== null) as Array<UserData>;
+      return await fetchWithRetry({
+        asyncFn: getUsersByUidAsync,
+        args: { uids },
+      });
     } catch (error) {
       showErrorAlert();
       return [];

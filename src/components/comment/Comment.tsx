@@ -25,7 +25,7 @@ const Comment = ({
   comment: CommentType;
   parentId?: string | null;
 }) => {
-  const { getUserByUid } = useGetUserByUid();
+  const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
   const [alert, setAlert] = useRecoilState(alertState);
   const [summaryText, setSummaryText] = useState<string>(
     comment.replies.length <= 0
@@ -39,7 +39,6 @@ const Comment = ({
   const setComments = useSetRecoilState(commentsState(imageId as string));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
-  const [isAuthorLoading, setIsAuthorLoading] = useState<boolean>(false);
 
   // 댓글 삭제
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -134,22 +133,20 @@ const Comment = ({
 
   // 작성자 상태 업데이트
   useEffect(() => {
-    if (!author && !isAuthorLoading) {
-      if (usersData[comment.uid]) {
-        const data = usersData[comment.uid];
-        setDisplayId(data.displayId || "");
-        setAuthor(data);
-      } else {
-        setIsAuthorLoading(true);
-        const uid = comment.uid;
+    if (author || isAuthorLoading) return;
 
-        (async () => {
-          const data = await getUserByUid({ uid });
-          setDisplayId(data?.displayId || "");
-          setAuthor(data);
-          setIsAuthorLoading(false);
-        })();
-      }
+    if (usersData[comment.uid]) {
+      const data = usersData[comment.uid];
+      setDisplayId(data.displayId || "");
+      setAuthor(data);
+    } else {
+      const uid = comment.uid;
+
+      (async () => {
+        const data = await getUserByUid({ uid });
+        setDisplayId(data?.displayId || "");
+        setAuthor(data);
+      })();
     }
   }, [author, comment.uid, getUserByUid, isAuthorLoading, usersData]);
 

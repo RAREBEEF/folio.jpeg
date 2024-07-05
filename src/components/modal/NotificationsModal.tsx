@@ -77,7 +77,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                 <div className="flex gap-4">
                   <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-shark-500">
                     <Image
-                      src={notification.image}
+                      src={notification.profileImage}
                       layout="fill"
                       alt={notification.title}
                     />
@@ -88,8 +88,17 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                       {notification.body}
                     </div>
                   </div>
+                  {notification.targetImage && (
+                    <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-shark-500">
+                      <Image
+                        src={notification.targetImage}
+                        layout="fill"
+                        alt={notification.title}
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="w-full text-end text-xs text-shark-500">
+                <div className="w-full pr-2 pt-2 text-end text-xs text-shark-500">
                   {dateDiffNow(notification.createdAt).diffSummary}
                 </div>
               </Link>

@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
-  const { getImages, isLoading } = useGetImages({
+  const { getImages, isLoading, isError } = useGetImages({
     gridType: "user-saved-" + folder.uid + "-" + folder.id,
   });
   const imageDataPages = useRecoilValue(
@@ -24,7 +24,12 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
 
   // 썸네일에 사용할 이미지 불러오기
   useEffect(() => {
-    if (isLoading || folder.images.length <= 0 || imageDataPages.length > 0)
+    if (
+      isLoading ||
+      folder.images.length <= 0 ||
+      imageDataPages.length > 0 ||
+      isError
+    )
       return;
 
     // 저장한 이미지 id 배열에서 가장 앞 4장의 이미지만 불러오기
@@ -33,7 +38,14 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
         filter: { where: where("id", "in", folder.images.slice(0, 4)) },
       });
     })();
-  }, [folder.images, folder.name, getImages, isLoading, imageDataPages]);
+  }, [
+    folder.images,
+    folder.name,
+    getImages,
+    isLoading,
+    imageDataPages,
+    isError,
+  ]);
 
   // 불러온 이미지를 썸네일 이미지 상태에 저장
   useEffect(() => {

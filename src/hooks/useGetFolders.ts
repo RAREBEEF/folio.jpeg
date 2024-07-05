@@ -5,29 +5,37 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import useErrorAlert from "./useErrorAlert";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 const useGetFolders = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
 
-  const getFolders = async ({ uid }: { uid: string }) => {
-    setIsLoading(true);
-    try {
-      const foldersRef = collection(db, "users", uid, "folders");
-      const queries = [];
-      if (!authStatus.data || authStatus.data?.uid !== uid) {
-        queries.push(where("isPrivate", "==", false));
-      }
-      const q = query(foldersRef, ...queries);
-      const docSnap = await getDocs(q);
-      const folders: Folders = [];
-      docSnap.forEach((doc) => {
-        const folder = doc.data() as Folder;
-        folders.push(folder);
-      });
+  const getFoldersAsync = async ({ uid }: { uid: string }) => {
+    console.log("폴더 불러오기");
+    const foldersRef = collection(db, "users", uid, "folders");
+    const queries = [];
+    if (!authStatus.data || authStatus.data?.uid !== uid) {
+      queries.push(where("isPrivate", "==", false));
+    }
+    const q = query(foldersRef, ...queries);
+    const docSnap = await getDocs(q);
+    const folders: Folders = [];
+    docSnap.forEach((doc) => {
+      const folder = doc.data() as Folder;
+      folders.push(folder);
+    });
 
-      return folders;
+    return folders;
+  };
+  const getFolders = async ({ uid }: { uid: string }) => {
+    if (isLoading) return null;
+    setIsLoading(true);
+
+    try {
+      return await fetchWithRetry({ asyncFn: getFoldersAsync, args: { uid } });
     } catch (error) {
       showErrorAlert();
       return null;

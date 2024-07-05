@@ -157,7 +157,8 @@ export interface InAppNotification {
   title: string;
   body: string | null;
   createdAt: number;
-  image: string;
+  profileImage: string;
+  targetImage?: string | null;
   URL: string;
 }
 

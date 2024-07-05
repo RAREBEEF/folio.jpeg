@@ -68,7 +68,8 @@ const useLike = ({ imageId }: { imageId: string }) => {
           data: {
             title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
             body: null,
-            image: imageItem?.URL,
+            profileImage: authStatus.data?.photoURL,
+            targetImage: imageItem?.URL,
             click_action: `/image/${imageId}`,
             fcmTokens: tokens ? tokens : null,
             tokenPath: tokens ? null : `users/${imageItem?.uid}`,

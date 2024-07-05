@@ -2,40 +2,7 @@ import { model } from "@/fb";
 import useErrorAlert from "./useErrorAlert";
 import { useState } from "react";
 import { AnalysisResult } from "@/types";
-
-const useAnalyzingImage = () => {
-  const showErrorAlert = useErrorAlert();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const analyzingImage = async ({
-    targetImage,
-  }: {
-    targetImage: File;
-  }): Promise<AnalysisResult | null> => {
-    setIsLoading(true);
-
-    try {
-      const result = await analyzing(targetImage);
-
-      if (result.includes("inappreciate")) {
-        return "inappreciate";
-      } else {
-        const jsonStringMatch = result.match(/\{[\s\S]*\}/);
-        const jsonString = jsonStringMatch?.[0] || "";
-        return JSON.parse(jsonString) as AnalysisResult;
-      }
-    } catch (error) {
-      showErrorAlert();
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return { isLoading, analyzingImage };
-};
-
-export default useAnalyzingImage;
+import useFetchWithRetry from "./useFetchWithRetry";
 
 async function fileToGenerativePart(file: File) {
   const base64EncodedDataPromise = new Promise((resolve) => {
@@ -100,7 +67,7 @@ const analyzing = async (targetImage: File): Promise<string> => {
 
     12. feedback 필드에 대한 작성은 아래 지침에 따라주세요.
     이미지 제작자가(사진가, 일러스트레이터 등) 자신이 제작한 이미지에 대한 피드백을 요청합니다.
-    이미지들에 대한 구도, 초점, 심도, 노출, 셔터스피드, ISO, 보정, 색감, 피사체, 그림체, 질감, 채색 등 이 외에도 다양한 영역을 바탕으로 이미지 제작자의 스킬을 전문가의 관점에서 최대한 자세하게 분석하여 500자 이내의 한국어로 “feedback” 객체의 “detail” 필드에 작성하세요.
+    이미지들에 대한 구도, 초점, 심도, 노출, 셔터스피드, ISO, 보정, 색감, 피사체, 그림체, 질감, 채색 등 이 외에도 다양한 영역을 바탕으로 이미지 제작자의 스킬을 전문가의 관점에서 최대한 자세하게 분석하여 500자 내외의 한국어로 “feedback” 객체의 “detail” 필드에 작성하세요.
     그리고 분석 결과를 바탕으로 이미지에서 좋았던 부분과 다음 작품에서는 개선했으면 하는 부분을 “feedback” 객체의 “summary” 필드 안에 있는 “good” 필드와 “improve” 필드에 각각 100자 이내로 요약하여 한국어로 작성하세요.
     주의할 점: 분석 결과는 이미지 제작자와 직접 대화하는 형태의 문장을 사용해 주세요. 다만 청자의 호칭이 명확하지 않으므로 대상을 직접적으로 호명하는 것은 피해주세요.
     `;
@@ -111,3 +78,48 @@ const analyzing = async (targetImage: File): Promise<string> => {
 
   return text;
 };
+
+const useAnalyzingImage = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
+  const showErrorAlert = useErrorAlert();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const analyzingImageAsync = async ({
+    targetImage,
+  }: {
+    targetImage: File;
+  }): Promise<AnalysisResult | null> => {
+    console.log("분석 시도");
+    const result = await analyzing(targetImage);
+
+    if (result.includes("inappreciate")) {
+      return "inappreciate";
+    } else {
+      const jsonStringMatch = result.match(/\{[\s\S]*\}/);
+      const jsonString = jsonStringMatch?.[0] || "";
+      return JSON.parse(jsonString) as AnalysisResult;
+    }
+  };
+
+  const analyzingImage = async ({ targetImage }: { targetImage: File }) => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    try {
+      return await fetchWithRetry({
+        asyncFn: analyzingImageAsync,
+        args: { targetImage },
+        retries: 1,
+      });
+    } catch (error) {
+      showErrorAlert();
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { isLoading, analyzingImage };
+};
+
+export default useAnalyzingImage;

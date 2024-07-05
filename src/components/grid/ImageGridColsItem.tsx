@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { GridItem, ImageDataPages } from "@/types";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { gridState, imageItemState } from "@/recoil/states";
 import Link from "next/link";
 import SaveButton from "../saveImage/SaveButton";
 import { usePathname } from "next/navigation";
+import BrokenSvg from "@/icons/link-slash-solid.svg";
 
 const ImageGridColsItem = ({
   gridItem,
@@ -17,6 +18,7 @@ const ImageGridColsItem = ({
   const pathname = usePathname();
   const [imageItem, setImageItem] = useRecoilState(imageItemState(gridItem.id));
   const grid = useRecoilValue(gridState);
+  const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
 
   useEffect(() => {
     setImageItem((prev) => {
@@ -50,19 +52,32 @@ const ImageGridColsItem = ({
           className="relative"
           href={`/image/${imageItem.id}`}
         >
-          <Image
-            style={{
-              background: imageItem.themeColor,
-            }}
-            className="overflow-hidden rounded-xl"
-            priority
-            quality={50}
-            src={imageItem.URL}
-            alt={imageItem.fileName}
-            width={grid!.colWidth}
-            height={gridItem.height}
-            placeholder="empty"
-          />
+          {isImageBroken ? (
+            <BrokenSvg
+              style={{
+                width: grid?.colWidth,
+                height: gridItem.height,
+              }}
+              className="overflow-hidden rounded-xl bg-shark-100 fill-shark-500 p-[20%]"
+            />
+          ) : (
+            <Image
+              style={{
+                background: imageItem.themeColor,
+              }}
+              className="overflow-hidden rounded-xl"
+              priority
+              quality={50}
+              src={imageItem.URL}
+              alt={imageItem.fileName}
+              width={grid!.colWidth}
+              height={gridItem.height}
+              placeholder="empty"
+              onError={() => {
+                setIsImageBroken(true);
+              }}
+            />
+          )}
         </Link>
       ) : (
         <div
@@ -79,9 +94,11 @@ const ImageGridColsItem = ({
             background:
               "linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0))",
           }}
-          className="pointer-events-none absolute right-0 top-0 hidden h-full w-full justify-end rounded-t-xl pr-2 pt-2 group-hover:flex"
+          className="pointer-events-none absolute right-0 top-0 hidden h-full w-full justify-end rounded-t-xl pr-2 pt-2 group-hover:flex xs:hidden group-hover:xs:hidden"
         >
-          <SaveButton imageItem={imageItem} />
+          <div className="h-8 w-8 origin-top-right transition-all hover:scale-105">
+            <SaveButton imageItem={imageItem} />
+          </div>
         </div>
       )}
     </li>

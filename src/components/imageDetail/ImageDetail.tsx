@@ -29,6 +29,8 @@ import { ExtraUserData, UserData } from "@/types";
 import ProfileCard from "@/components/user/ProfileCard";
 import ManageImage from "./ManageImage";
 import RefreshIcon from "@/icons/rotate-right-solid.svg";
+import BrokenSvg from "@/icons/link-slash-solid.svg";
+import SaveButton from "../saveImage/SaveButton";
 
 const ImageDetail = () => {
   const { replace } = useRouter();
@@ -46,6 +48,7 @@ const ImageDetail = () => {
     DocumentData,
     DocumentData
   > | null>(lastVisibleState("comments-" + imageId));
+  const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
@@ -142,18 +145,30 @@ const ImageDetail = () => {
                       aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
                       maxHeight: "calc(100vh - 150px)",
                     }}
-                    className="relative sticky top-28  m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br from-shark-100 to-shark-300"
+                    className="relative sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br from-shark-100 to-shark-300"
                   >
-                    <Image
-                      priority
-                      placeholder="empty"
-                      style={{ background: imageItem.themeColor }}
-                      className={`rounded-xl`}
-                      src={imageItem.URL}
-                      alt={imageItem.title || imageItem.fileName}
-                      layout="fill"
-                      objectFit="contain"
-                    />
+                    {isImageBroken ? (
+                      <BrokenSvg
+                        style={{
+                          aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
+                        }}
+                        className={`rounded-xl fill-shark-500 p-[20%]`}
+                      />
+                    ) : (
+                      <Image
+                        priority
+                        placeholder="empty"
+                        style={{ background: imageItem.themeColor }}
+                        className={`rounded-xl`}
+                        src={imageItem.URL}
+                        alt={imageItem.title || imageItem.fileName}
+                        layout="fill"
+                        objectFit="contain"
+                        onError={() => {
+                          setIsImageBroken(true);
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="basis-[50%] p-2">
@@ -184,8 +199,11 @@ const ImageDetail = () => {
                   </div>
 
                   <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 px-4 pb-8 pt-4">
-                    <div className="mb-4">
+                    <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />
+                      <div className="w-6 items-center">
+                        <SaveButton color="gray" imageItem={imageItem} />
+                      </div>
                     </div>
                     <CommentForm imageId={imageItem.id} author={author} />
                   </div>

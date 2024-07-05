@@ -4,11 +4,13 @@ import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
 import useErrorAlert from "./useErrorAlert";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 /**
  * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
  */
 const useSetImageFile = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [isInputUploading, setIsInputUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -86,7 +88,7 @@ const useSetImageFile = () => {
   /**
    * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수
    * */
-  const setImageFile = async ({
+  const setImageFileAsync = async ({
     uid,
     fileName,
     img,
@@ -95,25 +97,15 @@ const useSetImageFile = () => {
     fileName: string;
     img: File;
   }): Promise<string | null> => {
-    if (error || isLoading) return null;
-    setIsLoading(true);
+    console.log("파일 업로드 시도");
+    // 업로드
+    const storage = getStorage();
+    const storageRef = ref(storage, `images/${uid}/${fileName}`);
+    const downloadURL = await uploadBytes(storageRef, img).then(async () => {
+      return await getDownloadURL(storageRef);
+    });
 
-    try {
-      // 업로드
-      const storage = getStorage();
-      const storageRef = ref(storage, `images/${uid}/${fileName}`);
-      const downloadURL = await uploadBytes(storageRef, img).then(async () => {
-        return await getDownloadURL(storageRef);
-      });
-
-      setIsLoading(false);
-      return downloadURL;
-    } catch (error) {
-      showErrorAlert();
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    return downloadURL;
   };
 
   // 첨부파일 리셋 함수
@@ -126,6 +118,35 @@ const useSetImageFile = () => {
     setByte(0);
     setSize({ width: 0, height: 0 });
     setError(null);
+  };
+
+  const setImageFile = async ({
+    uid,
+    fileName,
+    img,
+  }: {
+    uid: string;
+    fileName: string;
+    img: File;
+  }) => {
+    if (error || isLoading) return null;
+    setIsLoading(true);
+
+    try {
+      return await fetchWithRetry({
+        asyncFn: setImageFileAsync,
+        args: {
+          uid,
+          fileName,
+          img,
+        },
+      });
+    } catch (error) {
+      showErrorAlert();
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {

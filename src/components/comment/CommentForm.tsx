@@ -87,7 +87,8 @@ const CommentForm = ({
             data: {
               title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
               body: `${authStatus.data?.displayName}님: ${content}`,
-              image: imageItem?.URL,
+              targetImage: imageItem?.URL,
+              profileImage: authStatus.data?.photoURL,
               click_action: `/image/${imageId}`,
               fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
               tokenPath: author?.fcmToken ? null : `users/${imageItem?.uid}`,
@@ -142,7 +143,8 @@ const CommentForm = ({
             data: {
               title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
               body: `${authStatus.data?.displayName}님: ${content}`,
-              image: imageItem?.URL,
+              profileImage: authStatus.data?.photoURL,
+              targetImage: imageItem?.URL,
               click_action: `/image/${imageId}`,
               fcmTokens: tokens,
               tokenPath: tokens

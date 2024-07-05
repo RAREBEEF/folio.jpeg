@@ -1,8 +1,8 @@
 import { authStatusState } from "@/recoil/states";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import logoImage from "@/images/logo.png";
 import logoIcon from "@/icons/favicon.ico";
+import defaultProfileIcon from "@/images/user-solid.png";
 
 const useSendFcm = () => {
   const authStatus = useRecoilValue(authStatusState);
@@ -20,7 +20,8 @@ const useSendFcm = () => {
     data: {
       title: string;
       body: string | undefined | null;
-      image: string | undefined | null;
+      profileImage: string | undefined | null;
+      targetImage?: string | undefined | null;
       click_action: string;
       fcmTokens?: Array<string> | null;
       tokenPath?: string | null;
@@ -40,7 +41,8 @@ const useSendFcm = () => {
         body: JSON.stringify({
           title: data.title,
           body: data.body || "",
-          image: data.image || logoImage.src,
+          profileImage: data.profileImage || defaultProfileIcon.src,
+          targetImage: data.targetImage || null,
           icon: logoIcon.src,
           click_action: data.click_action || "/",
           fcmTokens: data.fcmTokens,

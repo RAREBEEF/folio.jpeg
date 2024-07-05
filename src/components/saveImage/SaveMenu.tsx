@@ -2,7 +2,7 @@ import XSvg from "@/icons/xmark-solid.svg";
 import Button from "../Button";
 import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
 import { Folder, Folders, ImageDataPages, ImageItem } from "@/types";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { ChangeEvent, MouseEvent, useMemo, useState } from "react";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import _ from "lodash";
@@ -12,20 +12,20 @@ import {
   foldersState,
   gridImageIdsState,
   imageDataPagesState,
+  saveModalState,
 } from "@/recoil/states";
 
-const SaveMenuModal = ({
-  closeSaveMenu,
-  savedFolder,
-  imageItem,
-}: {
-  closeSaveMenu: Function;
-  savedFolder: Folder;
-  imageItem: ImageItem;
-}) => {
+const SaveMenu = () => {
+  const [saveModal, setSaveModal] = useRecoilState(saveModalState);
+  const savedFolder = useMemo(
+    () => saveModal.imageSavedFolder,
+    [saveModal.imageSavedFolder],
+  );
+  const imageItem = useMemo(() => saveModal.image, [saveModal.image]);
+
   const [alert, setAlert] = useRecoilState(alertState);
   const [selectedFolderId, setSelectedFolderId] = useState<string>(
-    savedFolder.id,
+    savedFolder?.id || "",
   );
   const authStatus = useRecoilValue(authStatusState);
   const [folders, setFolders] = useRecoilState(
@@ -60,10 +60,10 @@ const SaveMenuModal = ({
       ),
     );
 
-  // 저장 취소 버튼 클릭
+  // 저장 삭제 버튼 클릭
   const onUnsaveClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!folders || !savedFolder || !authStatus.data) return;
+    if (!folders || !savedFolder || !imageItem || !authStatus.data) return;
 
     const uid = authStatus.data.uid;
     const imageId = imageItem.id;
@@ -128,6 +128,7 @@ const SaveMenuModal = ({
           createdAt: Date.now(),
           text: "저장 목록에서 삭제되었습니다.",
         });
+        setSaveModal({ show: false, image: null, imageSavedFolder: null });
       })
       .catch((error) => {
         // 에러 시 백업 상태로 롤백
@@ -150,7 +151,8 @@ const SaveMenuModal = ({
       !folders ||
       !savedFolder ||
       !authStatus.data ||
-      savedFolder.id === selectedFolderId
+      savedFolder.id === selectedFolderId ||
+      !imageItem
     )
       return;
 
@@ -267,7 +269,7 @@ const SaveMenuModal = ({
           createdAt: Date.now(),
           text: "폴더가 변경되었습니다.",
         });
-        closeSaveMenu();
+        setSaveModal({ show: false, image: null, imageSavedFolder: null });
       })
       .catch((error) => {
         // 에러 시 백업 상태로 롤백
@@ -288,25 +290,15 @@ const SaveMenuModal = ({
   const onSelectedFolderChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedFolderId(e.target.value);
   };
+
   return (
-    <div className="absolute left-0 top-0 flex h-full w-full scale-105 flex-col justify-between gap-2 rounded-lg border-2 bg-shark-50 p-2 text-sm text-shark-700 shadow-inner sm:text-xs">
-      <div className="flex justify-between">
-        <h3 className="font-semibold">저장 관리</h3>
-        <button
-          className="h-5 w-5"
-          onClick={() => {
-            closeSaveMenu();
-          }}
-        >
-          <XSvg />
-        </button>
-      </div>
-      <div className="flex justify-center gap-2 text-center">
+    <div className="flex h-full w-full flex-col justify-between gap-2 p-4 text-sm">
+      <div className="flex grow items-center justify-center gap-2 text-center">
         {folders && (
           <select
             onChange={onSelectedFolderChange}
             value={selectedFolderId}
-            className="rounded-lg outline-none"
+            className="h-9 rounded-lg outline-none"
             name="folder"
             id="folder-select"
           >
@@ -318,10 +310,10 @@ const SaveMenuModal = ({
           </select>
         )}
         <Button
-          disabled={savedFolder.id === selectedFolderId}
+          disabled={!savedFolder || savedFolder.id === selectedFolderId}
           onClick={onSaveChange}
         >
-          <div>저장</div>
+          <div>폴더 변경</div>
         </Button>
       </div>
       <div className="flex w-full justify-end">
@@ -333,4 +325,4 @@ const SaveMenuModal = ({
   );
 };
 
-export default SaveMenuModal;
+export default SaveMenu;

@@ -92,7 +92,7 @@ const Auth = () => {
                 id: "_DEFAULT",
                 images: [],
                 isPrivate: true,
-                title: "_DEFAULT",
+                name: "_DEFAULT",
                 uid,
                 updatedAt: now,
               }),

@@ -6,8 +6,10 @@ import { useRecoilState } from "recoil";
 import _ from "lodash";
 import { usersDataState } from "@/recoil/states";
 import useErrorAlert from "./useErrorAlert";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 const useGetUserByUid = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -47,16 +49,28 @@ const useGetUserByUid = () => {
     }
   };
 
+  const getUserByUidAsync = async ({
+    uid,
+  }: {
+    uid: string;
+  }): Promise<UserData | null> => {
+    console.log("uid 유저 로드");
+    return await fetchUser({ uid });
+  };
+
   const getUserByUid = async ({
     uid,
   }: {
     uid: string;
   }): Promise<UserData | null> => {
+    if (isLoading) return null;
     setIsLoading(true);
+
     try {
-      const userData = fetchUser({ uid });
-      setIsLoading(false);
-      return userData;
+      return await fetchWithRetry({
+        asyncFn: getUserByUidAsync,
+        args: { uid },
+      });
     } catch (error) {
       showErrorAlert();
       return null;

@@ -144,7 +144,8 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
           data: {
             title: `${authStatus.data?.displayName}님이 회원님을 팔로우하기 시작했습니다.`,
             body: null,
-            image: authStatus.data?.photoURL,
+            profileImage: authStatus.data?.photoURL,
+            targetImage: null,
             click_action: authStatus.data?.displayId
               ? `/${authStatus.data?.displayId}`
               : "/",

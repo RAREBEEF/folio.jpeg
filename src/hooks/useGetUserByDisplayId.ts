@@ -5,8 +5,10 @@ import _ from "lodash";
 import { usersDataState } from "@/recoil/states";
 import useGetExtraUserDataByDisplayId from "./useGetExtraUserDataByDisplayId";
 import useErrorAlert from "./useErrorAlert";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 const useGetUserBydisplayId = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
   const [usersData, setUsersData] = useRecoilState(usersDataState);
@@ -51,15 +53,28 @@ const useGetUserBydisplayId = () => {
     );
   };
 
+  const getUserByDisplayIdAsync = async ({
+    displayId,
+  }: {
+    displayId: string;
+  }): Promise<UserData | null> => {
+    console.log("유저데이터 불러오기");
+    return await fetchUser({ displayId });
+  };
+
   const getUserByDisplayId = async ({
     displayId,
   }: {
     displayId: string;
   }): Promise<UserData | null> => {
+    if (isLoading) return null;
     setIsLoading(true);
+
     try {
-      const userData = await fetchUser({ displayId });
-      return userData;
+      return await fetchWithRetry({
+        asyncFn: getUserByDisplayIdAsync,
+        args: { displayId },
+      });
     } catch (error) {
       showErrorAlert();
       return null;

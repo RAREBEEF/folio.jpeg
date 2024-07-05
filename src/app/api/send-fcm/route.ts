@@ -7,7 +7,8 @@ export async function POST(req: Request) {
   const {
     title,
     body,
-    image,
+    profileImage,
+    targetImage,
     icon,
     click_action,
     fcmTokens,
@@ -18,7 +19,8 @@ export async function POST(req: Request) {
   }: {
     title: string;
     body: string;
-    image: string;
+    profileImage: string;
+    targetImage: string | null;
     icon: string;
     click_action: string;
     fcmTokens: Array<string> | undefined | null;
@@ -58,7 +60,8 @@ export async function POST(req: Request) {
       title,
       body,
       createdAt,
-      image: image,
+      profileImage,
+      targetImage,
       URL: click_action,
     };
 
@@ -146,7 +149,7 @@ export async function POST(req: Request) {
       },
       data: {
         click_action: click_action,
-        image,
+        image: profileImage,
         icon,
       },
       tokens: tokenList,

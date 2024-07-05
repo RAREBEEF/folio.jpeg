@@ -1,5 +1,5 @@
 import useAnalyzingRecentImages from "@/hooks/useAnalyzingRecentImages";
-import { Feedback as FeedbackType, UserFeedback } from "@/types";
+import { Feedback as FeedbackType, UserData, UserFeedback } from "@/types";
 import { MouseEvent, useEffect, useState } from "react";
 import Button from "../Button";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -12,7 +12,7 @@ import Modal from "@/components/modal/Modal";
 import UploadLoading from "@/components/loading/UploadLoading";
 import useGetFeedback from "@/hooks/useGetFeedback";
 
-const Feedback = () => {
+const AiFeedback = ({ userData }: { userData: UserData }) => {
   const [showInformationModal, setShowInformationModal] =
     useState<boolean>(false);
   const setAlert = useSetRecoilState(alertState);
@@ -26,7 +26,13 @@ const Feedback = () => {
 
   const onAnalyzingStartClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (isAnalyzing || !prevFeedback) return;
+    if (
+      isAnalyzing ||
+      !prevFeedback ||
+      !authStatus.data ||
+      userData.uid !== authStatus.data?.uid
+    )
+      return;
 
     // 이전 분석이 1일 전인지 확인
     const { days: diffDays } = dateDiffNow(prevFeedback.createdAt);
@@ -57,15 +63,17 @@ const Feedback = () => {
     }
   };
 
+  // 이전 분석 결과 불러오기
   useEffect(() => {
-    if (!authStatus.data || prevFeedback || isFeedbackLoading) return;
-    const uid = authStatus.data.uid;
+    if (prevFeedback || isFeedbackLoading || !userData) {
+      return;
+    }
     (async () => {
-      const feedback = await getFeedback({ uid });
+      const feedback = await getFeedback({ uid: userData.uid });
       if (!feedback) return;
       setPrevFeedback(feedback);
     })();
-  }, [authStatus.data, getFeedback, isFeedbackLoading, prevFeedback]);
+  }, [getFeedback, isFeedbackLoading, prevFeedback, userData]);
 
   const onImformationClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -123,16 +131,21 @@ const Feedback = () => {
             </div>
           ) : (
             <div className="text-shark-700">
-              아직 분석 결과가 없습니다. 이미지를 5장 이상 업로드하고 분석을
-              요청해 보세요.
+              아직 분석 결과가 없습니다.
+              <br />
+              {authStatus.data?.uid === userData.uid && (
+                <span>이미지를 5장 이상 업로드하고 분석을 요청해 보세요.</span>
+              )}
             </div>
           )}
         </div>
-        <div className="flex justify-end">
-          <Button onClick={onAnalyzingStartClick}>
-            <div className="text-xs">AI에게 분석 요청</div>
-          </Button>
-        </div>
+        {authStatus.data?.uid === userData.uid && (
+          <div className="flex justify-end">
+            <Button onClick={onAnalyzingStartClick}>
+              <div className="text-xs">AI에게 분석 요청</div>
+            </Button>
+          </div>
+        )}
       </div>
       {showInformationModal && (
         <Modal close={onCloseInformationModal} title="Gemini AI 이미지 분석">
@@ -145,10 +158,10 @@ const Feedback = () => {
               </div>
             </li>
             <li>
-              <h3 className="text-lg font-semibold">이미지 분석</h3>
+              <h3 className="text-lg font-semibold">이미지 분석 결과 종합</h3>
               <div className="pl-1">
-                Gemini에게 사용자가 최근 업로드한 10개 이미지를 분석해 좋았던
-                점과 아쉬운 점을 도출해내도록 요청합니다.
+                Gemini에게 사용자가 최근 업로드한 최대 10개 이미지의 분석 결과를
+                종합하여 피드백을 요청합니다.
               </div>
             </li>
             <li>
@@ -168,7 +181,7 @@ const Feedback = () => {
           <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg bg-shark-50">
             <UploadLoading />
             <div className="text-balance break-keep px-8 pb-8 text-center leading-tight text-shark-700">
-              이미지를 분석하고 있습니다.
+              최근 피드백을 종합하고 있습니다.
               <br />
               창을 닫지 마세요.
             </div>
@@ -179,4 +192,4 @@ const Feedback = () => {
   );
 };
 
-export default Feedback;
+export default AiFeedback;

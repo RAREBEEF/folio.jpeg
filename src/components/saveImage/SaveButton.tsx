@@ -5,6 +5,7 @@ import {
   gridImageIdsState,
   imageDataPagesState,
   loginModalState,
+  saveModalState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Button from "../Button";
@@ -15,10 +16,15 @@ import { db } from "@/fb";
 import _ from "lodash";
 import UnsaveIcon from "@/icons/bookmark-solid.svg";
 import SaveIcon from "@/icons/bookmark-regular.svg";
-import SaveMenu from "./SaveMenu";
 
-const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
-  const [showSaveMenu, setShowSaveMenu] = useState<boolean>(false);
+const SaveButton = ({
+  imageItem,
+  color = "white",
+}: {
+  imageItem: ImageItem;
+  color?: "white" | "gray";
+}) => {
+  const [saveModal, setSaveModal] = useRecoilState(saveModalState);
   const [loginModal, setLoginModal] = useRecoilState(loginModalState);
   const [alert, setAlert] = useRecoilState(alertState);
   const [saved, setSaved] = useState<boolean>(false);
@@ -26,7 +32,6 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
   const [folders, setFolders] = useRecoilState(
     foldersState(authStatus.data?.uid || ""),
   );
-  const [savedFolder, setSavedFolder] = useState<Folder | null>(null);
   const [defaultFolderImagePage, setDefaultFolderImagePage] = useRecoilState(
     imageDataPagesState(
       "user-saved-" + (authStatus.data?.uid || "") + "-" + "_DEFAULT",
@@ -40,15 +45,14 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
     );
 
   // 해당 이미지가 이미 저장되었는지 여부 확인
+  // 저장 여부는 각 버튼의 ui를 관리하기 때문에
+  // recoil과는 별도로 이미지 그리드 아이템마다 별도로 관리되는 로컬 상태로 구분
   useEffect(() => {
     if (!folders || !authStatus.data) {
       setSaved(false);
-      setSavedFolder(null);
-      setShowSaveMenu(false);
       return;
     }
 
-    let isSaved = false;
     const targetId = imageItem.id;
 
     for (const folder of folders) {
@@ -57,13 +61,12 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
       const targetIndex = images.findIndex((id) => id === targetId);
 
       if (targetIndex !== -1) {
-        isSaved = true;
-        setSavedFolder(folder);
-        break;
+        setSaved(true);
+        return;
       }
     }
 
-    setSaved(isSaved);
+    setSaved(false);
   }, [authStatus.data, folders, imageItem.id]);
 
   // 저장 버튼 클릭
@@ -75,10 +78,30 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
     } else if (authStatus.status === "noExtraData") {
       setLoginModal({ show: true, showInit: true });
       return;
+    } else if (!folders || !authStatus.data) {
+      return;
     }
 
-    if (!folders || !authStatus.data) return;
+    // 이미 저장된 이미지인지 체크
+    const targetId = imageItem.id;
 
+    for (const folder of folders) {
+      const { images } = folder;
+
+      const targetIndex = images.findIndex((id) => id === targetId);
+
+      // 이미 저장된 이미지는 저장관리 모달을 띄우고 리스너 종료
+      if (targetIndex !== -1) {
+        setSaveModal({
+          show: true,
+          image: imageItem,
+          imageSavedFolder: folder,
+        });
+        return;
+      }
+    }
+
+    // 아직 저장이 안된 이미지는 기본 폴더에 이미지 저장
     const uid = authStatus.data.uid;
     const updatedAt = Date.now();
     const defaultFolderIndex = folders.findIndex(
@@ -138,35 +161,29 @@ const SaveButton = ({ imageItem }: { imageItem: ImageItem }) => {
       });
   };
 
-  const onShowSaveMenuClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setShowSaveMenu(true);
-  };
+  // const onShowSaveMenuClick = (e: MouseEvent<HTMLButtonElement>) => {
+  //   e.preventDefault();
+  //   setSaveModal({ show: true, image: imageItem });
+  // };
 
-  const closeSaveMenu = () => {
-    setShowSaveMenu(false);
-  };
+  // const closeSaveMenu = () => {
+  //   setSaveModal({ show: false, image: null });
+  // };
 
   return (
-    <div className="pointer-events-auto w-8 origin-top-right">
-      <button
-        onClick={saved ? onShowSaveMenuClick : onSaveClick}
-        className=" transition-all hover:scale-105"
-      >
-        {saved ? (
-          <UnsaveIcon className="w-full fill-shark-50" />
-        ) : (
-          <SaveIcon className="w-full fill-shark-50" />
-        )}
-      </button>
-      {showSaveMenu && savedFolder && (
-        <SaveMenu
-          imageItem={imageItem}
-          savedFolder={savedFolder}
-          closeSaveMenu={closeSaveMenu}
+    <button onClick={onSaveClick} className="pointer-events-auto h-full">
+      {/* <button onClick={onSaveClick} className=""> */}
+      {saved ? (
+        <UnsaveIcon
+          className={`w-full ${color === "white" ? "fill-shark-50" : "fill-shark-500"}`}
+        />
+      ) : (
+        <SaveIcon
+          className={`w-full ${color === "white" ? "fill-shark-50" : "fill-shark-500"}`}
         />
       )}
-    </div>
+      {/* </button> */}
+    </button>
   );
 };
 export default SaveButton;

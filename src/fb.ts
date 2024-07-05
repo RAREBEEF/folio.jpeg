@@ -16,23 +16,20 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const auth = getAuth(app);
 
 if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
+  if (process.env.NODE_ENV === "development") {
+    // @ts-ignore
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  }
+
   const appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(
       process.env.NEXT_PUBLIC_APP_CHECK_SITE_KEY || "",
     ),
     isTokenAutoRefreshEnabled: true,
   });
-  if (process.env.NODE_ENV === "development") {
-    // @ts-ignore
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-  }
 
   const userAgent = navigator?.userAgent?.toLowerCase();
   const isIos =
@@ -52,11 +49,11 @@ if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
   }
 }
 
-// Initialize the Vertex AI service
 const vertexAI = getVertexAI(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+export const auth = getAuth(app);
 
-// Initialize the generative model with a model that supports your use case
-// Gemini 1.5 models are versatile and can be used with all API capabilities
 export const model = getGenerativeModel(vertexAI, {
   model: "gemini-1.5-flash-preview-0514",
 });

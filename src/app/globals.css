@@ -23,3 +23,10 @@ main:not(#home, #image-detail, #user-detail) {
 * {
   box-sizing: border-box;
 }
+
+summary::-webkit-details-marker {
+  display: none;
+}
+summary {
+  list-style-type: none;
+}

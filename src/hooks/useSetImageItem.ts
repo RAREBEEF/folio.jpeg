@@ -4,10 +4,38 @@ import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import useErrorAlert from "./useErrorAlert";
 import { deleteObject, ref } from "firebase/storage";
+import useFetchWithRetry from "./useFetchWithRetry";
 
 const useSetImageData = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const setImageDataAsync = async ({
+    id,
+    data,
+    update = false,
+  }: {
+    id: string;
+    data: ImageDocData;
+    update: boolean;
+  }): Promise<"success" | "error"> => {
+    console.log("데이터 업로드 시도");
+    const docRef = doc(db, "images", id);
+
+    if (update) {
+      const updateData: any = { ...data };
+      delete updateData.likes;
+      await updateDoc(docRef, { ...updateData }).then(() => {
+        setIsLoading(false);
+      });
+    } else {
+      await setDoc(docRef, data).then(() => {
+        setIsLoading(false);
+      });
+    }
+    return "success";
+  };
 
   const setImageData = async ({
     id,
@@ -17,23 +45,20 @@ const useSetImageData = () => {
     id: string;
     data: ImageDocData;
     update: boolean;
-  }): Promise<"success" | "error"> => {
+  }): Promise<"success" | "error" | ""> => {
+    if (isLoading) return "error";
+
     setIsLoading(true);
 
     try {
-      const docRef = doc(db, "images", id);
-
-      if (update) {
-        const updateData: any = { ...data };
-        delete updateData.likes;
-        await updateDoc(docRef, { ...updateData }).then(() => {
-          setIsLoading(false);
-        });
-      } else {
-        await setDoc(docRef, data).then(() => {
-          setIsLoading(false);
-        });
-      }
+      await fetchWithRetry({
+        asyncFn: setImageDataAsync,
+        args: {
+          id,
+          data,
+          update,
+        },
+      });
       return "success";
     } catch (error) {
       // 스토리지에서 이미지 삭제

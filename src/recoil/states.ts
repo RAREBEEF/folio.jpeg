@@ -3,8 +3,10 @@ import {
   Alert,
   AuthStatus,
   Comments,
+  Folder,
   Folders,
   Grid,
+  ImageData,
   ImageDataPages,
   ImageItem,
   InAppNotification,
@@ -32,6 +34,14 @@ export const usersDataState = atom({
 export const loginModalState = atom({
   key: "loginModalState",
   default: { show: false } as { show: boolean; showInit?: boolean },
+});
+export const saveModalState = atom({
+  key: "saveModalState",
+  default: { show: false, image: null } as {
+    show: boolean;
+    image: ImageData | null;
+    imageSavedFolder: Folder | null;
+  },
 });
 export const navState = atom({
   key: "navState",
@@ -88,12 +98,13 @@ export const gridState = atom<Grid>({
   default: null,
 });
 
-// alert
+// alert(앱 내 오류, 경고, 작업 성공 등의 안내창)
 export const alertState = atom<Alert>({
   key: "alertState",
   default: { text: null, createdAt: null, type: "default", show: false },
 });
 
+// 유저간 커뮤니케이션으로 발생하는 알림
 export const inAppNotificationState = atom<{
   list: Array<InAppNotification>;
   lastCheck: number;

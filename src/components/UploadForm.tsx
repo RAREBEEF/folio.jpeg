@@ -20,7 +20,22 @@ import AnalysisResultModal from "@/components/modal/AnalysisResultModal";
 import useAnalyzingImage from "@/hooks/useAnalyzingImage";
 
 const UploadForm = () => {
+  const { getImageItem, isLoading: isImageLoading } = useGetImage();
+  const { setImageData, isLoading: isImageDataUploading } = useSetImageData();
   const { analyzingImage, isLoading: isAnalyzing } = useAnalyzingImage();
+  const isLoading = useMemo(
+    () => isImageLoading || isImageDataUploading || isAnalyzing,
+    [isImageLoading, isImageDataUploading, isAnalyzing],
+  );
+  const {
+    setImageFile,
+    onFileSelect,
+    error,
+    reset,
+    isInputUploading,
+    isLoading: isImageFileUploading,
+    data: { file, previewURL, id, fileName, originalName, byte, size },
+  } = useSetImageFile();
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null,
@@ -33,10 +48,7 @@ const UploadForm = () => {
     [imageIdParam],
   );
   const isEdit = !!currentImageId;
-  const { getImageItem, isLoading: isImageLoading } = useGetImage();
-  const { setImageData } = useSetImageData();
   const [init, setInit] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentWork, setCurrentWork] = useState<"analyzing" | "uploading">(
     "analyzing",
   );
@@ -49,14 +61,7 @@ const UploadForm = () => {
   const resetUserGrid = useResetGrid({
     gridType: "user-" + authStatus.data?.uid,
   });
-  const {
-    setImageFile,
-    onFileSelect,
-    error,
-    reset,
-    isInputUploading,
-    data: { file, previewURL, id, fileName, originalName, byte, size },
-  } = useSetImageFile();
+
   const {
     value: title,
     setValue: setTitle,
@@ -135,7 +140,9 @@ const UploadForm = () => {
     // // // // // // // // //
     // 예외처리
     // // // // // // // // //
-    if (error !== null) {
+    if (isLoading) {
+      return;
+    } else if (error !== null) {
       switch (error) {
         case "fileType":
           setAlert({
@@ -211,8 +218,6 @@ const UploadForm = () => {
       }
     }
 
-    setIsLoading(true);
-
     // 분석 결과
     let analysisResult: AnalysisResult | null;
     // 업데이트 전 상태 백업
@@ -254,7 +259,6 @@ const UploadForm = () => {
         show: true,
         text: `부적절한 이미지를 감지하였습니다.\n업로드를 중단합니다.`,
       });
-      setIsLoading(false);
       return;
     }
 
@@ -348,8 +352,6 @@ const UploadForm = () => {
         text: "문제가 발생하였습니다. 작업을 중단하였습니다.",
       });
     }
-
-    setIsLoading(false);
   };
 
   const onCloseResultModal = () => {

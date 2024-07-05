@@ -16,7 +16,7 @@ const Loading = ({
       }}
       className="m-auto flex w-full items-center justify-center"
     >
-      <div className="m-auto flex h-[50%] gap-2">
+      <div className="m-auto flex h-[50%] min-w-12 gap-2">
         <DotSvg className={`animate-loading-dot-1 fill-${color}`} />
         <DotSvg className={`animate-loading-dot-2 fill-${color}`} />
         <DotSvg className={`animate-loading-dot-3 fill-${color}`} />

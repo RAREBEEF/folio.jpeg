@@ -19,7 +19,6 @@ const FolderDetail = ({}: {}) => {
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [alert, setAlert] = useRecoilState(alertState);
   const authStatus = useRecoilValue(authStatusState);
-
   const { replace } = useRouter();
   const { folderName: folderNameParam, displayId: dpid } = useParams();
   const [pageUid, setPageUid] = useState<string>("");
