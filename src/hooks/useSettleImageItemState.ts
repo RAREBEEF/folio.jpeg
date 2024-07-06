@@ -10,7 +10,6 @@ const useSettleImageItemState = () => {
 
   // id와 imageData를 받아와서 업데이트
   const settleImageItemState = ({ image }: { image: ImageData }) => {
-    console.log("settle");
     setId(image.id);
     setData(image);
   };

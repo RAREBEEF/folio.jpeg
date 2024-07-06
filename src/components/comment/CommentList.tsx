@@ -1,6 +1,6 @@
 import { db } from "@/fb";
 import { commentsState, lastVisibleState } from "@/recoil/states";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import CommentForm from "./CommentForm";
 import Comment from "./Comment";
@@ -18,53 +18,21 @@ import {
 import { Comment as CommentType, Comments } from "@/types";
 import _ from "lodash";
 import Loading from "@/components/loading/Loading";
+import useGetComments from "@/hooks/useGetComments";
 
 const CommentList = ({ imageId }: { imageId: string }) => {
+  const isInitialMount = useRef(true);
   const [comments, setComments] = useRecoilState(
     commentsState(imageId as string),
   );
-  const [lastVisible, setLastVisible] = useRecoilState<QueryDocumentSnapshot<
-    DocumentData,
-    DocumentData
-  > | null>(lastVisibleState("comments-" + imageId));
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [lastPage, setLastPage] = useState<boolean>(false);
-
-  const getComments = useCallback(async () => {
-    setIsLoading(true);
-    console.log("댓글 로딩");
-    const commentsRef = collection(db, "images", imageId, "comments");
-
-    const queries: Array<any> = [orderBy("createdAt", "desc"), limit(2)];
-
-    // 쿼리 (lastVisible)
-    if (lastVisible) queries.push(startAfter(lastVisible));
-
-    const q = query(commentsRef, ...queries);
-    const docSnap = await getDocs(q);
-
-    if (docSnap.empty) {
-      setLastPage(true);
-      if (!comments) setComments({});
-    } else {
-      const newComments: Comments = { ...comments };
-      docSnap.forEach((doc) => {
-        newComments[doc.id] = doc.data() as CommentType;
-      });
-      const lv = docSnap.docs[docSnap.docs.length - 1];
-      setLastVisible(() => {
-        const newLv = _.cloneDeep(lv);
-        return newLv;
-      });
-      setComments(newComments);
-    }
-
-    setIsLoading(false);
-  }, [comments, imageId, lastVisible, setComments, setLastVisible]);
+  const { getComments, isLoading, lastPage } = useGetComments({ imageId });
 
   // 최초 댓글
   useEffect(() => {
-    if (isLoading || lastPage || comments) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (isLoading || comments || lastPage) {
       return;
     } else {
       (async () => {

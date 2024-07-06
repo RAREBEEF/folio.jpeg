@@ -4,11 +4,16 @@ import _ from "lodash";
 import { Folder, Folders, UserData } from "@/types";
 import SavedImageList from "../imageList/SavedImageList";
 import Button from "../Button";
-import { MouseEvent, useEffect, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/fb";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { alertState, authStatusState, foldersState } from "@/recoil/states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  alertState,
+  authStatusState,
+  foldersState,
+  usersDataState,
+} from "@/recoil/states";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/modal/Modal";
 import EditFolderModal from "@/components/modal/EditFolderModal";
@@ -16,17 +21,8 @@ import useGetFolders from "@/hooks/useGetFolders";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
 
 const FolderDetail = ({}: {}) => {
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [alert, setAlert] = useRecoilState(alertState);
-  const authStatus = useRecoilValue(authStatusState);
-  const { replace } = useRouter();
+  const isInitialMount = useRef(true);
   const { folderName: folderNameParam, displayId: dpid } = useParams();
-  const [pageUid, setPageUid] = useState<string>("");
-  const [folders, setFolders] = useRecoilState(foldersState(pageUid));
-  const { getExtraUserDataByDisplayId, isLoading: isExtraUserDataLoading } =
-    useGetExtraUserDataByDisplayId();
-  const { getFolders, isLoading: isFolderLoading } = useGetFolders();
-  const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
   const folderName = useMemo(
     (): string =>
       decodeURIComponent(
@@ -41,53 +37,79 @@ const FolderDetail = ({}: {}) => {
     [dpid],
   );
 
-  // 폴더 주인의 uid 초기화
-  useEffect(() => {
-    if (typeof displayId !== "string" || isExtraUserDataLoading) return;
+  const { replace } = useRouter();
+  const authStatus = useRecoilValue(authStatusState);
+  const setAlert = useSetRecoilState(alertState);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
-    // 세션 스토리지에 저장된 pageUid 존재하면 (유저페이지에서 폴더를 클릭해 링크 이동했을 때)
-    const storedUid = sessionStorage.getItem("curpi");
-    if (storedUid) {
-      setPageUid(storedUid);
-      sessionStorage.removeItem("curpi");
-      // 저장된 pageUid 없으면 (유저페이지 외 다른 경로로 폴더 페이지에 들어왔을 때)
-      // db에서 uid를 새로 불러온다.
+  const usersData = useRecoilValue(usersDataState);
+  const [authorUid, setAuthorUid] = useState<string | null>(null);
+  const { getExtraUserDataByDisplayId, isLoading: isExtraUserDataLoading } =
+    useGetExtraUserDataByDisplayId();
+
+  const [folders, setFolders] = useRecoilState(foldersState(authorUid || ""));
+  const { getFolders, isLoading: isFolderLoading } = useGetFolders();
+  const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
+
+  // 폴더 주인의 유저데이터
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (!displayId || isExtraUserDataLoading || authorUid) return;
+
+    // usersData에서 폴더 주인 데이터 탐색
+    const users = Object.entries(usersData);
+    const curUserIndex = users.findIndex(
+      ([id, userData]) => userData.displayId === displayId,
+    );
+
+    // 못찾았으면 서버에 요청
+    if (curUserIndex === -1) {
+      (async () => {
+        const extraUserData = await getExtraUserDataByDisplayId({
+          displayId,
+        });
+        if (extraUserData?.data) {
+          setAuthorUid(extraUserData.data.uid);
+        } else {
+          // extraUserData 없으면 홈으로
+          replace("/");
+        }
+      })();
+      // 찾았으면 할당
     } else {
-      if (!folders && !pageUid) {
-        (async () => {
-          const extraUserData = await getExtraUserDataByDisplayId({
-            displayId,
-          });
-          if (extraUserData?.data) {
-            setPageUid(extraUserData.data.uid);
-          } else {
-            // extraUserData 없으면 홈으로
-            replace("/");
-          }
-        })();
-      }
+      const [curUid] = users[curUserIndex];
+      setAuthorUid(curUid);
     }
   }, [
+    authorUid,
     displayId,
-    folders,
     getExtraUserDataByDisplayId,
     isExtraUserDataLoading,
-    pageUid,
     replace,
+    usersData,
   ]);
 
   // 폴더 목록 초기화
   useEffect(() => {
-    if (isFolderLoading) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (isFolderLoading) return;
 
     // 현재 폴더 주인의 폴더 목록 데이터가 없지만 uid는 있다면
-    if (!folders && pageUid) {
+    if (!folders && authorUid) {
       // db에서 해당 유저의 폴더 목록 데이터 불러오기
       (async () => {
-        await getFolders({ uid: pageUid })
+        await getFolders({ uid: authorUid })
           .then((folders) => {
             // 폴더 목록 데이터가 존재하지 않거나 불러온 폴더의 uid와 현재 갖고 있는 uid가 일치하지 않으면
-            if (!folders || folders.length <= 0 || folders[0].uid !== pageUid) {
+            if (
+              !folders ||
+              folders.length <= 0 ||
+              folders[0].uid !== authorUid
+            ) {
               // 홈으로 이동
               replace("/");
             } else {
@@ -100,7 +122,7 @@ const FolderDetail = ({}: {}) => {
           });
       })();
     }
-  }, [folders, getFolders, isFolderLoading, pageUid, replace, setFolders]);
+  }, [authorUid, folders, getFolders, isFolderLoading, replace, setFolders]);
 
   // 현재 폴더 초기화(폴더 목록에서 현재 폴더 찾기)
   useEffect(() => {
@@ -109,7 +131,7 @@ const FolderDetail = ({}: {}) => {
 
     // 폴더 목록에서 폴더이름과 uid가 일치하는 폴더 찾기
     const curFolder = folders.find(
-      (folder) => folder.name === folderName && folder.uid === pageUid,
+      (folder) => folder.name === folderName && folder.uid === authorUid,
     );
 
     if (!curFolder) {
@@ -119,14 +141,15 @@ const FolderDetail = ({}: {}) => {
 
     // 현재 폴더 상태 업데이트
     setCurrentFolder(curFolder);
-  }, [displayId, folders, pageUid, folderName, replace]);
+  }, [displayId, folderName, folders, replace, authorUid]);
 
   const onDeleteFolderClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (
       !currentFolder ||
       authStatus.status !== "signedIn" ||
-      authStatus.data!.uid !== currentFolder.uid
+      authStatus.data!.uid !== currentFolder.uid ||
+      !authorUid
     ) {
       setAlert({
         text: "폴더를 삭제할 수 없습니다.",
@@ -160,7 +183,7 @@ const FolderDetail = ({}: {}) => {
       return newFolders;
     });
 
-    const docRef = doc(db, "users", pageUid, "folders", currentFolder.id);
+    const docRef = doc(db, "users", authorUid, "folders", currentFolder.id);
     await deleteDoc(docRef)
       .then(() => {
         setAlert({
@@ -215,7 +238,7 @@ const FolderDetail = ({}: {}) => {
             </div>
           )}
           <SavedImageList
-            type={"user-saved-" + pageUid + "-" + currentFolder.id}
+            type={"user-saved-" + authorUid + "-" + currentFolder.id}
             folder={currentFolder}
           />
         </div>

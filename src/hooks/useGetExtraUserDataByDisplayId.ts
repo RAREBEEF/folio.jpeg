@@ -23,7 +23,7 @@ const useGetExtraUserDataByDisplayId = () => {
     status: "success" | "notFound" | "error";
     data: null | { uid: string; displayId: string; photoURL: string };
   }> => {
-    console.log("엑스트라 데이터");
+    console.log("useGetExtraUserDataByDisplayId");
     const usersRef = collection(db, "users");
     // displayId는 고유값이므로 limit=1 로 쿼리
     const q = query(usersRef, where("displayId", "==", displayId), limit(1));

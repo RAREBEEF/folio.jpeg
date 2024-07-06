@@ -20,7 +20,7 @@ const useGetImage = () => {
   }: {
     imageId: string;
   }): Promise<ImageItem | null> => {
-    console.log("이미지 불러오기");
+    console.log("useGetImage");
     const docRef = doc(db, "images", imageId);
     const docSnap = await getDoc(docRef);
 

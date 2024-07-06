@@ -9,7 +9,7 @@ import {
 } from "@/recoil/states";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { MouseEvent, useEffect, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import CommentList from "@/components/comment/CommentList";
 import Like from "./Like";
@@ -33,6 +33,7 @@ import BrokenSvg from "@/icons/link-slash-solid.svg";
 import SaveButton from "../saveImage/SaveButton";
 
 const ImageDetail = () => {
+  const isInitialMount = useRef(true);
   const { replace } = useRouter();
   const [displayId, setDisplayId] = useState<string>("");
   const { getImageItem, isLoading } = useGetImage();
@@ -52,9 +53,12 @@ const ImageDetail = () => {
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     if (imageId && !imageItem && !isLoading) {
       (async () => {
-        console.log("이미지 로딩");
         const imageItem = await getImageItem({ imageId: imageId });
         if (imageItem) {
           setImageItem(imageItem);

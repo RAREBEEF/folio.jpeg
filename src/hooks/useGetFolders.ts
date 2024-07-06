@@ -14,7 +14,7 @@ const useGetFolders = () => {
   const authStatus = useRecoilValue(authStatusState);
 
   const getFoldersAsync = async ({ uid }: { uid: string }) => {
-    console.log("폴더 불러오기");
+    console.log("useGetFolders");
     const foldersRef = collection(db, "users", uid, "folders");
     const queries = [];
     if (!authStatus.data || authStatus.data?.uid !== uid) {

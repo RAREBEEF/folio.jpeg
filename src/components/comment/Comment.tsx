@@ -1,6 +1,13 @@
 import { Comment as CommentType, Comments, UserData } from "@/types";
 import CommentForm from "@/components/comment/CommentForm";
-import { ChangeEvent, Fragment, MouseEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import {
@@ -25,6 +32,7 @@ const Comment = ({
   comment: CommentType;
   parentId?: string | null;
 }) => {
+  const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
   const [alert, setAlert] = useRecoilState(alertState);
   const [summaryText, setSummaryText] = useState<string>(
@@ -133,7 +141,10 @@ const Comment = ({
 
   // 작성자 상태 업데이트
   useEffect(() => {
-    if (author || isAuthorLoading) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (author || isAuthorLoading) return;
 
     if (usersData[comment.uid]) {
       const data = usersData[comment.uid];

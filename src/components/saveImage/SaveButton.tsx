@@ -8,10 +8,9 @@ import {
   saveModalState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Button from "../Button";
-import { Folder, Folders, ImageDataPages, ImageItem } from "@/types";
-import { MouseEvent, MouseEventHandler, useEffect, useState } from "react";
-import { arrayRemove, doc, updateDoc } from "firebase/firestore";
+import { ImageDataPages, ImageItem } from "@/types";
+import { MouseEvent, useEffect, useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import _ from "lodash";
 import UnsaveIcon from "@/icons/bookmark-solid.svg";

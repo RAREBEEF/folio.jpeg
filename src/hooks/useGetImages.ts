@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import _, { last } from "lodash";
+import _ from "lodash";
 import { Filter } from "@/types";
 import useErrorAlert from "./useErrorAlert";
 import useSettleImageItemState from "@/hooks/useSettleImageItemState";
@@ -60,6 +60,7 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
     filter?: Filter;
     delayMs?: number;
   }) => {
+    console.log("useGetImages");
     const queries: Array<any> = [];
 
     // 필터 파라미터가 존재할 경우
@@ -108,7 +109,10 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
       });
 
       // 이미지 데이터 페이지 업데이트
-      setImageDataPages((prev) => [...prev, imgs]);
+      setImageDataPages((prev) => {
+        const newImageDataPages = Array.from(new Set([...prev, imgs]));
+        return newImageDataPages;
+      });
     }
     setIsError(false);
   };
@@ -129,6 +133,7 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
         args: { filter, delayMs },
       });
     } catch (error) {
+      console.log(error);
       showErrorAlert();
       setIsError(true);
     } finally {

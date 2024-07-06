@@ -54,6 +54,7 @@ const useGetUsersByUids = () => {
   }: {
     uids: Array<string>;
   }): Promise<Array<UserData>> => {
+    console.log("useGetUsersByUids");
     const fetches = uids.map((uid) => fetchUser({ uid }));
     const results = await Promise.all(fetches);
     return results.filter((result) => result !== null) as Array<UserData>;

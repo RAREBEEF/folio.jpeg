@@ -1,4 +1,4 @@
-import FolderDetail from "@/components/user/FolderDetail";
+import FolderDetail from "@/components/saveImage/FolderDetail";
 import _ from "lodash";
 import { ExtraUserData, Folder, ImageData } from "@/types";
 import { Metadata, ResolvingMetadata } from "next";

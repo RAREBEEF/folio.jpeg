@@ -97,7 +97,7 @@ const useSetImageFile = () => {
     fileName: string;
     img: File;
   }): Promise<string | null> => {
-    console.log("파일 업로드 시도");
+    console.log("useSetImageFile");
     // 업로드
     const storage = getStorage();
     const storageRef = ref(storage, `images/${uid}/${fileName}`);

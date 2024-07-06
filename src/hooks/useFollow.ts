@@ -53,6 +53,7 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
   }, [checkAlreadyFollowing, targetUid, authStatus.data]);
 
   const follow = async () => {
+    console.log("useFollow");
     if (
       typeof targetUid !== "string" ||
       isLoading ||
@@ -172,6 +173,7 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
   };
 
   const unfollow = async () => {
+    console.log("useFollow");
     if (typeof targetUid !== "string" || isLoading) return;
     if (authStatus.status !== "signedIn" || !authStatus.data) {
       setLoginModal({

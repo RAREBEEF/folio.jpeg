@@ -20,7 +20,7 @@ const useSetImageData = () => {
     data: ImageDocData;
     update: boolean;
   }): Promise<"success" | "error"> => {
-    console.log("데이터 업로드 시도");
+    console.log("useSetImageData");
     const docRef = doc(db, "images", id);
 
     if (update) {

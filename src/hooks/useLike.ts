@@ -40,6 +40,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
 
   // 좋아요
   const like = async (tokens: Array<string> | null) => {
+    console.log("useLike");
     if (typeof imageId !== "string" || isLoading) return;
 
     if (authStatus.status !== "signedIn" || !authStatus.data) {
@@ -92,6 +93,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
 
   // 좋아요 취소
   const dislike = async () => {
+    console.log("useLike");
     if (
       typeof imageId !== "string" ||
       authStatus.status !== "signedIn" ||

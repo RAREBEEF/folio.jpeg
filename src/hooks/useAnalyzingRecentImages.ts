@@ -27,6 +27,7 @@ const useAnalyzingRecentImages = () => {
   }: {
     prevFeedback: UserFeedback;
   }): Promise<Feedback | "Less than 5 new images" | null> => {
+    console.log("useAnalyzingRecentImages");
     const uid = authStatus.data?.uid;
     if (!uid) return null;
 

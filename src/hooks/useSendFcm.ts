@@ -28,6 +28,7 @@ const useSendFcm = () => {
       uids?: Array<string> | null;
     };
   }) => {
+    console.log("useSendFcm");
     // 토큰이나 토큰의 경로, uid가 전달되지 않았으면 리턴
     if (!data.fcmTokens && !data.tokenPath && !data.uids) {
       return;

@@ -5,10 +5,11 @@ import { where } from "firebase/firestore";
 import _ from "lodash";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
+  const isInitialMount = useRef(true);
   const { getImages, isLoading, isError } = useGetImages({
     gridType: "user-saved-" + folder.uid + "-" + folder.id,
   });
@@ -24,13 +25,17 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
 
   // 썸네일에 사용할 이미지 불러오기
   useEffect(() => {
-    if (
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (
       isLoading ||
       folder.images.length <= 0 ||
       imageDataPages.length > 0 ||
       isError
-    )
+    ) {
       return;
+    }
 
     // 저장한 이미지 id 배열에서 가장 앞 4장의 이미지만 불러오기
     (async () => {
@@ -45,6 +50,7 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
     isLoading,
     imageDataPages,
     isError,
+    thumbnailImgs,
   ]);
 
   // 불러온 이미지를 썸네일 이미지 상태에 저장

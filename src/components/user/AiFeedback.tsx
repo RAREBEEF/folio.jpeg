@@ -1,6 +1,6 @@
 import useAnalyzingRecentImages from "@/hooks/useAnalyzingRecentImages";
 import { Feedback as FeedbackType, UserData, UserFeedback } from "@/types";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { alertState, authStatusState } from "@/recoil/states";
@@ -13,6 +13,7 @@ import UploadLoading from "@/components/loading/UploadLoading";
 import useGetFeedback from "@/hooks/useGetFeedback";
 
 const AiFeedback = ({ userData }: { userData: UserData }) => {
+  const isInitialMount = useRef(true);
   const [showInformationModal, setShowInformationModal] =
     useState<boolean>(false);
   const setAlert = useSetRecoilState(alertState);
@@ -65,7 +66,10 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
 
   // 이전 분석 결과 불러오기
   useEffect(() => {
-    if (prevFeedback || isFeedbackLoading || !userData) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (prevFeedback || isFeedbackLoading || !userData) {
       return;
     }
     (async () => {

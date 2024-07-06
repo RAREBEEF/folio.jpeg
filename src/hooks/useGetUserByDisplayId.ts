@@ -58,7 +58,7 @@ const useGetUserBydisplayId = () => {
   }: {
     displayId: string;
   }): Promise<UserData | null> => {
-    console.log("유저데이터 불러오기");
+    console.log("useGetUserBydisplayId");
     return await fetchUser({ displayId });
   };
 

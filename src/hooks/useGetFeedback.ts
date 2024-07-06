@@ -11,7 +11,7 @@ const useGetFeedback = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getFeedbackAsync = async ({ uid }: { uid: string }) => {
-    console.log("이전 피드백 로딩");
+    console.log("useGetFeedback");
     const docRef = doc(db, "users", uid, "feedback", "data");
     const docSnap = await getDoc(docRef);
     const data = docSnap.data() as UserFeedback;

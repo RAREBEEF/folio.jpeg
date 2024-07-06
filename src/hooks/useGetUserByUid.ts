@@ -54,7 +54,7 @@ const useGetUserByUid = () => {
   }: {
     uid: string;
   }): Promise<UserData | null> => {
-    console.log("uid 유저 로드");
+    console.log("useGetUserByUid");
     return await fetchUser({ uid });
   };
 

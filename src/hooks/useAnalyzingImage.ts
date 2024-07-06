@@ -89,7 +89,7 @@ const useAnalyzingImage = () => {
   }: {
     targetImage: File;
   }): Promise<AnalysisResult | null> => {
-    console.log("분석 시도");
+    console.log("useAnalyzingImage");
     const result = await analyzing(targetImage);
 
     if (result.includes("inappreciate")) {
@@ -102,7 +102,7 @@ const useAnalyzingImage = () => {
   };
 
   const analyzingImage = async ({ targetImage }: { targetImage: File }) => {
-    if (isLoading) return;
+    if (isLoading) return null;
     setIsLoading(true);
 
     try {

@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import Modal from "@/components/modal/Modal";
 import AddFolderModal from "@/components/modal/AddFolderModal";
@@ -11,6 +11,7 @@ import SavedFolderList from "./SavedFolderList";
 import useGetFolders from "@/hooks/useGetFolders";
 
 const SavedTab = ({ userData }: { userData: UserData }) => {
+  const isInitialMount = useRef(true);
   const authStatus = useRecoilValue(authStatusState);
   const { getFolders } = useGetFolders();
   const [folders, setFolders] = useRecoilState(foldersState(userData.uid));
@@ -20,7 +21,10 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
 
   // 폴더 데이터 불러오기(내 페이지가 아닐 때만)
   useEffect(() => {
-    if (
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    } else if (
       !folders &&
       (!authStatus.data || authStatus.data.uid !== userData.uid)
     ) {
