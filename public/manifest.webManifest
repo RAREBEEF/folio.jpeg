@@ -3,11 +3,18 @@
   "background_color": "#f6f6f6",
   "display": "standalone",
   "scope": "/",
-  "start_url": "https://folio-jpeg.rarebeef.co.kr/",
+  "start_url": "/",
   "description": "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
   "name": "folio.JPEG",
   "short_name": "folio.JPEG",
   "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "rel": "icon",
+      "purpose": "any maskable"
+    },
     {
       "src": "/images/favicon-16x16.png",
       "sizes": "16x16",

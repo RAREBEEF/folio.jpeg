@@ -10,10 +10,13 @@ import Init from "@/components/background/Init";
 import logo from "@/images/logo.png";
 
 const inter = Inter({ subsets: ["latin"] });
-
 export const viewport: Viewport = {
   themeColor: "#1f1f1f",
   colorScheme: "light",
+  minimumScale: 1,
+  initialScale: 1,
+  viewportFit: "cover",
+  width: "device-width",
 };
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -36,6 +39,7 @@ export const metadata: Metadata = {
     "Frontend portfolio",
     "프론트엔드 포트폴리오",
   ],
+  manifest: "/manifest.webManifest",
   description:
     "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
   openGraph: {
@@ -64,6 +68,12 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: [
+    {
+      url: "/images/logo.png",
+      sizes: "512x512",
+      type: "image/png",
+      rel: "icon",
+    },
     {
       url: "/images/favicon-16x16.png",
       sizes: "16x16",
@@ -244,6 +254,56 @@ export default function RootLayout({
         <meta
           name="msapplication-square310x310logo"
           content="/images/mstile-310x310.png"
+        />
+        <link
+          href="/splashscreens/iphone5_splash.png"
+          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/iphone6_splash.png"
+          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/iphoneplus_splash.png"
+          media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/iphonex_splash.png"
+          media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/iphonexr_splash.png"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/iphonexsmax_splash.png"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/ipad_splash.png"
+          media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/ipadpro1_splash.png"
+          media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/ipadpro3_splash.png"
+          media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
+        />
+        <link
+          href="/splashscreens/ipadpro2_splash.png"
+          media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+          rel="apple-touch-startup-image"
         />
       </head>
       <body
