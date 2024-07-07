@@ -26,7 +26,7 @@ const Follow = ({ displayId }: { displayId: string }) => {
   };
 
   return (
-    <div className="flex justify-center gap-12 text-shark-950">
+    <div className="flex justify-center gap-12 ">
       <button onClick={onFollowingClick}>
         <div className="font-semibold">팔로잉</div>
         <div className="text-shark-700">

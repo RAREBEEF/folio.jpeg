@@ -23,7 +23,7 @@ const AnalysisResultModal = ({
         </div>
       )}
       <div>
-        <h3 className="mb-2 text-lg font-semibold text-shark-950">대표 색상</h3>
+        <h3 className="mb-2 text-lg font-semibold ">대표 색상</h3>
         <div
           className="mx-2 rounded p-2"
           style={{ background: result.themeColor }}
@@ -39,9 +39,7 @@ const AnalysisResultModal = ({
         </div>
       </div>
       <div>
-        <h3 className="mb-2 text-lg font-semibold text-shark-950">
-          이미지 키워드
-        </h3>
+        <h3 className="mb-2 text-lg font-semibold ">이미지 키워드</h3>
         <ul className="mx-2 flex flex-wrap gap-1">
           {result.tags.map((tag, i) => (
             <li key={i}>#{tag}</li>
@@ -49,7 +47,7 @@ const AnalysisResultModal = ({
         </ul>
       </div>
       <div>
-        <h3 className="mb-2 text-lg font-semibold text-shark-950">AI의 분석</h3>
+        <h3 className="mb-2 text-lg font-semibold ">AI의 분석</h3>
         <div className="mx-2 flex flex-col gap-2">
           <div>
             <div className="mx-2">{result.feedback.detail}</div>

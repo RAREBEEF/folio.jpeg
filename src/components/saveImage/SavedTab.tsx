@@ -66,7 +66,7 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
     <div>
       <ul className="mt-4 border-y-2 pb-6">
         <div className="flex items-center justify-end px-8 pt-4">
-          {/* <h4 className="text-lg font-semibold text-shark-950">폴더 목록</h4> */}
+          {/* <h4 className="text-lg font-semibold ">폴더 목록</h4> */}
           <div className="text-xs">
             {/* {authStatus.data && authStatus.data.uid === userData.uid && ( */}
             <Button onClick={onAddFolderClick}>
@@ -89,9 +89,7 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
       </ul>
       {defaultFolder && (
         <ul className="mt-12">
-          <h4 className="text-center text-lg font-semibold text-shark-950">
-            미분류 이미지
-          </h4>
+          <h4 className="text-center text-lg font-semibold ">미분류 이미지</h4>
           <SavedImageList
             type={"user-saved-" + userData.uid + "-" + "_DEFAULT"}
             folder={defaultFolder}

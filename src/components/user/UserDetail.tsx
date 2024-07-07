@@ -115,7 +115,7 @@ const UserDetail = () => {
               <ProfileImage URL={userData.photoURL} />
             </div>
             <h3 className="flex flex-col items-center">
-              <span className="text-2xl font-bold text-shark-950">
+              <span className="text-2xl font-bold ">
                 {userData.displayName}
               </span>
               <span className="text-base text-shark-500">

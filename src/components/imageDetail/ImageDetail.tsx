@@ -186,7 +186,7 @@ const ImageDetail = () => {
                     </div>
                   </div>
 
-                  <div className="z-20 my-4 break-keep text-shark-950">
+                  <div className="z-20 my-4 break-keep ">
                     <h2 className="text-xl font-semibold">{imageItem.title}</h2>
                     <div className="text-shark-900">
                       {imageItem.description}
@@ -194,9 +194,7 @@ const ImageDetail = () => {
                   </div>
 
                   <div className="mt-8">
-                    <h3 className="mb-2 text-lg font-semibold text-shark-950">
-                      댓글
-                    </h3>
+                    <h3 className="mb-2 text-lg font-semibold ">댓글</h3>
                     <div>
                       <CommentList imageId={imageItem.id} />
                     </div>
@@ -217,9 +215,7 @@ const ImageDetail = () => {
           </div>
 
           <div className="mt-12">
-            <h3 className="text-center text-lg font-semibold text-shark-950">
-              추천 이미지
-            </h3>
+            <h3 className="text-center text-lg font-semibold ">추천 이미지</h3>
             <RecommendImageList imageItem={imageItem} />
           </div>
         </div>

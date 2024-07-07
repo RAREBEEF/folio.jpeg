@@ -210,7 +210,7 @@ const SignInForm = () => {
               placeholder="example@email.com"
               value={email}
               onChange={onEmailChange}
-              className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
+              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
               maxLength={50}
             />
           </label>
@@ -222,7 +222,7 @@ const SignInForm = () => {
                 value={pw}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwChange}
-                className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
+                className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
@@ -237,7 +237,7 @@ const SignInForm = () => {
                 value={pwCheck}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwCheckChange}
-                className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
+                className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>

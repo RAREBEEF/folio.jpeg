@@ -45,9 +45,7 @@ const Modal = ({
         </button>
         {/* max-h-[90vh] w-[400px] min-w-[250px] overflow-scroll xs:aspect-auto xs:w-auto xs:overflow-scroll */}
         <div className="">
-          <h2 className="mb-4 ml-8 mt-8 text-2xl font-bold text-shark-950">
-            {title}
-          </h2>
+          <h2 className="mb-4 ml-8 mt-8 text-2xl font-bold ">{title}</h2>
           {children}
         </div>
       </div>

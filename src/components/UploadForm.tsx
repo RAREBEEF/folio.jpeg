@@ -439,7 +439,7 @@ const UploadForm = () => {
                 value={title}
                 onChange={onTitleChange}
                 type="text"
-                className="rounded-lg border border-shark-200 py-1 pl-2 outline-none"
+                className="rounded-lg border border-shark-200 bg-white py-1 pl-2 outline-none"
                 placeholder="이미지의 제목을 적어주세요."
                 maxLength={50}
               />

@@ -303,7 +303,7 @@ const ProfileForm = () => {
                     : authStatus.data?.photoURL || ""
               }
             />
-            <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-shark-100 px-2 py-1 text-shark-950 opacity-0 group-hover:opacity-80">
+            <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-shark-100 px-2 py-1  opacity-0 group-hover:opacity-80">
               이미지 변경
             </div>
             <input
@@ -328,7 +328,7 @@ const ProfileForm = () => {
               placeholder="2~16 글자"
               value={displayName}
               onChange={onDisplayNameChange}
-              className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
+              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
           </label>
@@ -340,7 +340,7 @@ const ProfileForm = () => {
               value={displayId}
               placeholder="2~16 글자"
               onChange={onDisplayIdChange}
-              className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
+              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
             <p className="ml-2 mt-1 text-xs text-shark-500">
