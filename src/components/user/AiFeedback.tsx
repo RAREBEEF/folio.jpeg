@@ -66,7 +66,7 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
 
   // 이전 분석 결과 불러오기
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     } else if (prevFeedback || isFeedbackLoading || !userData) {

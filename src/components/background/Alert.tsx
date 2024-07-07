@@ -28,7 +28,7 @@ const Alert = () => {
 
   return (
     <div
-      className={`pointer-events-none fixed bottom-[50px] left-0 right-0 z-50 m-auto flex min-h-12 w-fit max-w-[90vw] select-none items-center justify-center gap-4 break-keep rounded-xl bg-alto-200 px-8 py-4 text-lg font-semibold text-alto-900 shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
+      className={`pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex min-h-12 w-fit max-w-[90vw] select-none items-center justify-center gap-4 break-keep rounded-xl bg-alto-200 px-8 py-4 text-lg font-semibold text-alto-900 shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
     >
       {alert.type === "success" ? (
         <CircleCheckIcon className="aspect-square h-8 fill-alto-900" />

@@ -21,7 +21,7 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
 
   // 폴더 데이터 불러오기(내 페이지가 아닐 때만)
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     } else if (

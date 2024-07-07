@@ -141,7 +141,7 @@ const Comment = ({
 
   // 작성자 상태 업데이트
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     } else if (author || isAuthorLoading) return;

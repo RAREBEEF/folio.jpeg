@@ -53,10 +53,12 @@ const FolderDetail = ({}: {}) => {
 
   // 폴더 주인의 유저데이터
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
-    } else if (!displayId || isExtraUserDataLoading || authorUid) return;
+    } else if (!displayId || isExtraUserDataLoading || authorUid) {
+      return;
+    }
 
     // usersData에서 폴더 주인 데이터 탐색
     const users = Object.entries(usersData);
@@ -227,16 +229,21 @@ const FolderDetail = ({}: {}) => {
     <div className="relative h-full bg-shark-50">
       {currentFolder && (
         <div className="flex h-full flex-col">
-          {authStatus.data?.uid === currentFolder.uid && (
-            <div className="flex w-full justify-end gap-2 p-4">
-              <Button onClick={onFolderEditClick}>
-                <div className="text-xs">폴더 수정</div>
-              </Button>
-              <Button onClick={onDeleteFolderClick}>
-                <div className="text-xs">폴더 삭제</div>
-              </Button>
-            </div>
-          )}
+          <div className="flex min-h-20 items-center border-b border-shark-950 p-4 pl-10">
+            <h2 className="text-2xl font-semibold text-shark-700">
+              {currentFolder.name}
+            </h2>
+            {authStatus.data?.uid === currentFolder.uid && (
+              <div className="flex shrink-0 grow justify-end gap-2">
+                <Button onClick={onFolderEditClick}>
+                  <div className="text-xs">폴더 수정</div>
+                </Button>
+                <Button onClick={onDeleteFolderClick}>
+                  <div className="text-xs">폴더 삭제</div>
+                </Button>
+              </div>
+            )}
+          </div>
           <SavedImageList
             type={"user-saved-" + authorUid + "-" + currentFolder.id}
             folder={currentFolder}

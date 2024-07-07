@@ -21,10 +21,7 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
-import SignInForm from "../user/SignInForm";
-import ProfileForm from "../user/ProfileForm";
 import { AuthStatus, Folder, Folders, UserData } from "@/types";
-import Modal from "../modal/Modal";
 
 const Auth = () => {
   // 로그인 모달창 state
@@ -181,21 +178,7 @@ const Auth = () => {
     }
   }, [setLoginModal, authStatus, setUserData, setUsersData]);
 
-  // 로그인 모달 닫는 함수
-  const closeModal = () => {
-    setLoginModal({ show: false });
-  };
-
-  return (
-    loginModal.show && (
-      <Modal
-        close={closeModal}
-        title={loginModal.showInit ? "프로필 설정하기" : "로그인"}
-      >
-        {loginModal.showInit ? <ProfileForm /> : <SignInForm />}
-      </Modal>
-    )
-  );
+  return null;
 };
 
 export default Auth;

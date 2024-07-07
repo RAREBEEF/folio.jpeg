@@ -3,8 +3,6 @@
 import { PropsWithChildren } from "react";
 import LayoutNav from "./LayoutNav";
 
-import Alert from "@/components/background/Alert";
-
 const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     // LayoutHeader의 높이만큼 LayoutContent의 mt 조절하기
@@ -16,7 +14,6 @@ const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
       >
         {children}
       </div>
-      <Alert />
     </div>
   );
 };

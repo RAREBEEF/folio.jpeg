@@ -25,7 +25,7 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
 
   // 썸네일에 사용할 이미지 불러오기
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     } else if (

@@ -23,9 +23,10 @@ const UploadForm = () => {
   const { getImageItem, isLoading: isImageLoading } = useGetImage();
   const { setImageData, isLoading: isImageDataUploading } = useSetImageData();
   const { analyzingImage, isLoading: isAnalyzing } = useAnalyzingImage();
+  const [loading, setLoading] = useState<boolean>(false);
   const isLoading = useMemo(
-    () => isImageLoading || isImageDataUploading || isAnalyzing,
-    [isImageLoading, isImageDataUploading, isAnalyzing],
+    () => isImageLoading || isImageDataUploading || isAnalyzing || loading,
+    [isImageLoading, isImageDataUploading, isAnalyzing, loading],
   );
   const {
     setImageFile,
@@ -218,6 +219,8 @@ const UploadForm = () => {
       }
     }
 
+    setLoading(true);
+
     // 분석 결과
     let analysisResult: AnalysisResult | null;
     // 업데이트 전 상태 백업
@@ -235,6 +238,7 @@ const UploadForm = () => {
       analysisResult = await analyzingImage({ targetImage: file as File });
 
       if (!analysisResult) {
+        setLoading(false);
         return;
       }
 
@@ -248,6 +252,7 @@ const UploadForm = () => {
         feedback: imageItem.feedback,
       };
     } else {
+      setLoading(false);
       return;
     }
 
@@ -259,6 +264,7 @@ const UploadForm = () => {
         show: true,
         text: `부적절한 이미지를 감지하였습니다.\n업로드를 중단합니다.`,
       });
+      setLoading(false);
       return;
     }
 
@@ -278,7 +284,10 @@ const UploadForm = () => {
           img: file as File,
         });
 
-    if (!downloadURL) return;
+    if (!downloadURL) {
+      setLoading(false);
+      return;
+    }
 
     // 업로드 후 분석 결과에 이미지 띄울 때 필요한 정보
     setImgURL(downloadURL);
@@ -341,6 +350,7 @@ const UploadForm = () => {
         resetHomeGrid();
         resetFollowingGrid();
         resetUserGrid();
+        setLoading(false);
       }
     } else {
       if (isEdit) setImageItem(prevImageItem);
@@ -351,6 +361,7 @@ const UploadForm = () => {
         show: true,
         text: "문제가 발생하였습니다. 작업을 중단하였습니다.",
       });
+      setLoading(false);
     }
   };
 
@@ -358,6 +369,14 @@ const UploadForm = () => {
     setShowResultModal(false);
     setAnalysisResult(null);
   };
+
+  useEffect(() => {
+    if (isLoading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auth";
+    }
+  }, [isLoading]);
 
   return (
     <div className="h-full w-full bg-shark-50 px-12 py-24">
@@ -477,6 +496,20 @@ const UploadForm = () => {
             />
           </Modal>
         )}
+      {/* <Modal close={onCloseResultModal} title="AI 분석 결과">
+        <AnalysisResultModal
+          result={{
+            feedback: {
+              detail: "alfasfasdf",
+              summary: { good: "dsafasfas", improve: "sdadfjaslkfdjsa" },
+            },
+            tags: ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a"],
+            themeColor: "#123123",
+          }}
+          imgURL={"/favicon.ico"}
+          imgSize={imgSize}
+        />
+      </Modal> */}
     </div>
   );
 };

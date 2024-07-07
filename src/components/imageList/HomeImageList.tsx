@@ -35,7 +35,7 @@ const HomeImageList = () => {
 
   return (
     <div className="relative h-full bg-shark-50">
-      <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold text-shark-950">
+      <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold text-shark-950 xs:pt-8">
         <Link
           href="/"
           className={`border-shark-950 ${listType === "all" && "border-b-2"}`}

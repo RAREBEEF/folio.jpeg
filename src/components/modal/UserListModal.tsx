@@ -1,5 +1,5 @@
 import useGetUsersByUids from "@/hooks/useGetUsersByUids";
-import { userDataState, usersDataState } from "@/recoil/states";
+import { usersDataState } from "@/recoil/states";
 import { UserData } from "@/types";
 import _ from "lodash";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -7,7 +7,7 @@ import { useRecoilState } from "recoil";
 import ProfileCard from "@/components/user/ProfileCard";
 import Loading from "@/components/loading/Loading";
 
-const FollowModal = ({ users }: { users: Array<string> }) => {
+const UserListModal = ({ users }: { users: Array<string> }) => {
   const loadRef = useRef<HTMLDivElement>(null);
   const { getUsersByUid, isLoading } = useGetUsersByUids();
   const [userStack, setUserStack] = useState<Array<string>>(users);
@@ -73,7 +73,7 @@ const FollowModal = ({ users }: { users: Array<string> }) => {
           ))
         )}
       </ul>
-      {!isLoading && userStack.length > 0 && (
+      {userList.length !== users.length && (
         <div
           ref={loadRef}
           className="pb-24 pt-12 text-center text-sm text-shark-500"
@@ -85,4 +85,4 @@ const FollowModal = ({ users }: { users: Array<string> }) => {
   );
 };
 
-export default FollowModal;
+export default UserListModal;

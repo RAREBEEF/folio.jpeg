@@ -53,7 +53,7 @@ const ImageDetail = () => {
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
@@ -202,7 +202,7 @@ const ImageDetail = () => {
                     </div>
                   </div>
 
-                  <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 px-4 pb-8 pt-4">
+                  <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 px-4 pb-8 pt-4 xs:bottom-[70px]">
                     <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />
                       <div className="w-6 items-center">

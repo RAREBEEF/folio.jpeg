@@ -29,7 +29,7 @@ const CommentList = ({ imageId }: { imageId: string }) => {
 
   // 최초 댓글
   useEffect(() => {
-    if (isInitialMount.current) {
+    if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
     } else if (isLoading || comments || lastPage) {

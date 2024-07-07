@@ -2,7 +2,7 @@ import { userDataState } from "@/recoil/states";
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 import Modal from "@/components/modal/Modal";
-import FollowModal from "@/components/modal/FollowModal";
+import UserListModal from "@/components/modal/UserListModal";
 
 const Follow = ({ displayId }: { displayId: string }) => {
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
@@ -41,7 +41,7 @@ const Follow = ({ displayId }: { displayId: string }) => {
       </button>
       {showModal && (
         <Modal close={onModalClose} title={!!showModal ? showModal : ""}>
-          <FollowModal
+          <UserListModal
             users={showModal === "Follower" ? follower : following}
           />
         </Modal>

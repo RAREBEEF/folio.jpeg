@@ -329,7 +329,7 @@ const ProfileForm = () => {
               value={displayName}
               onChange={onDisplayNameChange}
               className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
-              maxLength={50}
+              maxLength={20}
             />
           </label>
           <label className="flex flex-col">
@@ -341,7 +341,7 @@ const ProfileForm = () => {
               placeholder="2~16 글자"
               onChange={onDisplayIdChange}
               className="rounded-lg border border-shark-200 py-1 pl-2 text-shark-950 outline-none"
-              maxLength={50}
+              maxLength={20}
             />
             <p className="ml-2 mt-1 text-xs text-shark-500">
               folio-jpeg.rarebeef.co.kr/{displayId || "사용자명"}

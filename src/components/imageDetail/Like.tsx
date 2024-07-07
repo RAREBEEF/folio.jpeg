@@ -5,7 +5,7 @@ import { MouseEvent, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import FlashIcon from "@/icons/bolt-lightning-solid.svg";
 import Modal from "@/components/modal/Modal";
-import FollowModal from "@/components/modal/FollowModal";
+import UserListModal from "@/components/modal/UserListModal";
 import { UserData } from "@/types";
 
 const Like = ({ author }: { author: UserData | null }) => {
@@ -58,7 +58,7 @@ const Like = ({ author }: { author: UserData | null }) => {
         </button>
         {showModal && (
           <Modal close={onCloseModal} title="좋아요">
-            <FollowModal users={imageItem.likes} />
+            <UserListModal users={imageItem.likes} />
           </Modal>
         )}
       </div>

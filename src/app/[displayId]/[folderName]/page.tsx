@@ -131,7 +131,7 @@ export async function generateMetadata(
 
 const FolderDetailPage = () => {
   return (
-    <main>
+    <main id="folder-detail">
       {/* <PageHeader header={currentFolder?.name || ""} /> */}
       <FolderDetail />
     </main>

@@ -146,7 +146,7 @@ const AddFolder = ({
           value={name}
           onChange={onnameChange}
           onKeyDown={restrictingInputChar}
-          maxLength={50}
+          maxLength={20}
         />
       </label>
       <div>

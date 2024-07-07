@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 import createProxyMiddleware from "http-proxy-middleware";
+import withPwa from "next-pwa";
+
+const pwa = withPwa({
+  dest: "public",
+});
 
 const nextConfig = {
   webpack(config) {
@@ -24,4 +29,4 @@ const nextConfig = {
   // reactStrictMode: false,
 };
 
-export default nextConfig;
+export default pwa(nextConfig);
