@@ -4,7 +4,7 @@ import { ChangeEvent, KeyboardEvent, MouseEvent, useState } from "react";
 import Button from "../Button";
 import useInput from "@/hooks/useInput";
 import Loading from "@/components/loading/Loading";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { alertState, authStatusState, foldersState } from "@/recoil/states";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/fb";
@@ -22,7 +22,7 @@ const AddFolder = ({
   const [folders, setFolders] = useRecoilState(
     foldersState(authStatus.data!.uid),
   );
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { value: name, onChange: onnameChange } = useInput("");
   const [isPrivate, setIsPrivate] = useState<"true" | "false">("false");
@@ -141,7 +141,7 @@ const AddFolder = ({
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input
-          className="w-full rounded-lg border border-shark-200 bg-white py-1 pl-2 outline-none"
+          className="border-ebony-clay-200 w-full rounded-lg border bg-white py-1 pl-2 outline-none"
           type="text"
           value={name}
           onChange={onnameChange}

@@ -50,7 +50,7 @@ const CommentList = ({ imageId }: { imageId: string }) => {
     <div>
       <ol className="flex flex-col gap-4">
         {!comments || Object.keys(comments).length === 0 ? (
-          <div className="text-shark-500">아직 댓글이 없습니다.</div>
+          <div className="text-ebony-clay-500">아직 댓글이 없습니다.</div>
         ) : (
           Object.keys(comments).map((id, i) => {
             const comment = comments[id];
@@ -67,7 +67,7 @@ const CommentList = ({ imageId }: { imageId: string }) => {
           <div className="mt-4 w-full text-center">
             <button
               onClick={onLoadClick}
-              className="m-auto text-center text-xs text-shark-500"
+              className="text-ebony-clay-500 m-auto text-center text-xs"
             >
               댓글 더 보기
             </button>

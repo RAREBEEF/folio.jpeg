@@ -34,7 +34,7 @@ const Comment = ({
 }) => {
   const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [summaryText, setSummaryText] = useState<string>(
     comment.replies.length <= 0
       ? "답글 달기"
@@ -182,7 +182,7 @@ const Comment = ({
 
   return (
     <li
-      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-shark-50"}`}
+      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-ebony-clay-50"}`}
     >
       <div className="flex items-start gap-2">
         <Link
@@ -205,13 +205,13 @@ const Comment = ({
             {author?.displayName}
           </Link>
           <span>{comment.content}</span>
-          <div className="mt-1 text-xs text-shark-500">
+          <div className="text-ebony-clay-500 mt-1 text-xs">
             {dateDiffNow(comment.createdAt).diffSummary}
             {authStatus.data?.uid === comment.uid && (
               <Fragment>
                 {" ・ "}
                 <button
-                  className="text・-shark-500 text-xs hover:underline"
+                  className="text・-ebony-clay-500 text-xs hover:underline"
                   onClick={onDeleteClick}
                 >
                   삭제
@@ -221,23 +221,23 @@ const Comment = ({
           </div>
         </div>
       </div>
-      <div className="relative mt-2 rounded-lg bg-shark-100">
+      <div className="bg-ebony-clay-100 relative mt-2 rounded-lg">
         {!parentId && (
           <details onToggle={onRepliesToggle} className="p-2">
             {comment.replies.length <= 0 ? (
               <Fragment>
-                <summary className="pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs text-shark-500">
+                <summary className="text-ebony-clay-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>
                 </summary>
-                <div className="ml-2 text-sm text-shark-500">
+                <div className="text-ebony-clay-500 ml-2 text-sm">
                   아직 답글이 없습니다.
                 </div>
               </Fragment>
             ) : (
               <Fragment>
-                <summary className="pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs text-shark-500">
+                <summary className="text-ebony-clay-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>

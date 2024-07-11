@@ -2,7 +2,7 @@
 
 import _ from "lodash";
 import ImageGrid from "../grid/ImageGrid";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { authStatusState, gridState, loginModalState } from "@/recoil/states";
 import ImageInfiniteScroller from "./ImageInfiniteScroller";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { MouseEvent, useMemo } from "react";
 import { where } from "firebase/firestore";
 
 const HomeImageList = () => {
-  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
+  const setLoginModal = useSetRecoilState(loginModalState);
   const authStatus = useRecoilValue(authStatusState);
   const params = useSearchParams();
   const listType = useMemo(
@@ -34,18 +34,18 @@ const HomeImageList = () => {
   };
 
   return (
-    <div className="relative h-full bg-shark-50">
+    <div className="bg-ebony-clay-50 relative h-full">
       <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold  xs:pt-8">
         <Link
           href="/"
-          className={`border-shark-950 ${listType === "all" && "border-b-2"}`}
+          className={`border-ebony-clay-950 ${listType === "all" && "border-b-2"}`}
         >
           모든 이미지
         </Link>
         <Link
           onClick={needLogin}
           href="?where=following"
-          className={`border-shark-950 ${listType === "following" && "border-b-2"}`}
+          className={`border-ebony-clay-950 ${listType === "following" && "border-b-2"}`}
         >
           팔로잉
         </Link>
@@ -54,7 +54,6 @@ const HomeImageList = () => {
       {grid && (
         <ImageInfiniteScroller
           type={listType === "following" ? "following" : "home"}
-          // filter={{ orderBy: ["createdAt", "desc"], limit: grid.colCount * 2 }}
           filter={
             listType === "following"
               ? {
@@ -67,11 +66,11 @@ const HomeImageList = () => {
                       ? authStatus.data.following
                       : [""],
                   ),
-                  limit: 2,
+                  limit: grid.colCount * 2,
                 }
               : {
                   orderBy: ["createdAt", "desc"],
-                  limit: 2,
+                  limit: grid.colCount * 2,
                 }
           }
         />

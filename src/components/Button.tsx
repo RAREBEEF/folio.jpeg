@@ -19,7 +19,7 @@ const Button = ({
   return href ? (
     <Link
       href={href}
-      className={`relative block w-fit rounded-lg bg-shark-950 px-3 py-2 text-shark-50 hover:bg-shark-900 ${tailwindStyle} ${disabled && "pointer-events-none cursor-default"}`}
+      className={`bg-ebony-clay-950 text-ebony-clay-50 hover:bg-ebony-clay-900 relative block w-fit rounded-lg px-3 py-2 ${tailwindStyle} ${disabled && "pointer-events-none cursor-default"}`}
     >
       {children}
     </Link>
@@ -28,7 +28,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`relative block rounded-lg bg-shark-950 px-3 py-2 text-shark-50 hover:bg-shark-900 ${tailwindStyle} ${disabled && "cursor-default"}`}
+      className={`bg-ebony-clay-950 text-ebony-clay-50 hover:bg-ebony-clay-900 relative block rounded-lg px-3 py-2 ${tailwindStyle} ${disabled && "cursor-default"}`}
     >
       {children}
     </button>

@@ -69,7 +69,7 @@ export const metadata: Metadata = {
   },
   icons: [
     {
-      url: "/images/logo.png",
+      url: "/images/favicon-512x512.png",
       sizes: "512x512",
       type: "image/png",
       rel: "icon",
@@ -307,7 +307,9 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={inter.className + " flex min-h-lvh flex-col bg-shark-950"}
+        className={
+          inter.className + " bg-ebony-clay-950 flex min-h-lvh flex-col"
+        }
       >
         <RecoilProvider>
           <Fragment>

@@ -23,12 +23,8 @@ const useGetUserByUid = () => {
 
     const [userData, extraUserData]: [{ data: UserData }, ExtraUserData] =
       await Promise.all([
-        fetch("/api/get-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ uid }),
+        fetch(`/api/user/${uid}`, {
+          method: "GET",
         }).then(async (response) => {
           return await response.json();
         }),

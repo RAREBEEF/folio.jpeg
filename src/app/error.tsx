@@ -26,7 +26,7 @@ const Error = ({ error, reset }: ErrorProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-shark-50 text-2xl font-bold">
+    <div className="bg-ebony-clay-50 flex h-full flex-col items-center justify-center text-2xl font-bold">
       <div className="flex flex-col text-center">
         <div>문제가 발생하였습니다.</div>
         <div>잠시 후 다시 시도해 주세요.</div>

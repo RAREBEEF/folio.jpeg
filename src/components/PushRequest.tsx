@@ -2,14 +2,14 @@ import { MouseEvent, useEffect, useState } from "react";
 import Modal from "@/components/modal/Modal";
 import Button from "./Button";
 import { getMessaging, getToken } from "firebase/messaging";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { alertState, authStatusState } from "@/recoil/states";
 import { UserData } from "@/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 
 const PushRequest = () => {
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
   const [showPushRequestModal, setShowPushRequestModal] =
     useState<boolean>(false);
@@ -98,7 +98,7 @@ const PushRequest = () => {
                   click_action: "",
                   fcmTokens: [currentToken],
                 };
-                await fetch("/api/send-fcm", {
+                await fetch("/api/fcm", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -151,14 +151,17 @@ const PushRequest = () => {
                 <Button onClick={onGrantClick}>
                   <div>허용</div>
                 </Button>
-                <Button tailwindStyle="bg-shark-700" onClick={onNotNowClick}>
+                <Button
+                  tailwindStyle="bg-ebony-clay-700"
+                  onClick={onNotNowClick}
+                >
                   <div>나중에 다시 알림</div>
                 </Button>
               </div>
               {secondRequest && (
                 <button
                   onClick={ondeniClick}
-                  className="pt-4 text-shark-700 underline"
+                  className="text-ebony-clay-700 pt-4 underline"
                 >
                   <div>다시 보지 않기</div>
                 </button>

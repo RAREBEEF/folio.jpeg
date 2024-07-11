@@ -28,12 +28,8 @@ const useGetUserBydisplayId = () => {
         const { uid } = extraUserData.data;
 
         // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
-        const userData = await fetch("/api/get-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ uid }),
+        const userData = await fetch(`/api/user/${uid}`, {
+          method: "GET",
         }).then(async (response) => {
           return await response.json();
         });

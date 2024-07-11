@@ -78,7 +78,7 @@ const SavedFolderThumbnail = ({ folder }: { folder: Folder }) => {
               style={{
                 background: img?.themeColor,
               }}
-              className="relative aspect-square grow overflow-hidden rounded-lg bg-gradient-to-br from-shark-100 to-shark-300"
+              className="from-ebony-clay-100 to-ebony-clay-300 relative aspect-square grow overflow-hidden rounded-lg bg-gradient-to-br"
               key={i}
             >
               {img && (

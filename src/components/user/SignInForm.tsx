@@ -25,7 +25,7 @@ const SignInForm = () => {
   const handleAuthError = useHandleAuthError();
   const setLoginModal = useSetRecoilState(loginModalState);
   const setAuthStatus = useSetRecoilState(authStatusState);
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
   const [pwReset, setPwReset] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -197,39 +197,41 @@ const SignInForm = () => {
   return (
     <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
       {(createAccount || pwReset) && (
-        <h3 className="text-center text-lg font-semibold text-shark-700">
+        <h3 className="text-ebony-clay-700 text-center text-lg font-semibold">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}
         </h3>
       )}
       <div className="mt-10 flex grow flex-col justify-between gap-12">
         <form className="flex w-72 flex-col gap-y-4" onSubmit={onSubmit}>
           <label className="flex flex-col">
-            <h4 className="pb-1 pl-2 text-xs text-shark-700">이메일</h4>
+            <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">이메일</h4>
             <input
               type="email"
               placeholder="example@email.com"
               value={email}
               onChange={onEmailChange}
-              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
+              className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
               maxLength={50}
             />
           </label>
           {!pwReset && (
             <label className="flex flex-col">
-              <h4 className="pb-1 pl-2 text-xs text-shark-700">비밀번호</h4>
+              <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">
+                비밀번호
+              </h4>
               <input
                 type="password"
                 value={pw}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwChange}
-                className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
+                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
           {createAccount && (
             <label className="flex flex-col">
-              <h4 className="pb-1 pl-2 text-xs text-shark-700">
+              <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">
                 비밀번호 확인
               </h4>
               <input
@@ -237,16 +239,16 @@ const SignInForm = () => {
                 value={pwCheck}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwCheckChange}
-                className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
+                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
-          <div className="itmes-center flex justify-center gap-2 text-center text-sm text-shark-200 text-shark-700">
+          <div className="itmes-center text-ebony-clay-200 text-ebony-clay-700 flex justify-center gap-2 text-center text-sm">
             <button
               type="button"
               onClick={onCovertSignInUpClick}
-              className="text-xs text-shark-500 hover:underline"
+              className="text-ebony-clay-500 text-xs hover:underline"
             >
               {createAccount ? "기존 계정으로 로그인" : "회원가입"}
             </button>{" "}
@@ -254,7 +256,7 @@ const SignInForm = () => {
             <button
               type="button"
               onClick={onConvertPwResetClick}
-              className="text-xs text-shark-500 hover:underline"
+              className="text-ebony-clay-500 text-xs hover:underline"
             >
               {pwReset ? "기존 계정으로 로그인" : "비밀번호 재설정"}
             </button>
@@ -284,27 +286,29 @@ const SignInForm = () => {
         <div>
           <div className="mb-12 flex items-center gap-2">
             <hr className="grow" />
-            <span className="text-xs text-shark-500">다른 방법으로 로그인</span>
+            <span className="text-ebony-clay-500 text-xs">
+              다른 방법으로 로그인
+            </span>
             <hr className="grow" />
           </div>
           <div className="flex justify-center gap-2">
             <button
-              className="aspect-square rounded-lg bg-shark-950 p-2"
+              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
               onClick={onGoogleSignInClick}
             >
-              <GoogleSvg className="h-6 w-6 fill-shark-50" />
+              <GoogleSvg className="fill-ebony-clay-50 h-6 w-6" />
             </button>
             <button
-              className="aspect-square rounded-lg bg-shark-950 p-2"
+              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
               onClick={onGithubSignInClick}
             >
-              <GithubSvg className="h-6 w-6 fill-shark-50" />
+              <GithubSvg className="fill-ebony-clay-50 h-6 w-6" />
             </button>
             <button
-              className="aspect-square rounded-lg bg-shark-950 p-2"
+              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
               onClick={onFacebookSignInClick}
             >
-              <FacebookSvg className="h-6 w-6 fill-shark-50" />
+              <FacebookSvg className="fill-ebony-clay-50 h-6 w-6" />
             </button>
           </div>
         </div>

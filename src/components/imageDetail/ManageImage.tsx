@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { alertState, authStatusState, imageItemState } from "@/recoil/states";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/loading/Loading";
@@ -10,7 +10,7 @@ import PenIcon from "@/icons/pen-solid.svg";
 import Link from "next/link";
 
 const ManageImage = ({ id }: { id: string }) => {
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
@@ -31,17 +31,13 @@ const ManageImage = ({ id }: { id: string }) => {
 
     setIsLoading(true);
 
-    await fetch("/api/delete-image", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    // 이미지 doc의 하위 컬렉션인 comments도 함께 지우려면 admin-sdk를 이용하는게 좋아서 엔드포인트 구현
+    await fetch(
+      `/api/image/${id}?uid=${imageItem.uid}&fileName=${imageItem.fileName}`,
+      {
+        method: "DELETE",
       },
-      body: JSON.stringify({
-        imageId: id,
-        uid: imageItem.uid,
-        fileName: imageItem.fileName,
-      }),
-    })
+    )
       .then(() => {
         setImageItem(null);
         resetHomeGrid();
@@ -72,15 +68,15 @@ const ManageImage = ({ id }: { id: string }) => {
     imageItem &&
     authStatus.data &&
     imageItem.uid === authStatus.data.uid && (
-      <div className="flex gap-2 rounded-l bg-shark-50 p-2 pr-2 text-xs">
+      <div className="bg-ebony-clay-50 flex gap-2 rounded-l p-2 pr-2 text-xs">
         <Link href={`/edit/${imageItem.id}`}>
-          <PenIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+          <PenIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-7 p-1 transition-all" />
         </Link>
         <button onClick={onDeleteClick} disabled={isLoading}>
           {isLoading ? (
             <Loading />
           ) : (
-            <TrashIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+            <TrashIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-7 p-1 transition-all" />
           )}
         </button>
       </div>

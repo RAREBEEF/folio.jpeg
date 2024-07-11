@@ -58,7 +58,7 @@ const ImageGridColsItem = ({
                 width: grid?.colWidth,
                 height: gridItem.height,
               }}
-              className="overflow-hidden rounded-xl bg-shark-100 fill-shark-500 p-[20%]"
+              className="bg-ebony-clay-100 fill-ebony-clay-500 overflow-hidden rounded-xl p-[20%]"
             />
           ) : (
             <Image
@@ -81,7 +81,7 @@ const ImageGridColsItem = ({
         </Link>
       ) : (
         <div
-          className="rounded-xl bg-gradient-to-br from-shark-100 to-shark-300"
+          className="from-ebony-clay-100 to-ebony-clay-300 rounded-xl bg-gradient-to-br"
           style={{
             width: `${grid!.colWidth}px`,
             height: `${gridItem.height}px`,

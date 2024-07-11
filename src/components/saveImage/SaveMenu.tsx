@@ -1,6 +1,11 @@
 import XSvg from "@/icons/xmark-solid.svg";
 import Button from "../Button";
-import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
+import {
+  useRecoilState,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from "recoil";
 import { Folder, Folders, ImageDataPages, ImageItem } from "@/types";
 import { ChangeEvent, MouseEvent, useMemo, useState } from "react";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
@@ -23,7 +28,7 @@ const SaveMenu = () => {
   );
   const imageItem = useMemo(() => saveModal.image, [saveModal.image]);
 
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [selectedFolderId, setSelectedFolderId] = useState<string>(
     savedFolder?.id || "",
   );

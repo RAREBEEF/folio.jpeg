@@ -8,7 +8,7 @@ import useSetImageData from "@/hooks/useSetImageItem";
 import useSetImageFile from "@/hooks/useSetImageFile";
 import { useParams, useRouter } from "next/navigation";
 import NextImage from "next/image";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { alertState, authStatusState, imageItemState } from "@/recoil/states";
 import useGetImage from "@/hooks/useGetImage";
 import Loading from "@/components/loading/Loading";
@@ -73,7 +73,7 @@ const UploadForm = () => {
     setValue: setDesc,
     onChange: onDescChange,
   } = useInput(imageItem?.description || "");
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setAlert = useSetRecoilState(alertState);
   const [imgURL, setImgURL] = useState<string | null>(null);
   const [imgSize, setImgSize] = useState<{
     width: number;
@@ -379,11 +379,11 @@ const UploadForm = () => {
   }, [isLoading]);
 
   return (
-    <div className="h-full w-full bg-shark-50 px-12 py-24">
+    <div className="bg-ebony-clay-50 h-full w-full px-12 py-24">
       {init ? (
         <div className="flex h-full items-center justify-center gap-12 gap-x-24 sm:flex-col md:gap-x-12">
           <label
-            className={`relative h-auto max-w-[500px] grow overflow-hidden rounded-xl bg-gradient-to-br from-shark-100 to-shark-300 sm:w-full sm:grow-0 ${isEdit ? " cursor-default" : "cursor-pointer"}`}
+            className={`from-ebony-clay-100 to-ebony-clay-300 relative h-auto max-w-[500px] grow overflow-hidden rounded-xl bg-gradient-to-br sm:w-full sm:grow-0 ${isEdit ? " cursor-default" : "cursor-pointer"}`}
           >
             {(previewURL || (isEdit && imageItem && imageItem.URL)) &&
             !isInputUploading ? (
@@ -401,16 +401,16 @@ const UploadForm = () => {
                   alt={fileName || ""}
                 />
                 {!isEdit && (
-                  <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-shark-100 px-2 py-1 opacity-0 group-hover:opacity-80">
+                  <div className="bg-ebony-clay-100 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl px-2 py-1 opacity-0 group-hover:opacity-80">
                     이미지 변경
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex aspect-[3/4] w-full flex-col items-center justify-center text-balance break-keep p-6 text-center font-bold text-shark-50">
+              <div className="text-ebony-clay-50 flex aspect-[3/4] w-full flex-col items-center justify-center text-balance break-keep p-6 text-center font-bold">
                 {isInputUploading ? (
                   <div>
-                    <Loading color="shark-50" />
+                    <Loading color="ebony-clay-50" />
                     <br />
                     <div>이미지 압축 중</div>
                   </div>
@@ -434,22 +434,22 @@ const UploadForm = () => {
           </label>
           <div className="flex w-72 flex-col gap-y-6">
             <label className="flex flex-col">
-              <h3 className="pb-1 pl-2 text-shark-700">제목 (선택)</h3>
+              <h3 className="text-ebony-clay-700 pb-1 pl-2">제목 (선택)</h3>
               <input
                 value={title}
                 onChange={onTitleChange}
                 type="text"
-                className="rounded-lg border border-shark-200 bg-white py-1 pl-2 outline-none"
+                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2 outline-none"
                 placeholder="이미지의 제목을 적어주세요."
                 maxLength={50}
               />
             </label>
             <label className="flex flex-col">
-              <h3 className="pb-1 pl-2 text-shark-700">내용 (선택)</h3>
+              <h3 className="text-ebony-clay-700 pb-1 pl-2">내용 (선택)</h3>
               <textarea
                 value={desc}
                 onChange={onDescChange}
-                className="aspect-[5/2] resize-none rounded-lg border border-shark-200 py-1 pl-2 outline-none"
+                className="border-ebony-clay-200 aspect-[5/2] resize-none rounded-lg border py-1 pl-2 outline-none"
                 placeholder="이미지에 대한 설명을 적어주세요."
                 maxLength={1000}
               />
@@ -466,10 +466,10 @@ const UploadForm = () => {
           </div>
           {isLoading && (
             <div className="fixed left-0 top-0 z-50 h-screen w-screen">
-              <div className="h-full w-full bg-shark-950 opacity-30" />
-              <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg bg-shark-50">
+              <div className="bg-ebony-clay-950 h-full w-full opacity-30" />
+              <div className="bg-ebony-clay-50 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg">
                 <UploadLoading />
-                <div className="text-balance break-keep px-8 pb-8 text-center leading-tight text-shark-700">
+                <div className="text-ebony-clay-700 text-balance break-keep px-8 pb-8 text-center leading-tight">
                   {currentWork === "analyzing"
                     ? "이미지를 분석해 태그를 생성하고 있습니다."
                     : "이미지 업로드 중입니다."}

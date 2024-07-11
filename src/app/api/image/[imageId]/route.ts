@@ -1,9 +1,17 @@
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
 
-export async function POST(req: Request) {
-  const data = await req.json();
-  const { imageId, uid, fileName } = data;
+// 이미지를 삭제할 때
+// 이미지 doc 하위에 있는 comments 컬렉션도 함께 삭제하려면
+// admin sdk의 recursiveDelete를 사용해야함
+export async function DELETE(
+  req: Request,
+  { params }: { params: { imageId: string } },
+) {
+  const { searchParams } = new URL(req.url);
+  const uid = searchParams.get("uid");
+  const fileName = searchParams.get("fileName");
+  const imageId = params.imageId;
 
   if (!imageId || !uid || !fileName) {
     return NextResponse.json({ data: "Missing image ID", status: 400 });

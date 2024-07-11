@@ -1,6 +1,6 @@
 "use client";
 
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Angles from "@/icons/angles-solid.svg";
 import Link from "next/link";
 import SnsLinks from "@/components/SnsLinks";
@@ -18,9 +18,11 @@ import ProfileSvg from "@/icons/user-solid.svg";
 import NotificationSvg from "@/icons/bell-solid.svg";
 import Modal from "@/components/modal/Modal";
 import NotificationsModal from "@/components/modal/NotificationsModal";
+import { usePathname } from "next/navigation";
 
 const LayoutNav = () => {
-  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
+  const pathname = usePathname();
+  const setLoginModal = useSetRecoilState(loginModalState);
   const authStatus = useRecoilValue(authStatusState);
   const [nav, setNav] = useRecoilState(navState);
   const [innerWidth, setInnerWidth] = useState<number>(0);
@@ -28,6 +30,44 @@ const LayoutNav = () => {
     useState<boolean>(false);
   const notification = useRecoilValue(inAppNotificationState);
   const [notificationCount, setNotificationCount] = useState<number>(0);
+  const [curPath, setCurPath] = useState<
+    null | "home" | "image" | "upload" | "edit" | "profile" | "notification"
+  >(null);
+
+  console.log(curPath);
+
+  useEffect(() => {
+    if (showNotificationModal) {
+      setCurPath("notification");
+      return;
+    }
+
+    const regex = /^\/([^/]+)(?:\/|$)/;
+    const curPath = pathname.match(regex);
+    const myDisplayId = authStatus.data?.displayId || "";
+
+    if (!curPath) {
+      setCurPath("home");
+      return;
+    }
+    switch (curPath[1]) {
+      case "image":
+        setCurPath("image");
+        break;
+      case "upload":
+        setCurPath("upload");
+        break;
+      case "edit":
+        setCurPath("edit");
+        break;
+      case myDisplayId:
+        setCurPath("profile");
+        break;
+      default:
+        setCurPath(null);
+        break;
+    }
+  }, [authStatus.data?.displayId, pathname, showNotificationModal]);
 
   useEffect(() => {
     if (nav.show) {
@@ -99,17 +139,11 @@ const LayoutNav = () => {
   }, [notification.lastCheck, notification.list]);
 
   return (
-    // <div
-    //   className={`fixed top-0 z-40 flex h-full pt-16 ${nav.show ? "w-full" : "w-[50px]"}`}
-    // >
-    //   <nav
-    //     className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-shark-950 pb-24 text-shark-50 transition-all transition-all ${nav.show ? "w-[200px]" : "w-[50px]"}`}
-    //   >
     <div
-      className={`fixed bottom-0 top-0 z-40 flex h-full pt-16 xs:top-auto xs:h-[70px] xs:w-screen xs:border-t xs:border-shark-500 xs:bg-shark-950 xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
+      className={`xs:bg-ebony-clay-950 fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-[70px] xs:w-screen xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-shark-950 text-shark-50 transition-all xs:h-[50px] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
+        className={`bg-ebony-clay-950 text-ebony-clay-50 relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll transition-all xs:h-[50px] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
         <button
           onClick={(e) => {
@@ -124,58 +158,90 @@ const LayoutNav = () => {
         </button>
 
         <ul
-          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-6 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
+          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
-          <li className="w-full text-center">
+          <li
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+          >
             <Link
               href="/"
               className="m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
-                <div>Home</div>
+                <div
+                  className={`${curPath === "home" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                >
+                  Home
+                </div>
               ) : (
-                <HomeSvg className="aspect-square w-[30px] fill-shark-50" />
+                <HomeSvg
+                  className={`aspect-square w-[30px] ${curPath === "home" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                />
               )}
             </Link>
           </li>
-          <li className="w-full text-center">
+          <li
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+          >
             <Link
               onClick={checkAuthBeforeNavigate}
               href="/upload"
               className="m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
-                <div>Upload</div>
+                <div
+                  className={`${curPath === "upload" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                >
+                  Upload
+                </div>
               ) : (
-                <ImageSvg className="aspect-square w-[30px] fill-shark-50" />
+                <ImageSvg
+                  className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                />
               )}
             </Link>
           </li>
-          <li className="w-full text-center">
+          <li
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+          >
             <Link
               onClick={checkAuthBeforeNavigate}
               href={`/${authStatus.data?.displayId}`}
               className="m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
-                <div>Profile</div>
+                <div
+                  className={`${curPath === "profile" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                >
+                  Profile
+                </div>
               ) : (
-                <ProfileSvg className="aspect-square w-[30px] fill-shark-50" />
+                <ProfileSvg
+                  className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                />
               )}
             </Link>
           </li>
-          <li className="w-full text-center">
+          <li
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+          >
             <button
               onClick={onNotificationClick}
               className="relative m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
-                <div>Notifications</div>
+                <div
+                  className={`${curPath === "notification" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                >
+                  Notifications
+                </div>
               ) : (
-                <NotificationSvg className="aspect-square w-[30px] fill-shark-50" />
+                <NotificationSvg
+                  className={`aspect-square w-[30px] ${curPath === "notification" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                />
               )}
               <div
-                className={`absolute text-center ${nav.show ? "left-full" : "right-0"} top-0 aspect-square w-4 rounded-full bg-[firebrick] text-xs tracking-tighter`}
+                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} bg-ebony-clay-900 top-0 aspect-square w-4 rounded-full text-xs tracking-tighter`}
               >
                 {Math.min(notificationCount, 99)}
               </div>

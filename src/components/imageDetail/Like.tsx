@@ -38,10 +38,10 @@ const Like = ({ author }: { author: UserData | null }) => {
 
   return (
     imageItem && (
-      <div className="flex items-center justify-end gap-4 text-shark-700">
+      <div className="text-ebony-clay-700 flex items-center justify-end gap-4">
         <button
           onClick={onLikeListClick}
-          className="flex items-center gap-1 text-shark-300"
+          className="text-ebony-clay-300 flex items-center gap-1"
         >
           <FlashIcon className="aspect-square w-3 fill-[#FADF15]" />
           {imageItem.likes.length.toLocaleString()}
@@ -53,7 +53,7 @@ const Like = ({ author }: { author: UserData | null }) => {
           {alreadyLiked ? (
             <FlashIcon className="aspect-square w-4 fill-[#FADF15] transition-all" />
           ) : (
-            <FlashIcon className="aspect-square w-4 fill-shark-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
+            <FlashIcon className="fill-ebony-clay-500 aspect-square w-4 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
           )}
         </button>
         {showModal && (

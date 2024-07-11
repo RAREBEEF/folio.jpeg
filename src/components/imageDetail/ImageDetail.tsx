@@ -86,12 +86,8 @@ const ImageDetail = () => {
           const docRef = doc(db, "users", uid);
 
           await Promise.all([
-            fetch("/api/get-user", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ uid }),
+            fetch(`/api/user/${uid}`, {
+              method: "GET",
             }).then(async (response) => {
               const { data } = await response.json();
               userData = data;
@@ -126,17 +122,17 @@ const ImageDetail = () => {
   };
 
   return (
-    <div className="relative h-full bg-shark-50 px-10 xs:px-4">
+    <div className="bg-ebony-clay-50 relative h-full px-10 xs:px-4">
       {imageItem ? (
         <div>
           <nav className="fixed top-16 z-10 flex items-center justify-between py-4 xs:hidden">
             <button
-              className="flex aspect-square h-fit items-center gap-2 rounded-full bg-shark-50 px-2 py-1 font-semibold text-shark-700"
+              className="bg-ebony-clay-50 text-ebony-clay-700 flex aspect-square h-fit items-center gap-2 rounded-full px-2 py-1 font-semibold"
               onClick={() => {
                 back();
               }}
             >
-              <ArrowIcon className="h-5 fill-shark-700 transition-all hover:fill-shark-500" />
+              <ArrowIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-5 transition-all" />
             </button>
           </nav>
 
@@ -149,14 +145,14 @@ const ImageDetail = () => {
                       aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
                       maxHeight: "calc(100vh - 150px)",
                     }}
-                    className="relative sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br from-shark-100 to-shark-300"
+                    className="from-ebony-clay-100 to-ebony-clay-300 relative sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br"
                   >
                     {isImageBroken ? (
                       <BrokenSvg
                         style={{
                           aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
                         }}
-                        className={`rounded-xl fill-shark-500 p-[20%]`}
+                        className={`fill-ebony-clay-500 rounded-xl p-[20%]`}
                       />
                     ) : (
                       <Image
@@ -180,7 +176,7 @@ const ImageDetail = () => {
                     {<ProfileCard profileData={author} />}
                     <div className="flex">
                       <button onClick={refreshImage}>
-                        <RefreshIcon className="h-7 fill-shark-700 p-1 transition-all hover:fill-shark-500" />
+                        <RefreshIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-7 p-1 transition-all" />
                       </button>
                       <ManageImage id={imageItem.id} />
                     </div>
@@ -188,7 +184,7 @@ const ImageDetail = () => {
 
                   <div className="z-20 my-4 break-keep ">
                     <h2 className="text-xl font-semibold">{imageItem.title}</h2>
-                    <div className="text-shark-900">
+                    <div className="text-ebony-clay-900">
                       {imageItem.description}
                     </div>
                   </div>
@@ -200,7 +196,7 @@ const ImageDetail = () => {
                     </div>
                   </div>
 
-                  <div className="sticky bottom-0 z-10 mt-4 border-t bg-shark-50 px-4 pb-8 pt-4 xs:bottom-[70px]">
+                  <div className="bg-ebony-clay-50 sticky bottom-0 z-10 mt-4 border-t px-4 pb-8 pt-4 xs:bottom-[70px]">
                     <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />
                       <div className="w-6 items-center">

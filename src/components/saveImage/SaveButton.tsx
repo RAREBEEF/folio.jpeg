@@ -7,7 +7,7 @@ import {
   loginModalState,
   saveModalState,
 } from "@/recoil/states";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { ImageDataPages, ImageItem } from "@/types";
 import { MouseEvent, useEffect, useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
@@ -23,9 +23,9 @@ const SaveButton = ({
   imageItem: ImageItem;
   color?: "white" | "gray";
 }) => {
-  const [saveModal, setSaveModal] = useRecoilState(saveModalState);
-  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
-  const [alert, setAlert] = useRecoilState(alertState);
+  const setSaveModal = useSetRecoilState(saveModalState);
+  const setLoginModal = useSetRecoilState(loginModalState);
+  const setAlert = useSetRecoilState(alertState);
   const [saved, setSaved] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
   const [folders, setFolders] = useRecoilState(
@@ -174,11 +174,11 @@ const SaveButton = ({
       {/* <button onClick={onSaveClick} className=""> */}
       {saved ? (
         <UnsaveIcon
-          className={`w-full ${color === "white" ? "fill-shark-50" : "fill-shark-500"}`}
+          className={`w-full ${color === "white" ? "fill-ebony-clay-50" : "fill-ebony-clay-500"}`}
         />
       ) : (
         <SaveIcon
-          className={`w-full ${color === "white" ? "fill-shark-50" : "fill-shark-500"}`}
+          className={`w-full ${color === "white" ? "fill-ebony-clay-50" : "fill-ebony-clay-500"}`}
         />
       )}
       {/* </button> */}

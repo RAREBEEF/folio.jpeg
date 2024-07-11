@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
 
-export async function POST(req: Request) {
-  const data = await req.json();
-  const { uid } = data;
+// 다른 유저의 auth data를 불러오는 것은
+// admin sdk로만 가능
+export async function GET(
+  req: Request,
+  { params }: { params: { uid: string } },
+) {
+  const { uid } = params;
 
   if (!uid) {
     return NextResponse.json({ data: "Missing UID", status: 400 });
@@ -23,7 +27,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const user = await admin.auth().getUser(data.uid);
+    const user = await admin.auth().getUser(uid);
 
     return NextResponse.json({
       data: {

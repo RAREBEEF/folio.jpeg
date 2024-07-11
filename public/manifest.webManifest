@@ -9,7 +9,7 @@
   "short_name": "folio.JPEG",
   "icons": [
     {
-      "src": "/images/logo.png",
+      "src": "/images/favicon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "rel": "icon",

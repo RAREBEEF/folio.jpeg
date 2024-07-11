@@ -4,7 +4,7 @@ import LoadingSvg from "@/icons/spinner-solid.svg";
 
 const Loading = ({
   height = null,
-  color = "shark-500",
+  color = "ebony-clay-500",
 }: {
   height?: string | null;
   color?: string;
@@ -29,6 +29,6 @@ export default Loading;
 {
   /* <LoadingSvg
         style={{ width }}
-        className={`aspect-1/1 animate-spin-slow h-[100%] w-[50%] max-w-[150px] fill-shark-700`}
+        className={`aspect-1/1 animate-spin-slow h-[100%] w-[50%] max-w-[150px] fill-ebony-clay-700`}
       /> */
 }

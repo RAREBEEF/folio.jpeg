@@ -7,7 +7,9 @@
 
 body {
   min-width: 350px;
-  color: #1f1f1f;
+  /* color: #1f1f1f; */
+  color: #2d3349;
+  margin-top: env(safe-area-inset-top);
 }
 
 main {

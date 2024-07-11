@@ -303,7 +303,7 @@ const ProfileForm = () => {
                     : authStatus.data?.photoURL || ""
               }
             />
-            <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-shark-100 px-2 py-1  opacity-0 group-hover:opacity-80">
+            <div className="bg-ebony-clay-100 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl px-2 py-1  opacity-0 group-hover:opacity-80">
               이미지 변경
             </div>
             <input
@@ -317,33 +317,33 @@ const ProfileForm = () => {
           </label>
           <button
             onClick={onDefaultImgClick}
-            className="mb-4 text-xs text-shark-500 underline"
+            className="text-ebony-clay-500 mb-4 text-xs underline"
           >
             기본 이미지로
           </button>
           <label className="flex flex-col">
-            <h4 className="pb-1 pl-2 text-xs text-shark-700">닉네임</h4>
+            <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">닉네임</h4>
             <input
               type="string"
               placeholder="2~16 글자"
               value={displayName}
               onChange={onDisplayNameChange}
-              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
+              className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
           </label>
           <label className="flex flex-col">
-            <h4 className="pb-1 pl-2 text-xs text-shark-700">사용자명</h4>
+            <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">사용자명</h4>
             <input
               onKeyDown={restrictingInputChar}
               type="string"
               value={displayId}
               placeholder="2~16 글자"
               onChange={onDisplayIdChange}
-              className="rounded-lg border border-shark-200 bg-white py-1 pl-2  outline-none"
+              className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
-            <p className="ml-2 mt-1 text-xs text-shark-500">
+            <p className="text-ebony-clay-500 ml-2 mt-1 text-xs">
               folio-jpeg.rarebeef.co.kr/{displayId || "사용자명"}
             </p>
           </label>

@@ -3,7 +3,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/fb";
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   authStatusState,
   foldersState,
@@ -25,7 +25,7 @@ import { AuthStatus, Folder, Folders, UserData } from "@/types";
 
 const Auth = () => {
   // 로그인 모달창 state
-  const [loginModal, setLoginModal] = useRecoilState(loginModalState);
+  const setLoginModal = useSetRecoilState(loginModalState);
   // pending 여부
   const [extraDataPending, setExtraDataPending] = useState<boolean>(false);
   const [folderPending, setFolderPending] = useState<boolean>(false);

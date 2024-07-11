@@ -29,13 +29,13 @@ const Follow = ({ displayId }: { displayId: string }) => {
     <div className="flex justify-center gap-12 ">
       <button onClick={onFollowingClick}>
         <div className="font-semibold">팔로잉</div>
-        <div className="text-shark-700">
+        <div className="text-ebony-clay-700">
           {following.length.toLocaleString() || 0}명
         </div>
       </button>
       <button onClick={onFollowerClick}>
         <div className="font-semibold">팔로워</div>
-        <div className="text-shark-700">
+        <div className="text-ebony-clay-700">
           {follower.length.toLocaleString() || 0}명
         </div>
       </button>

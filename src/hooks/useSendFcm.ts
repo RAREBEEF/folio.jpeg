@@ -34,7 +34,7 @@ const useSendFcm = () => {
       return;
     } else {
       // 토큰 전송 요청
-      await fetch("/api/send-fcm", {
+      await fetch("/api/fcm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

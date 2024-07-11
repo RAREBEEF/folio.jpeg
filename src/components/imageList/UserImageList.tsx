@@ -12,7 +12,7 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
   const grid = useRecoilValue(gridState);
 
   return (
-    <div className="relative h-full bg-shark-50">
+    <div className="bg-ebony-clay-50 relative h-full">
       <ImageGrid type={"user-" + userData.uid} />
       {grid && (
         <ImageInfiniteScroller
@@ -20,8 +20,7 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
           filter={{
             orderBy: ["createdAt", "desc"],
             where: where("uid", "==", userData.uid),
-            // limit: grid.colCount * 5,
-            limit: 2,
+            limit: grid.colCount * 2,
           }}
         />
       )}

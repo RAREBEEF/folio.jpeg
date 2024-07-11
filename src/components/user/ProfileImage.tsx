@@ -9,7 +9,7 @@ const ProfileImage = ({ URL }: { URL: string | null }) => {
   const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
   return (
     <div
-      className={`relative aspect-square overflow-hidden rounded-full bg-gradient-to-br from-shark-100 to-shark-300`}
+      className={`from-ebony-clay-100 to-ebony-clay-300 relative aspect-square overflow-hidden rounded-full bg-gradient-to-br`}
     >
       {/* {URL && !isImageBroken ? ( */}
       <Image
