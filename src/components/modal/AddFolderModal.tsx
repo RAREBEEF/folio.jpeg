@@ -141,7 +141,7 @@ const AddFolder = ({
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input
-          className="border-ebony-clay-200 w-full rounded-lg border bg-white py-1 pl-2 outline-none"
+          className="border-astronaut-200 w-full rounded-lg border bg-white py-1 pl-2 outline-none"
           type="text"
           value={name}
           onChange={onnameChange}

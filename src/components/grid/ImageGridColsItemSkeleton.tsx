@@ -7,7 +7,7 @@ const ImageGridColsItemSkeleton = ({
 }) => {
   return (
     <div
-      className="from-ebony-clay-100 to-ebony-clay-300 rounded-xl bg-gradient-to-br"
+      className="from-astronaut-100 to-astronaut-300 rounded-xl bg-gradient-to-br"
       style={{
         width: `${width}px`,
         height: `${height}px`,

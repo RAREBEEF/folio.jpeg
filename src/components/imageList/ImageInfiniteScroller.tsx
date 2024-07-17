@@ -67,18 +67,18 @@ const ImageInfiniteScroller = ({
   return !lastPage && !isError ? (
     <div
       ref={loadRef}
-      className="text-ebony-clay-500 pb-24 pt-12 text-center text-sm"
+      className="text-astronaut-500 pb-24 pt-12 text-center text-sm"
     >
       <Loading />
     </div>
   ) : (
     grid && (
-      <div className="text-ebony-clay-500 h-[168px] pb-24 pt-12 text-center text-sm">
+      <div className="text-astronaut-500 h-[168px] pb-24 pt-12 text-center text-sm">
         {imageCount > 0 ? (
           <div className="flex flex-col">
             <p>{imageCount} 이미지.</p>
             <button
-              className="text-ebony-clay-500 m-auto mt-4 w-fit font-semibold"
+              className="text-astronaut-500 m-auto mt-4 w-fit font-semibold"
               onClick={onScrollToTopClick}
             >
               맨 위로

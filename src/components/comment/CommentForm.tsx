@@ -1,4 +1,3 @@
-import { db } from "@/fb";
 import useInput from "@/hooks/useInput";
 import {
   authStatusState,
@@ -7,17 +6,17 @@ import {
   loginModalState,
 } from "@/recoil/states";
 import { Comment, Comments, UserData } from "@/types";
-import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { v4 as uuidv4 } from "uuid";
 import Button from "../Button";
 import Loading from "@/components//loading/Loading";
 import useSendFcm from "@/hooks/useSendFcm";
+import useSetComment from "@/hooks/useSetComment";
 
 const CommentForm = ({
   imageId,
-  parentId,
+  parentId = null,
   author,
 }: {
   imageId: string;
@@ -25,10 +24,15 @@ const CommentForm = ({
   author: UserData | null;
 }) => {
   const sendFcm = useSendFcm();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const setLoginModal = useSetRecoilState(loginModalState);
   const setComments = useSetRecoilState(commentsState(imageId as string));
   const imageItem = useRecoilValue(imageItemState(imageId));
+  const { setComment, isLoading } = useSetComment({
+    imageItem,
+    author,
+    parentId,
+  });
   const authStatus = useRecoilValue(authStatusState);
   const {
     value: content,
@@ -52,7 +56,7 @@ const CommentForm = ({
       return;
     }
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
     const commentId = uuidv4();
 
@@ -70,44 +74,22 @@ const CommentForm = ({
 
     if (!parentId) {
       // 댓글 쓰기
-      const docRef = doc(db, "images", imageId, "comments", commentId);
 
       // 댓글 상태 업데이트
       setComments((prev) => {
         prevComments = prev;
-        return { ...prev, [commentId]: comment };
+        return { [commentId]: comment, ...prev };
       });
 
       // db에 댓글 등록
-      await setDoc(docRef, comment)
-        .then(async () => {
-          setContent("");
-          // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
-          await sendFcm({
-            data: {
-              title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
-              body: `${authStatus.data?.displayName}님: ${content}`,
-              targetImage: imageItem?.URL,
-              profileImage: authStatus.data?.photoURL,
-              click_action: `/image/${imageId}`,
-              fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
-              tokenPath: author?.fcmToken ? null : `users/${imageItem?.uid}`,
-              uids: author?.uid ? [author.uid] : null,
-            },
-          });
-        })
-        .catch((error) => {
-          // 에러 시 롤백
-          setComments(prevComments);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      await setComment({ comment }).catch((error) => {
+        // 에러 시 롤백
+        setComments(prevComments);
+      });
     } else {
       // 답글 쓰기
-      const docRef = doc(db, "images", imageId, "comments", parentId);
       let tokens: Array<string> | undefined = undefined;
-      let parentComment: Comment;
+      let parentComment: Comment | null = null;
       // 댓글 상태 업데이트
       setComments((prev) => {
         prevComments = prev;
@@ -132,38 +114,13 @@ const CommentForm = ({
       });
 
       // db에 답글 등록
-      await updateDoc(docRef, {
-        replies: arrayUnion(comment),
-        fcmTokens: arrayUnion(authStatus.data.fcmToken || ""),
-      })
-        .then(async () => {
-          setContent("");
-          // 답글 작성이 완료되면 해당 댓글 및 답글 작성자들에게 푸시 전송
-          await sendFcm({
-            data: {
-              title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
-              body: `${authStatus.data?.displayName}님: ${content}`,
-              profileImage: authStatus.data?.photoURL,
-              targetImage: imageItem?.URL,
-              click_action: `/image/${imageId}`,
-              fcmTokens: tokens,
-              tokenPath: tokens
-                ? null
-                : `images/${imageId}/comments/${parentId}`,
-              uids: parentComment
-                ? parentComment.replies.map((reply) => reply.uid)
-                : null,
-            },
-          });
-        })
-        .catch((error) => {
-          // 에러 시 롤백
-          setComments(prevComments);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      await setComment({ comment, tokens, parentComment }).catch((error) => {
+        // 에러 시 롤백
+        setComments(prevComments);
+      });
     }
+
+    setContent("");
   };
 
   return (

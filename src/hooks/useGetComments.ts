@@ -34,7 +34,7 @@ const useGetComments = ({ imageId }: { imageId: string }) => {
     console.log("useGetComments");
     const commentsRef = collection(db, "images", imageId, "comments");
 
-    const queries: Array<any> = [orderBy("createdAt", "desc"), limit(2)];
+    const queries: Array<any> = [orderBy("createdAt", "asc"), limit(2)];
 
     // 쿼리 (lastVisible)
     if (lastVisible) queries.push(startAfter(lastVisible));

@@ -68,15 +68,15 @@ const ManageImage = ({ id }: { id: string }) => {
     imageItem &&
     authStatus.data &&
     imageItem.uid === authStatus.data.uid && (
-      <div className="bg-ebony-clay-50 flex gap-2 rounded-l p-2 pr-2 text-xs">
+      <div className="bg-astronaut-50 flex gap-2 rounded-l p-2 pr-2 text-xs">
         <Link href={`/edit/${imageItem.id}`}>
-          <PenIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-7 p-1 transition-all" />
+          <PenIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-7 p-1 transition-all" />
         </Link>
         <button onClick={onDeleteClick} disabled={isLoading}>
           {isLoading ? (
             <Loading />
           ) : (
-            <TrashIcon className="fill-ebony-clay-700 hover:fill-ebony-clay-500 h-7 p-1 transition-all" />
+            <TrashIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-7 p-1 transition-all" />
           )}
         </button>
       </div>

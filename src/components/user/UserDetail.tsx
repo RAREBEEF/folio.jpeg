@@ -100,7 +100,7 @@ const UserDetail = () => {
   };
 
   return (
-    <div className="bg-ebony-clay-50 h-full">
+    <div className="bg-astronaut-50 h-full">
       {!isLoading && userData ? (
         <div className="flex flex-col gap-4 pb-12">
           <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">
@@ -118,7 +118,7 @@ const UserDetail = () => {
               <span className="text-2xl font-bold ">
                 {userData.displayName}
               </span>
-              <span className="text-ebony-clay-500 text-base">
+              <span className="text-astronaut-500 text-base">
                 @{userData.displayId}
               </span>
             </h3>
@@ -139,14 +139,14 @@ const UserDetail = () => {
             <Link
               href={`/${displayId}?tab=uploaded`}
               scroll={false}
-              className={`border-ebony-clay-950 ${tab === "uploaded" && "border-b-2"}`}
+              className={`border-astronaut-950 ${tab === "uploaded" && "border-b-2"}`}
             >
               업로드한 이미지
             </Link>
             <Link
               href={`/${displayId}?tab=saved`}
               scroll={false}
-              className={`border-ebony-clay-950 ${tab === "saved" && "border-b-2"}`}
+              className={`border-astronaut-950 ${tab === "saved" && "border-b-2"}`}
             >
               저장한 이미지
             </Link>

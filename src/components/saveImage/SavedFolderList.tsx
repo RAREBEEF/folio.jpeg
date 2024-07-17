@@ -20,15 +20,15 @@ const SavedFolderList = ({
           >
             <SavedFolderThumbnail folder={folder} />
             <div className="">
-              <div className="text-ebony-clay-700 mt-2 flex items-center gap-1 text-lg font-semibold">
+              <div className="text-astronaut-700 mt-2 flex items-center gap-1 text-lg font-semibold">
                 <div className="max-w-[130px] overflow-hidden text-ellipsis whitespace-nowrap break-keep">
                   {folder.name}
                 </div>
                 {folder.isPrivate && (
-                  <LockSvg className="fill-ebony-clay-700 h-[15px] w-[15px]" />
+                  <LockSvg className="fill-astronaut-700 h-[15px] w-[15px]" />
                 )}
               </div>
-              <div className="text-ebony-clay-500 text-xs">
+              <div className="text-astronaut-500 text-xs">
                 이미지 {folder.images.length}장
               </div>
             </div>

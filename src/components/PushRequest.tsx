@@ -152,7 +152,7 @@ const PushRequest = () => {
                   <div>허용</div>
                 </Button>
                 <Button
-                  tailwindStyle="bg-ebony-clay-700"
+                  tailwindStyle="bg-astronaut-700"
                   onClick={onNotNowClick}
                 >
                   <div>나중에 다시 알림</div>
@@ -161,7 +161,7 @@ const PushRequest = () => {
               {secondRequest && (
                 <button
                   onClick={ondeniClick}
-                  className="text-ebony-clay-700 pt-4 underline"
+                  className="text-astronaut-700 pt-4 underline"
                 >
                   <div>다시 보지 않기</div>
                 </button>

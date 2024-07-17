@@ -63,7 +63,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
       <ul className="flex flex-col gap-4 p-4 px-6">
         {notification.list.length <= 0 ? (
-          <div className="text-ebony-clay-700 text-center">
+          <div className="text-astronaut-700 text-center">
             목록이 비어있습니다.
           </div>
         ) : (
@@ -77,7 +77,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                 }}
               >
                 <div className="flex gap-4">
-                  <div className="bg-ebony-clay-500 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                  <div className="bg-astronaut-800 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full">
                     <Image
                       src={notification.profileImage}
                       layout="fill"
@@ -86,12 +86,12 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                   </div>
                   <div className="flex flex-col gap-0 break-keep leading-tight">
                     <div>{notification.title}</div>
-                    <div className="text-ebony-clay-700 text-sm">
+                    <div className="text-astronaut-700 text-sm">
                       {notification.body}
                     </div>
                   </div>
                   {notification.targetImage && (
-                    <div className="bg-ebony-clay-500 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+                    <div className="bg-astronaut-800 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                       <Image
                         src={notification.targetImage}
                         layout="fill"
@@ -100,7 +100,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                     </div>
                   )}
                 </div>
-                <div className="text-ebony-clay-500 w-full pr-2 pt-2 text-end text-xs">
+                <div className="text-astronaut-500 w-full pr-2 pt-2 text-end text-xs">
                   {dateDiffNow(notification.createdAt).diffSummary}
                 </div>
               </Link>

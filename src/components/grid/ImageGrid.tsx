@@ -158,7 +158,7 @@ const ImageGrid = ({ type }: { type: string }) => {
   }, [pathname, gridInit, grid]);
 
   return (
-    <div className="pb-16 pt-8" ref={containerRef}>
+    <div className="pb-16 pt-4" ref={containerRef}>
       {gridInit && grid && (
         <div
           className="m-auto"

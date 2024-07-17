@@ -3,7 +3,8 @@ import Link from "next/link";
 const LayoutFooter = () => {
   return (
     <div
-      className={`bg-ebony-clay-950 text-ebony-clay-50 ml-[50px] px-10 py-4 transition-all xs:mb-[60px] xs:ml-0`}
+      id="footer"
+      className={`bg-astronaut-800 text-astronaut-50 ml-[50px] px-10 py-4 transition-all xs:ml-0`}
     >
       <nav className="mx-auto mb-6 max-w-[1300px]">
         <ul className="flex gap-x-24 *:flex *:flex-col *:gap-2">

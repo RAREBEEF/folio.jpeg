@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
 import useErrorAlert from "./useErrorAlert";
+import useImagePopularity from "./useImagePopularity";
 
 const useLike = ({ imageId }: { imageId: string }) => {
   const showErrorAlert = useErrorAlert();
@@ -28,6 +29,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
     },
     [],
   );
+  const { adjustPopularity } = useImagePopularity({ imageId });
 
   useEffect(() => {
     if (authStatus.data && imageItem) {
@@ -86,7 +88,8 @@ const useLike = ({ imageId }: { imageId: string }) => {
         });
         showErrorAlert();
       })
-      .finally(() => {
+      .finally(async () => {
+        await adjustPopularity(2);
         setIsLoading(false);
       });
   };
@@ -123,7 +126,8 @@ const useLike = ({ imageId }: { imageId: string }) => {
         });
         showErrorAlert();
       })
-      .finally(() => {
+      .finally(async () => {
+        await adjustPopularity(-2);
         setIsLoading(false);
       });
   };

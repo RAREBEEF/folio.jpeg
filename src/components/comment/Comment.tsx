@@ -1,4 +1,4 @@
-import { Comment as CommentType, Comments, UserData } from "@/types";
+import { Comment as CommentType, Comments, ImageItem, UserData } from "@/types";
 import CommentForm from "@/components/comment/CommentForm";
 import {
   ChangeEvent,
@@ -22,16 +22,20 @@ import ProfileImage from "@/components/user/ProfileImage";
 import Link from "next/link";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
 import useGetUserByUid from "@/hooks/useGetUserByUid";
+import useImagePopularity from "@/hooks/useImagePopularity";
+import useDeleteComment from "@/hooks/useDeleteComment";
 
 const Comment = ({
-  imageId,
+  imageItem,
   comment,
   parentId = null,
 }: {
-  imageId: string;
+  imageItem: ImageItem;
   comment: CommentType;
   parentId?: string | null;
 }) => {
+  const { deleteComment } = useDeleteComment({ imageId: imageItem.id });
+  const { adjustPopularity } = useImagePopularity({ imageId: imageItem.id });
   const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
   const setAlert = useSetRecoilState(alertState);
@@ -44,7 +48,7 @@ const Comment = ({
   const [displayId, setDisplayId] = useState<string>("");
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const authStatus = useRecoilValue(authStatusState);
-  const setComments = useSetRecoilState(commentsState(imageId as string));
+  const setComments = useSetRecoilState(commentsState(imageItem.id));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
 
@@ -60,82 +64,18 @@ const Comment = ({
       return;
     }
 
-    // 이전 상태 백업
-    let prevComments: Comments | null;
-
     // 댓글인 경우 (답글x)
     if (!parentId) {
-      const docRef = doc(db, "images", imageId, "comments", comment.id);
+      await deleteComment({ imageItem, comment, author });
 
-      setComments((prev) => {
-        prevComments = prev;
-        if (!prev) return prevComments;
-        const newComments = { ...prevComments };
-        delete newComments![comment.id];
-
-        return newComments;
-      });
-
-      await deleteDoc(docRef)
-        .then(() => {
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "삭제가 완료되었습니다.",
-          });
-        })
-        .catch((error) => {
-          // 에러 시 이전 상태로 롤백
-          setComments(prevComments);
-          setAlert({
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "삭제 중 문제가 발생하였습니다.",
-          });
-        });
       // 답글인 경우
     } else {
-      const docRef = doc(db, "images", imageId, "comments", parentId);
-
-      let newReplies: Array<CommentType> = [];
-
-      setComments((prev) => {
-        prevComments = prev;
-        if (!prev) return prevComments;
-        const parentComment = prev[parentId];
-        const replies = parentComment.replies;
-        newReplies = replies.filter((reply) => reply.id !== comment.id);
-
-        return {
-          ...prev,
-          [parentId]: {
-            ...parentComment,
-            replies: newReplies,
-          },
-        };
+      await deleteComment({
+        imageItem,
+        comment,
+        author,
+        parentId,
       });
-
-      await updateDoc(docRef, { replies: newReplies })
-        .then(() => {
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "삭제가 완료되었습니다.",
-          });
-        })
-        .catch((error) => {
-          // 에러 시 이전 상태로 롤백
-          setComments(prevComments);
-          setAlert({
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "삭제 중 문제가 발생하였습니다.",
-          });
-        });
     }
   };
 
@@ -182,7 +122,7 @@ const Comment = ({
 
   return (
     <li
-      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-ebony-clay-50"}`}
+      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-astronaut-50"}`}
     >
       <div className="flex items-start gap-2">
         <Link
@@ -205,13 +145,13 @@ const Comment = ({
             {author?.displayName}
           </Link>
           <span>{comment.content}</span>
-          <div className="text-ebony-clay-500 mt-1 text-xs">
+          <div className="text-astronaut-500 mt-1 text-xs">
             {dateDiffNow(comment.createdAt).diffSummary}
             {authStatus.data?.uid === comment.uid && (
               <Fragment>
                 {" ・ "}
                 <button
-                  className="text・-ebony-clay-500 text-xs hover:underline"
+                  className="text・-astronaut-500 text-xs hover:underline"
                   onClick={onDeleteClick}
                 >
                   삭제
@@ -221,23 +161,23 @@ const Comment = ({
           </div>
         </div>
       </div>
-      <div className="bg-ebony-clay-100 relative mt-2 rounded-lg">
+      <div className="bg-astronaut-100 relative mt-2 rounded-lg">
         {!parentId && (
           <details onToggle={onRepliesToggle} className="p-2">
             {comment.replies.length <= 0 ? (
               <Fragment>
-                <summary className="text-ebony-clay-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
+                <summary className="text-astronaut-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>
                 </summary>
-                <div className="text-ebony-clay-500 ml-2 text-sm">
+                <div className="text-astronaut-500 ml-2 text-sm">
                   아직 답글이 없습니다.
                 </div>
               </Fragment>
             ) : (
               <Fragment>
-                <summary className="text-ebony-clay-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
+                <summary className="text-astronaut-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>
@@ -247,7 +187,7 @@ const Comment = ({
                     {comment.replies.map((reply, j) => {
                       return (
                         <Comment
-                          imageId={imageId}
+                          imageItem={imageItem}
                           comment={reply}
                           key={j}
                           parentId={comment.id}
@@ -262,7 +202,7 @@ const Comment = ({
             <div className="mt-4">
               <CommentForm
                 author={author}
-                imageId={imageId}
+                imageId={imageItem.id}
                 parentId={comment.id}
               />
             </div>

@@ -3,7 +3,7 @@ import { User } from "firebase/auth";
 // 필터
 // export type FilterWhere = [string, WhereFilterOp, string | Array<string>];
 export interface Filter {
-  orderBy?: ["createdAt" | "popular", "desc" | "asc"];
+  orderBy?: ["createdAt" | "popularity", "desc" | "asc"];
   limit?: number;
   where?: any;
 }
@@ -51,21 +51,15 @@ export interface ImageDocData {
     width: number;
     height: number;
   };
-  tags: [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-  ];
+  aiTags: Array<string>;
+  customTags: Array<string>;
+  tags: Array<string>;
   feedback: Feedback;
   likes: Array<string>;
   themeColor: string;
+  popularity: number;
+  metadata: ImageMetadata;
+  customMetadata: ImageMetadata;
 }
 export interface ImageData extends ImageDocData {
   id: string;
@@ -79,18 +73,9 @@ export type ImageItem = {
   createdAt: number;
   uid: string;
   likes: Array<string>;
-  tags: [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-  ];
+  aiTags: Array<string>;
+  customTags: Array<string>;
+  tags: Array<string>;
   feedback: Feedback;
   byte: number;
   URL: string;
@@ -99,6 +84,9 @@ export type ImageItem = {
     width: number;
     height: number;
   };
+  popularity: number;
+  metadata: ImageMetadata;
+  customMetadata: ImageMetadata;
 };
 export type ImageDataPages = Array<Array<ImageData>>;
 
@@ -164,18 +152,7 @@ export interface InAppNotification {
 
 export type AnalysisResult =
   | {
-      tags: [
-        string,
-        string,
-        string,
-        string,
-        string,
-        string,
-        string,
-        string,
-        string,
-        string,
-      ];
+      tags: Array<string>;
       themeColor: string;
       feedback: Feedback;
     }
@@ -189,4 +166,15 @@ export interface Feedback {
 export interface UserFeedback {
   createdAt: number;
   feedback: Feedback | null;
+}
+
+export interface ImageMetadata {
+  make: string | null;
+  model: string | null;
+  lensMake: string | null;
+  lensModel: string | null;
+  shutterSpeed: string | null;
+  fNumber: number | null;
+  ISO: number | null;
+  focalLength: number | null;
 }

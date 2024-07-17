@@ -6,10 +6,10 @@ import LayoutNav from "./LayoutNav";
 const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     // LayoutHeader의 높이만큼 LayoutContent의 mt 조절하기
-    <div className="mt-16 flex grow">
+    <div id="body-nav-wrapper" className="mt-16 flex grow">
       <LayoutNav />
       <div
-        style={{ minHeight: "calc(100lvh - 64px)" }}
+        id="body-wrapper"
         className={`ml-[50px] w-full min-w-[300px] transition-all xs:ml-0`}
       >
         {children}

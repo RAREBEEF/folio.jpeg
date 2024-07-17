@@ -5,11 +5,40 @@
 @media (prefers-color-scheme: dark) {
 }
 
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+}
+
 body {
   min-width: 350px;
   /* color: #1f1f1f; */
   color: #2d3349;
-  margin-top: env(safe-area-inset-top);
+}
+
+#header {
+  height: calc(64px + env(safe-area-inset-top));
+}
+
+#body-wrapper {
+  min-height: calc(100lvh - 64px);
+}
+
+@media all and (max-width: 550px) {
+  #nav {
+    height: calc(64px + env(safe-area-inset-bottom));
+  }
+  #image-detail__sticky-comment-form {
+    bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  #footer {
+    margin-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+  #body-nav-wrapper {
+    margin-top: calc(64px + env(safe-area-inset-top));
+  }
 }
 
 main {

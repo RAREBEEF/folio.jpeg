@@ -26,34 +26,43 @@ const LayoutHeader = () => {
 
   return (
     // LayoutHeader의 높이만큼 LayoutContent의 mt 조절하기
-    <header className="bg-ebony-clay-950 text-ebony-clay-50 fixed top-0 z-40 flex h-16 w-full min-w-[300px] items-center justify-between">
-      <h1 className="font-bold xs:pl-2">
-        <Link href="/" className="relative flex w-[50px] items-center">
-          <div className="flex h-[50px] w-[50px] items-center justify-center">
-            <Image
-              src={logo}
-              alt="folio.JPEG"
-              className="h-[40px] w-auto overflow-hidden rounded-lg"
-            />
-          </div>
-        </Link>
-      </h1>
-      {authStatus.status === "signedIn" ||
-      authStatus.status === "noExtraData" ? (
-        <button
-          onClick={onLogoutClick}
-          className="bg-ebony-clay-50 mr-6 rounded-lg px-2 py-1 text-sm"
-        >
-          <div className="text-ebony-clay-950">로그아웃</div>
-        </button>
-      ) : (
-        <button
-          onClick={onLoginClick}
-          className="bg-ebony-clay-50 mr-6 rounded-lg px-2 py-1 text-sm"
-        >
-          <div className="text-ebony-clay-950">로그인</div>
-        </button>
-      )}
+    <header
+      id="header"
+      className="bg-astronaut-800 text-astronaut-50 fixed top-0 z-40 flex h-16 w-full min-w-[300px] items-end pb-[7px]"
+    >
+      <div className="flex w-full items-center justify-between">
+        <h1 className="font-bold xs:pl-2">
+          <Link href="/" className="relative flex w-[50px] items-center">
+            <div className="flex h-[50px] w-[50px] items-center justify-center">
+              <Image
+                src={logo}
+                alt="folio.JPEG"
+                className="h-[40px] w-auto overflow-hidden rounded-lg"
+              />
+            </div>
+          </Link>
+        </h1>
+        {authStatus.status === "signedIn" ||
+        authStatus.status === "noExtraData" ? (
+          <button
+            onClick={onLogoutClick}
+            className="bg-astronaut-50 mr-6 rounded-lg px-2 py-1 text-sm font-semibold"
+          >
+            <div className="text-astronaut-600 hover:text-astronaut-800">
+              로그아웃
+            </div>
+          </button>
+        ) : (
+          <button
+            onClick={onLoginClick}
+            className="bg-astronaut-50 mr-6 rounded-lg px-2 py-1 text-sm font-semibold"
+          >
+            <div className="text-astronaut-600 hover:text-astronaut-800">
+              로그인
+            </div>
+          </button>
+        )}
+      </div>
     </header>
   );
 };

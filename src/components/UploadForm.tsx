@@ -3,7 +3,7 @@
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
 import useInput from "@/hooks/useInput";
-import { AnalysisResult, ImageData, ImageItem } from "@/types";
+import { AnalysisResult, ImageData, ImageItem, ImageMetadata } from "@/types";
 import useSetImageData from "@/hooks/useSetImageItem";
 import useSetImageFile from "@/hooks/useSetImageFile";
 import { useParams, useRouter } from "next/navigation";
@@ -18,8 +18,10 @@ import UploadLoading from "@/components/loading/UploadLoading";
 import Modal from "@/components/modal/Modal";
 import AnalysisResultModal from "@/components/modal/AnalysisResultModal";
 import useAnalyzingImage from "@/hooks/useAnalyzingImage";
+import useCreateKeywordFromContent from "@/hooks/useCreateKeywordFromContent";
 
 const UploadForm = () => {
+  const { createKeywordFromContent } = useCreateKeywordFromContent();
   const { getImageItem, isLoading: isImageLoading } = useGetImage();
   const { setImageData, isLoading: isImageDataUploading } = useSetImageData();
   const { analyzingImage, isLoading: isAnalyzing } = useAnalyzingImage();
@@ -35,7 +37,16 @@ const UploadForm = () => {
     reset,
     isInputUploading,
     isLoading: isImageFileUploading,
-    data: { file, previewURL, id, fileName, originalName, byte, size },
+    data: {
+      file,
+      previewURL,
+      id,
+      fileName,
+      originalName,
+      byte,
+      size,
+      imgMetaData,
+    },
   } = useSetImageFile();
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
@@ -62,6 +73,23 @@ const UploadForm = () => {
   const resetUserGrid = useResetGrid({
     gridType: "user-" + authStatus.data?.uid,
   });
+  const setAlert = useSetRecoilState(alertState);
+  const [imgURL, setImgURL] = useState<string | null>(null);
+  const [imgSize, setImgSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const [loadedMetadata, setLoadedMetadata] = useState<ImageMetadata>({
+    make: null,
+    model: null,
+    lensMake: null,
+    lensModel: null,
+    shutterSpeed: null,
+    fNumber: null,
+    ISO: null,
+    focalLength: null,
+  });
 
   const {
     value: title,
@@ -73,12 +101,36 @@ const UploadForm = () => {
     setValue: setDesc,
     onChange: onDescChange,
   } = useInput(imageItem?.description || "");
-  const setAlert = useSetRecoilState(alertState);
-  const [imgURL, setImgURL] = useState<string | null>(null);
-  const [imgSize, setImgSize] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
+  const {
+    value: customCameraModel,
+    setValue: setCustomCameraModel,
+    onChange: onCustomCameraModelChange,
+  } = useInput(imageItem?.metadata.model || "");
+  const {
+    value: customLensModel,
+    setValue: setCustomLensModel,
+    onChange: onCustomLensModelChange,
+  } = useInput(imageItem?.metadata.lensModel || "");
+  const {
+    value: customShutterSpeed,
+    setValue: setCustomShutterSpeed,
+    onChange: onCustomShutterSpeedChange,
+  } = useInput(imageItem?.metadata.shutterSpeed || "");
+  const {
+    value: customFNumber,
+    setValue: setCustomFNumber,
+    onChange: onCustomFNumberChange,
+  } = useInput(imageItem?.metadata.fNumber?.toString() || "");
+  const {
+    value: customISO,
+    setValue: setCustomISO,
+    onChange: onCustomISOChange,
+  } = useInput(imageItem?.metadata.ISO?.toString() || "");
+  const {
+    value: customFocalLength,
+    setValue: setCustomFocalLength,
+    onChange: onCustomFocalLengthChange,
+  } = useInput(imageItem?.metadata.focalLength?.toString() || "");
 
   useEffect(() => {
     if (init || isImageLoading) return;
@@ -133,6 +185,12 @@ const UploadForm = () => {
     setImageItem,
     setTitle,
   ]);
+
+  useEffect(() => {
+    setLoadedMetadata({
+      ...(isEdit && imageItem ? imageItem.metadata : imgMetaData),
+    });
+  }, [isEdit, imgMetaData, imageItem]);
 
   // 업로드/수정
   const onUploadClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -247,7 +305,7 @@ const UploadForm = () => {
       // 기존 분석 결과 유지
     } else if (imageItem) {
       analysisResult = {
-        tags: imageItem.tags,
+        tags: imageItem.aiTags,
         themeColor: imageItem.themeColor,
         feedback: imageItem.feedback,
       };
@@ -293,6 +351,10 @@ const UploadForm = () => {
     setImgURL(downloadURL);
     setImgSize(size);
 
+    // 태그 정리
+
+    const customTags = createKeywordFromContent(title + " " + desc);
+
     const data: ImageData = {
       id: imageId,
       createdAt: isEdit && imageItem ? imageItem.createdAt : Date.now(),
@@ -305,9 +367,23 @@ const UploadForm = () => {
       size: isEdit && imageItem ? imageItem.size : size,
       URL: downloadURL,
       themeColor: analysisResult.themeColor,
-      tags: analysisResult.tags,
+      customTags: customTags,
+      aiTags: analysisResult.tags,
+      tags: customTags.concat(analysisResult.tags),
       feedback: analysisResult.feedback,
       likes: isEdit && imageItem ? imageItem.likes : [],
+      popularity: 0,
+      metadata: loadedMetadata,
+      customMetadata: {
+        model: customCameraModel,
+        lensModel: customLensModel,
+        make: imgMetaData.make,
+        lensMake: imgMetaData.lensMake,
+        shutterSpeed: customShutterSpeed,
+        fNumber: parseInt(customFNumber),
+        ISO: parseInt(customISO),
+        focalLength: parseInt(customFocalLength),
+      },
     };
 
     // 수정 모드는 앱에 이미지 상태가 존재하기 때문에 상태 업데이트
@@ -374,24 +450,32 @@ const UploadForm = () => {
     if (isLoading) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auth";
+      document.body.style.overflow = "auto";
     }
   }, [isLoading]);
 
+  console.log(imgMetaData);
+
+  const onNumberInputWheel = (e: MouseEvent<HTMLInputElement>) => {
+    e.currentTarget.blur();
+    e.stopPropagation();
+  };
+
   return (
-    <div className="bg-ebony-clay-50 h-full w-full px-12 py-24">
+    <div className="bg-astronaut-50 h-full w-full px-12 py-24">
       {init ? (
         <div className="flex h-full items-center justify-center gap-12 gap-x-24 sm:flex-col md:gap-x-12">
           <label
-            className={`from-ebony-clay-100 to-ebony-clay-300 relative h-auto max-w-[500px] grow overflow-hidden rounded-xl bg-gradient-to-br sm:w-full sm:grow-0 ${isEdit ? " cursor-default" : "cursor-pointer"}`}
+            className={`from-astronaut-100 to-astronaut-300 sticky top-[150px] h-auto max-w-[500px] grow self-start overflow-hidden rounded-xl bg-gradient-to-br sm:relative sm:top-auto sm:w-full sm:grow-0 sm:self-center ${isEdit ? " cursor-default" : "cursor-pointer"}`}
           >
             {(previewURL || (isEdit && imageItem && imageItem.URL)) &&
             !isInputUploading ? (
               <div
                 style={{
+                  maxHeight: "calc(100vh - 156px)",
                   aspectRatio: `${isEdit ? imageItem?.size.width : size?.width || 0}/${isEdit ? imageItem?.size.height : size?.height || 0}`,
                 }}
-                className={`group relative rounded-xl p-4`}
+                className={`group relative m-auto rounded-xl p-4 `}
               >
                 <NextImage
                   layout="fill"
@@ -401,16 +485,16 @@ const UploadForm = () => {
                   alt={fileName || ""}
                 />
                 {!isEdit && (
-                  <div className="bg-ebony-clay-100 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl px-2 py-1 opacity-0 group-hover:opacity-80">
+                  <div className="bg-astronaut-100 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl px-2 py-1 opacity-0 group-hover:opacity-80">
                     이미지 변경
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-ebony-clay-50 flex aspect-[3/4] w-full flex-col items-center justify-center text-balance break-keep p-6 text-center font-bold">
+              <div className="text-astronaut-50 flex aspect-[3/4] w-full flex-col items-center justify-center text-balance break-keep p-6 text-center font-bold">
                 {isInputUploading ? (
                   <div>
-                    <Loading color="ebony-clay-50" />
+                    <Loading color="astronaut-50" />
                     <br />
                     <div>이미지 압축 중</div>
                   </div>
@@ -434,26 +518,161 @@ const UploadForm = () => {
           </label>
           <div className="flex w-72 flex-col gap-y-6">
             <label className="flex flex-col">
-              <h3 className="text-ebony-clay-700 pb-1 pl-2">제목 (선택)</h3>
+              <h3 className="text-astronaut-700 pb-1 pl-2">
+                제목{" "}
+                <span className="text-astronaut-500 text-xs">(선택 입력)</span>
+              </h3>
               <input
                 value={title}
                 onChange={onTitleChange}
                 type="text"
-                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2 outline-none"
+                className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none"
                 placeholder="이미지의 제목을 적어주세요."
                 maxLength={50}
               />
             </label>
             <label className="flex flex-col">
-              <h3 className="text-ebony-clay-700 pb-1 pl-2">내용 (선택)</h3>
+              <h3 className="text-astronaut-700 pb-1 pl-2">
+                내용{" "}
+                <span className="text-astronaut-500 text-xs">(선택 입력)</span>
+              </h3>
               <textarea
                 value={desc}
                 onChange={onDescChange}
-                className="border-ebony-clay-200 aspect-[5/2] resize-none rounded-lg border py-1 pl-2 outline-none"
+                className="border-astronaut-200 aspect-[5/2] resize-none rounded-lg border py-1 pl-2 outline-none"
                 placeholder="이미지에 대한 설명을 적어주세요."
                 maxLength={1000}
               />
             </label>
+            {/* {Object.values(imgMetaData).some((data) => data !== null) && ( */}
+            <div className="flex flex-col py-6">
+              <h2 className="text-astronaut-800 text-xl font-semibold">
+                촬영 정보
+              </h2>
+              <p className="text-astronaut-500  text-xs">
+                메타데이터에서 로드된 정보는 수정할 수 없습니다.
+              </p>
+              <div className="mt-4 flex flex-col gap-8">
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    카메라 모델{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.model
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.model || customCameraModel}
+                    onChange={onCustomCameraModelChange}
+                    disabled={!!loadedMetadata.model}
+                    type="text"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none ${!!loadedMetadata.model && "border-none"}`}
+                    placeholder="촬영에 사용된 카메라 모델명을 적어주세요."
+                    maxLength={50}
+                  />
+                </label>
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    렌즈 모델{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.lensModel
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.lensModel || customLensModel}
+                    onChange={onCustomLensModelChange}
+                    disabled={!!loadedMetadata.lensModel}
+                    type="text"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none ${!!loadedMetadata.lensModel && "border-none"}`}
+                    placeholder="촬영에 사용된 렌즈 모델명을 적어주세요."
+                    maxLength={50}
+                  />
+                </label>
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    셔터스피드{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.shutterSpeed
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.shutterSpeed || customShutterSpeed}
+                    onChange={onCustomShutterSpeedChange}
+                    disabled={!!loadedMetadata.shutterSpeed}
+                    type="string"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none ${!!loadedMetadata.shutterSpeed && "border-none"}`}
+                    placeholder="촬영에 사용된 셔터스피드 값을 적어주세요."
+                    maxLength={20}
+                  />
+                </label>
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    조리개 값{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.fNumber
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.fNumber || customFNumber}
+                    onChange={onCustomFNumberChange}
+                    disabled={!!loadedMetadata.fNumber}
+                    onWheel={onNumberInputWheel}
+                    type="number"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.fNumber && "border-none"}`}
+                    placeholder="촬영에 사용된 조리개 값을 적어주세요."
+                    maxLength={10}
+                  />
+                </label>
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    ISO 값{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.ISO
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.ISO || customISO}
+                    onChange={onCustomISOChange}
+                    disabled={!!loadedMetadata.ISO}
+                    onWheel={onNumberInputWheel}
+                    type="number"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.ISO && "border-none"}`}
+                    placeholder="촬영에 사용된 ISO 값을 적어주세요."
+                    maxLength={10}
+                  />
+                </label>
+                <label className="flex flex-col">
+                  <h3 className="text-astronaut-700 pb-1 pl-2">
+                    초점 거리{" "}
+                    <span className="text-astronaut-500 text-xs">
+                      {!loadedMetadata.focalLength
+                        ? "(선택 입력)"
+                        : "(메타데이터 로드됨)"}
+                    </span>
+                  </h3>
+                  <input
+                    value={loadedMetadata.focalLength || customFocalLength}
+                    onChange={onCustomFocalLengthChange}
+                    disabled={!!loadedMetadata.focalLength}
+                    onWheel={onNumberInputWheel}
+                    type="number"
+                    className={`border-astronaut-200 rounded-lg border bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.focalLength && "border-none"}`}
+                    placeholder="촬영에 사용된 초점 거리를 적어주세요."
+                    maxLength={10}
+                  />
+                </label>
+              </div>
+            </div>
+            {/* )} */}
             <Button onClick={onUploadClick} disabled={isLoading}>
               {isLoading ? (
                 <div className="flex h-full">
@@ -466,10 +685,10 @@ const UploadForm = () => {
           </div>
           {isLoading && (
             <div className="fixed left-0 top-0 z-50 h-screen w-screen">
-              <div className="bg-ebony-clay-950 h-full w-full opacity-30" />
-              <div className="bg-ebony-clay-50 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg">
+              <div className="bg-astronaut-800 h-full w-full opacity-30" />
+              <div className="bg-astronaut-50 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg">
                 <UploadLoading />
-                <div className="text-ebony-clay-700 text-balance break-keep px-8 pb-8 text-center leading-tight">
+                <div className="text-astronaut-700 text-balance break-keep px-8 pb-8 text-center leading-tight">
                   {currentWork === "analyzing"
                     ? "이미지를 분석해 태그를 생성하고 있습니다."
                     : "이미지 업로드 중입니다."}

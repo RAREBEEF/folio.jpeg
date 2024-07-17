@@ -197,41 +197,39 @@ const SignInForm = () => {
   return (
     <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
       {(createAccount || pwReset) && (
-        <h3 className="text-ebony-clay-700 text-center text-lg font-semibold">
+        <h3 className="text-astronaut-700 text-center text-lg font-semibold">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}
         </h3>
       )}
       <div className="mt-10 flex grow flex-col justify-between gap-12">
         <form className="flex w-72 flex-col gap-y-4" onSubmit={onSubmit}>
           <label className="flex flex-col">
-            <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">이메일</h4>
+            <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">이메일</h4>
             <input
               type="email"
               placeholder="example@email.com"
               value={email}
               onChange={onEmailChange}
-              className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+              className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
               maxLength={50}
             />
           </label>
           {!pwReset && (
             <label className="flex flex-col">
-              <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">
-                비밀번호
-              </h4>
+              <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">비밀번호</h4>
               <input
                 type="password"
                 value={pw}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwChange}
-                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+                className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
           {createAccount && (
             <label className="flex flex-col">
-              <h4 className="text-ebony-clay-700 pb-1 pl-2 text-xs">
+              <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">
                 비밀번호 확인
               </h4>
               <input
@@ -239,16 +237,16 @@ const SignInForm = () => {
                 value={pwCheck}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwCheckChange}
-                className="border-ebony-clay-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+                className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
-          <div className="itmes-center text-ebony-clay-200 text-ebony-clay-700 flex justify-center gap-2 text-center text-sm">
+          <div className="itmes-center text-astronaut-200 text-astronaut-700 flex justify-center gap-2 text-center text-sm">
             <button
               type="button"
               onClick={onCovertSignInUpClick}
-              className="text-ebony-clay-500 text-xs hover:underline"
+              className="text-astronaut-500 text-xs hover:underline"
             >
               {createAccount ? "기존 계정으로 로그인" : "회원가입"}
             </button>{" "}
@@ -256,7 +254,7 @@ const SignInForm = () => {
             <button
               type="button"
               onClick={onConvertPwResetClick}
-              className="text-ebony-clay-500 text-xs hover:underline"
+              className="text-astronaut-500 text-xs hover:underline"
             >
               {pwReset ? "기존 계정으로 로그인" : "비밀번호 재설정"}
             </button>
@@ -286,29 +284,29 @@ const SignInForm = () => {
         <div>
           <div className="mb-12 flex items-center gap-2">
             <hr className="grow" />
-            <span className="text-ebony-clay-500 text-xs">
+            <span className="text-astronaut-500 text-xs">
               다른 방법으로 로그인
             </span>
             <hr className="grow" />
           </div>
           <div className="flex justify-center gap-2">
             <button
-              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
+              className="bg-astronaut-800 aspect-square rounded-lg p-2"
               onClick={onGoogleSignInClick}
             >
-              <GoogleSvg className="fill-ebony-clay-50 h-6 w-6" />
+              <GoogleSvg className="fill-astronaut-50 h-6 w-6" />
             </button>
             <button
-              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
+              className="bg-astronaut-800 aspect-square rounded-lg p-2"
               onClick={onGithubSignInClick}
             >
-              <GithubSvg className="fill-ebony-clay-50 h-6 w-6" />
+              <GithubSvg className="fill-astronaut-50 h-6 w-6" />
             </button>
             <button
-              className="bg-ebony-clay-950 aspect-square rounded-lg p-2"
+              className="bg-astronaut-800 aspect-square rounded-lg p-2"
               onClick={onFacebookSignInClick}
             >
-              <FacebookSvg className="fill-ebony-clay-50 h-6 w-6" />
+              <FacebookSvg className="fill-astronaut-50 h-6 w-6" />
             </button>
           </div>
         </div>

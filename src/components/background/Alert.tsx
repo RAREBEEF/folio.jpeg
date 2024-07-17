@@ -28,12 +28,12 @@ const Alert = () => {
 
   return (
     <div
-      className={`pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex min-h-12 w-fit max-w-[90vw] select-none items-center justify-center gap-4 break-keep rounded-xl bg-alto-200 px-8 py-4 text-lg font-semibold text-alto-900 shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
+      className={`text-astronaut-800 bg-astronaut-100 pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex min-h-12 w-fit max-w-[90vw] select-none items-center justify-center gap-4 break-keep rounded-xl px-8 py-4 text-lg font-semibold shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
     >
       {alert.type === "success" ? (
-        <CircleCheckIcon className="aspect-square h-8 fill-alto-900" />
+        <CircleCheckIcon className="fill-astronaut-500 aspect-square h-8" />
       ) : alert.type === "warning" ? (
-        <CircleExclamationIcon className="aspect-square h-8 fill-alto-900" />
+        <CircleExclamationIcon className="fill-astronaut-500 aspect-square h-8" />
       ) : null}
       <div className="whitespace-pre-line leading-tight">{alert.text}</div>
     </div>

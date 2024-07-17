@@ -5,6 +5,21 @@ import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
 import useErrorAlert from "./useErrorAlert";
 import useFetchWithRetry from "./useFetchWithRetry";
+import exifr from "exifr";
+import { ImageMetadata } from "@/types";
+
+const calcShutterSpeed = (shutterSpeedValue: number) => {
+  const exposureTime = Math.pow(2, -shutterSpeedValue);
+  const shutterSpeed = 1 / (1 / exposureTime);
+
+  if (shutterSpeed >= 1) {
+    return Math.round(shutterSpeed).toString();
+  } else {
+    const numerator = 1;
+    const denominator = Math.round(1 / exposureTime);
+    return `${numerator}/${denominator}`;
+  }
+};
 
 /**
  * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
@@ -25,12 +40,21 @@ const useSetImageFile = () => {
     height: 0,
   });
   const [error, setError] = useState<unknown>(null);
+  const [imgMetaData, setImgMetaData] = useState<ImageMetadata>({
+    make: null,
+    model: null,
+    lensMake: null,
+    lensModel: null,
+    shutterSpeed: null,
+    fNumber: null,
+    ISO: null,
+    focalLength: null,
+  });
 
   // 이미지 압축
   const compressor = async ({ targetImage }: { targetImage: File }) => {
     const compressedImage = await imageCompression(targetImage, {
       maxSizeMB: 10,
-      maxWidthOrHeight: 1920,
       useWebWorker: false,
     });
     return compressedImage;
@@ -39,50 +63,56 @@ const useSetImageFile = () => {
   // 첨부파일 선택
   const onFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-    if (fileList && fileList?.length !== 0) {
-      // 상태 초기화
-      reset();
 
-      const compressedImage = await compressor({ targetImage: fileList[0] });
-      setFile(compressedImage);
+    if (!fileList || fileList.length === 0) return;
 
-      // 미리보기 이미지 경로
-      const previewImg = new Image();
-      const _URL = window.URL || window.webkitURL;
-      const objectURL = _URL.createObjectURL(compressedImage);
-      previewImg.onload = async function () {
-        // @ts-ignore
-        setSize({ width: this.width, height: this.height });
-        setPreviewURL(objectURL);
-        // const gradient = await getGradient(objectURL);
-        // setGradient(gradient);
-      };
-      previewImg.src = objectURL;
+    // 상태 초기화
+    reset();
 
-      // 파일 형식 체크
-      const fileType = compressedImage.type.replace("image/", "");
-      if (!["jpg", "jpeg", "gif", "webp", "png"].includes(fileType)) {
-        setError("fileType");
-        setIsInputUploading(false);
-        return;
-      }
+    const exifData = await exifr.parse(fileList[0]);
 
-      // 스토리지에 중복된 파일명을 방지하기 위해 해시 id를 생성하고 id를 파일명으로 사용
-      const id = uuidv4();
-      setId(id);
-      setOriginalName(compressedImage.name);
-      setFileName(id + "." + fileType);
-      setByte(compressedImage.size);
+    setImgMetaData({
+      make: exifData?.Make || null,
+      model: exifData?.Model || null,
+      lensMake: exifData?.LensMake || null,
+      lensModel: exifData?.LensModel || null,
+      shutterSpeed: exifData?.ShutterSpeedValue
+        ? calcShutterSpeed(exifData?.ShutterSpeedValue)
+        : null,
+      fNumber: exifData?.FNumber || null,
+      ISO: exifData?.ISO || null,
+      focalLength: exifData?.FocalLength || null,
+    });
+
+    const compressedImage = await compressor({ targetImage: fileList[0] });
+    setFile(compressedImage);
+
+    // 미리보기 이미지 경로
+    const previewImg = new Image();
+    const _URL = window.URL || window.webkitURL;
+    const objectURL = _URL.createObjectURL(compressedImage);
+
+    previewImg.onload = () => {
+      setSize({ width: previewImg.width, height: previewImg.height });
+      setPreviewURL(objectURL);
+    };
+    previewImg.src = objectURL;
+
+    // 파일 형식 체크
+    const fileType = compressedImage.type.replace("image/", "");
+    if (!["jpg", "jpeg", "gif", "webp", "png"].includes(fileType)) {
+      setError("fileType");
       setIsInputUploading(false);
-    } else {
-      // setFile(null);
-      // setPreviewURL(null);
-      // setId(null);
-      // setFileName(null);
-      // setOriginalName(null);
-      // setByte(null);
-      // setSize(null);
+      return;
     }
+
+    // 스토리지에 중복된 파일명을 방지하기 위해 해시 id를 생성하고 id를 파일명으로 사용
+    const id = uuidv4();
+    setId(id);
+    setOriginalName(compressedImage.name);
+    setFileName(id + "." + fileType);
+    setByte(compressedImage.size);
+    setIsInputUploading(false);
   };
 
   /**
@@ -156,7 +186,16 @@ const useSetImageFile = () => {
     onFileSelect,
     reset,
     error,
-    data: { file, previewURL, id, fileName, originalName, byte, size },
+    data: {
+      file,
+      previewURL,
+      id,
+      fileName,
+      originalName,
+      byte,
+      size,
+      imgMetaData,
+    },
   };
 };
 

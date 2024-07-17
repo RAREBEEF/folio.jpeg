@@ -140,10 +140,11 @@ const LayoutNav = () => {
 
   return (
     <div
-      className={`xs:bg-ebony-clay-950 fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-[70px] xs:w-screen xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
+      id="nav"
+      className={`xs:bg-astronaut-800 fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`bg-ebony-clay-950 text-ebony-clay-50 relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll transition-all xs:h-[50px] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
+        className={`bg-astronaut-800 text-astronaut-50 relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll transition-all xs:h-16 xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
         <button
           onClick={(e) => {
@@ -161,7 +162,7 @@ const LayoutNav = () => {
           className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
           >
             <Link
               href="/"
@@ -169,19 +170,19 @@ const LayoutNav = () => {
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "home" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                  className={`${curPath === "home" ? "text-astronaut-300" : "text-astronaut-50 hover:text-astronaut-300"}`}
                 >
                   Home
                 </div>
               ) : (
                 <HomeSvg
-                  className={`aspect-square w-[30px] ${curPath === "home" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                  className={`aspect-square w-[30px] ${curPath === "home" ? "fill-astronaut-500" : "fill-astronaut-50 hover:fill-astronaut-300 "}`}
                 />
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -190,19 +191,19 @@ const LayoutNav = () => {
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "upload" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                  className={`${curPath === "upload" ? "text-astronaut-300" : "text-astronaut-50 hover:text-astronaut-300"}`}
                 >
                   Upload
                 </div>
               ) : (
                 <ImageSvg
-                  className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                  className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-astronaut-500" : "fill-astronaut-50 hover:fill-astronaut-300 "}`}
                 />
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -211,37 +212,37 @@ const LayoutNav = () => {
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "profile" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                  className={`${curPath === "profile" ? "text-astronaut-300" : "text-astronaut-50 hover:text-astronaut-300"}`}
                 >
                   Profile
                 </div>
               ) : (
                 <ProfileSvg
-                  className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                  className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-astronaut-500" : "fill-astronaut-50 hover:fill-astronaut-300 "}`}
                 />
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-ebony-clay-50 "}`} xs:bg-ebony-clay-950 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
           >
             <button
               onClick={onNotificationClick}
-              className="relative m-auto flex h-[30px] w-fit items-center justify-center"
+              className="group relative m-auto flex h-[30px] w-fit items-center justify-center"
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "notification" ? "text-ebony-clay-500" : "text-ebony-clay-50 hover:text-ebony-clay-300"}`}
+                  className={`${curPath === "notification" ? "text-astronaut-300" : "text-astronaut-50 hover:text-astronaut-300"}`}
                 >
                   Notifications
                 </div>
               ) : (
                 <NotificationSvg
-                  className={`aspect-square w-[30px] ${curPath === "notification" ? "fill-ebony-clay-500" : "fill-ebony-clay-50 hover:fill-ebony-clay-300 "}`}
+                  className={`aspect-square w-[30px] ${curPath === "notification" ? "fill-astronaut-500" : "fill-astronaut-50 group-hover:fill-astronaut-300 "}`}
                 />
               )}
               <div
-                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} bg-ebony-clay-900 top-0 aspect-square w-4 rounded-full text-xs tracking-tighter`}
+                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} bg-astronaut-800 top-0 aspect-square w-4 rounded-full text-xs tracking-tighter`}
               >
                 {Math.min(notificationCount, 99)}
               </div>

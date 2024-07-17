@@ -14,7 +14,7 @@ const RecommendImageList = ({ imageItem }: { imageItem: ImageItem }) => {
   const grid = useRecoilValue(gridState);
 
   return (
-    <div className="bg-ebony-clay-50 relative h-full">
+    <div className="bg-astronaut-50 relative h-full">
       <ImageGrid type={`recommend-${id}`} />
       {grid && (
         <ImageInfiniteScroller

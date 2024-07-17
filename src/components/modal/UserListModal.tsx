@@ -64,7 +64,7 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
       <ul className="flex flex-col gap-4 p-4 px-6">
         {!isLoading && userList.length <= 0 ? (
-          <div className="text-ebony-clay-700 text-center">
+          <div className="text-astronaut-700 text-center">
             목록이 비어있습니다.
           </div>
         ) : (
@@ -78,7 +78,7 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
       {userList.length !== users.length && (
         <div
           ref={loadRef}
-          className="text-ebony-clay-500 pb-24 pt-12 text-center text-sm"
+          className="text-astronaut-500 pb-24 pt-12 text-center text-sm"
         >
           <Loading />
         </div>

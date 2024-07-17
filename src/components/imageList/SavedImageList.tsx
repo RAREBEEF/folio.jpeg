@@ -13,9 +13,9 @@ const SavedImageList = ({ type, folder }: { type: string; folder: Folder }) => {
   const grid = useRecoilValue(gridState);
 
   return (
-    <div className="bg-ebony-clay-50 relative h-full">
+    <div className="bg-astronaut-50 relative h-full">
       {folder.images.length <= 0 ? (
-        <div className="text-ebony-clay-500 flex h-full min-h-[200px] items-center justify-center text-center text-sm">
+        <div className="text-astronaut-500 flex h-full min-h-[200px] items-center justify-center text-center text-sm">
           이미지가 존재하지 않습니다.
         </div>
       ) : (

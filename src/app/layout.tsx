@@ -308,7 +308,7 @@ export default function RootLayout({
       </head>
       <body
         className={
-          inter.className + " bg-ebony-clay-950 flex min-h-lvh flex-col"
+          inter.className + " bg-astronaut-800 flex min-h-lvh flex-col"
         }
       >
         <RecoilProvider>

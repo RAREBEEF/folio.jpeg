@@ -1,31 +1,19 @@
-import { db } from "@/fb";
-import { commentsState, lastVisibleState } from "@/recoil/states";
-import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { commentsState } from "@/recoil/states";
+import { MouseEvent, useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
-import CommentForm from "./CommentForm";
 import Comment from "./Comment";
-import {
-  DocumentData,
-  QueryDocumentSnapshot,
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  startAfter,
-  where,
-} from "firebase/firestore";
-import { Comment as CommentType, Comments } from "@/types";
+
+import { ImageItem } from "@/types";
 import _ from "lodash";
 import Loading from "@/components/loading/Loading";
 import useGetComments from "@/hooks/useGetComments";
 
-const CommentList = ({ imageId }: { imageId: string }) => {
+const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
   const isInitialMount = useRef(true);
-  const [comments, setComments] = useRecoilState(
-    commentsState(imageId as string),
-  );
-  const { getComments, isLoading, lastPage } = useGetComments({ imageId });
+  const [comments, setComments] = useRecoilState(commentsState(imageItem.id));
+  const { getComments, isLoading, lastPage } = useGetComments({
+    imageId: imageItem.id,
+  });
 
   // 최초 댓글
   useEffect(() => {
@@ -39,7 +27,7 @@ const CommentList = ({ imageId }: { imageId: string }) => {
         await getComments();
       })();
     }
-  }, [comments, getComments, imageId, isLoading, lastPage, setComments]);
+  }, [comments, getComments, imageItem.id, isLoading, lastPage, setComments]);
 
   const onLoadClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -50,11 +38,11 @@ const CommentList = ({ imageId }: { imageId: string }) => {
     <div>
       <ol className="flex flex-col gap-4">
         {!comments || Object.keys(comments).length === 0 ? (
-          <div className="text-ebony-clay-500">아직 댓글이 없습니다.</div>
+          <div className="text-astronaut-500">아직 댓글이 없습니다.</div>
         ) : (
           Object.keys(comments).map((id, i) => {
             const comment = comments[id];
-            return <Comment imageId={imageId} comment={comment} key={i} />;
+            return <Comment imageItem={imageItem} comment={comment} key={id} />;
           })
         )}
       </ol>
@@ -67,7 +55,7 @@ const CommentList = ({ imageId }: { imageId: string }) => {
           <div className="mt-4 w-full text-center">
             <button
               onClick={onLoadClick}
-              className="text-ebony-clay-500 m-auto text-center text-xs"
+              className="text-astronaut-500 m-auto text-center text-xs"
             >
               댓글 더 보기
             </button>

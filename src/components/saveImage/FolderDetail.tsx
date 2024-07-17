@@ -226,11 +226,11 @@ const FolderDetail = ({}: {}) => {
   };
 
   return (
-    <div className="bg-ebony-clay-50 relative h-full">
+    <div className="bg-astronaut-50 relative h-full">
       {currentFolder && (
         <div className="flex h-full flex-col">
-          <div className="border-ebony-clay-950 flex min-h-20 items-center border-b p-4 pl-10">
-            <h2 className="text-ebony-clay-700 text-2xl font-semibold">
+          <div className="border-astronaut-950 flex min-h-20 items-center border-b p-4 pl-10">
+            <h2 className="text-astronaut-700 text-2xl font-semibold">
               {currentFolder.name}
             </h2>
             {authStatus.data?.uid === currentFolder.uid && (

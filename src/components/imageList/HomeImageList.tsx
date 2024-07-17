@@ -2,15 +2,18 @@
 
 import _ from "lodash";
 import ImageGrid from "../grid/ImageGrid";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authStatusState, gridState, loginModalState } from "@/recoil/states";
 import ImageInfiniteScroller from "./ImageInfiniteScroller";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MouseEvent, useMemo } from "react";
+import { ChangeEvent, MouseEvent, useMemo, useState } from "react";
 import { where } from "firebase/firestore";
+import OrderByFilter from "./OrderByFilter";
+import { useRouter } from "next/navigation";
 
 const HomeImageList = () => {
+  const { replace } = useRouter();
   const setLoginModal = useSetRecoilState(loginModalState);
   const authStatus = useRecoilValue(authStatusState);
   const params = useSearchParams();
@@ -22,6 +25,14 @@ const HomeImageList = () => {
     [params, authStatus.status],
   );
   const grid = useRecoilValue(gridState);
+  const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
+    "createdAt",
+  );
+
+  const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setOrderBy(e.target.value as "popularity" | "createdAt");
+    replace(`?where=${listType}&orderBy=${orderBy}`, { scroll: false });
+  };
 
   const needLogin = (e: MouseEvent<HTMLAnchorElement>) => {
     if (authStatus.status !== "signedIn" && authStatus.status !== "pending") {
@@ -34,30 +45,35 @@ const HomeImageList = () => {
   };
 
   return (
-    <div className="bg-ebony-clay-50 relative h-full">
+    <div className="bg-astronaut-50 relative h-full">
       <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold  xs:pt-8">
         <Link
-          href="/"
-          className={`border-ebony-clay-950 ${listType === "all" && "border-b-2"}`}
+          href={`?where=all&orderBy=${orderBy}`}
+          className={`border-astronaut-950 ${listType === "all" && "border-b-2"}`}
         >
           모든 이미지
         </Link>
         <Link
           onClick={needLogin}
-          href="?where=following"
-          className={`border-ebony-clay-950 ${listType === "following" && "border-b-2"}`}
+          href={`?where=following&orderBy=${orderBy}`}
+          className={`border-astronaut-950 ${listType === "following" && "border-b-2"}`}
         >
           팔로잉
         </Link>
       </nav>
-      <ImageGrid type={listType === "following" ? "following" : "home"} />
+      <div className="flex justify-end px-4 pt-4 opacity-50">
+        <OrderByFilter onChange={onOrderByChange} value={orderBy} />
+      </div>
+      <ImageGrid
+        type={listType === "following" ? "following" : "home" + "-" + orderBy}
+      />
       {grid && (
         <ImageInfiniteScroller
-          type={listType === "following" ? "following" : "home"}
+          type={listType === "following" ? "following" : "home" + "-" + orderBy}
           filter={
             listType === "following"
               ? {
-                  orderBy: ["createdAt", "desc"],
+                  orderBy: [orderBy, "desc"],
                   where: where(
                     "uid",
                     "in",
@@ -69,7 +85,7 @@ const HomeImageList = () => {
                   limit: grid.colCount * 2,
                 }
               : {
-                  orderBy: ["createdAt", "desc"],
+                  orderBy: [orderBy, "desc"],
                   limit: grid.colCount * 2,
                 }
           }
