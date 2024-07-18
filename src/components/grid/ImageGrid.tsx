@@ -145,20 +145,29 @@ const ImageGrid = ({ type }: { type: string }) => {
     };
   }, []);
 
-  // 스크롤 복원
+  // 그리드 페이지 스크롤 복원
   useEffect(() => {
     if (!gridInit || !grid) return;
-    const storedScrollY = sessionStorage.getItem(pathname);
 
-    if (storedScrollY) {
-      const scrollY = parseInt(storedScrollY);
-      window.scrollTo({ top: scrollY });
-      sessionStorage.removeItem(pathname);
+    const storedScroll = sessionStorage.getItem(pathname);
+    const storedPrevPath = sessionStorage.getItem("prevPath");
+
+    if (storedScroll && storedPrevPath) {
+      const scroll = JSON.parse(storedScroll);
+      const { scrollY, restoreWhenFrom } = scroll as {
+        scrollY: number;
+        restoreWhenFrom: string;
+      };
+
+      if (restoreWhenFrom === storedPrevPath || pathname === "/") {
+        window.scrollTo({ top: scrollY });
+        sessionStorage.removeItem(pathname);
+      }
     }
   }, [pathname, gridInit, grid]);
 
   return (
-    <div className="pb-16 pt-4" ref={containerRef}>
+    <div className="pb-4 pt-4" ref={containerRef}>
       {gridInit && grid && (
         <div
           className="m-auto"

@@ -13,9 +13,9 @@ const SavedImageList = ({ type, folder }: { type: string; folder: Folder }) => {
   const grid = useRecoilValue(gridState);
 
   return (
-    <div className="bg-astronaut-50 relative h-full">
+    <div className="relative h-full bg-astronaut-50">
       {folder.images.length <= 0 ? (
-        <div className="text-astronaut-500 flex h-full min-h-[200px] items-center justify-center text-center text-sm">
+        <div className="flex h-full min-h-[200px] items-center justify-center text-center text-sm text-astronaut-500">
           이미지가 존재하지 않습니다.
         </div>
       ) : (
@@ -27,7 +27,7 @@ const SavedImageList = ({ type, folder }: { type: string; folder: Folder }) => {
               filter={{
                 orderBy: ["createdAt", "desc"],
                 where: where("id", "in", folder.images),
-                limit: grid.colCount * 2,
+                limit: Math.min(grid.colCount * 2, 1),
               }}
               folder={folder}
             />

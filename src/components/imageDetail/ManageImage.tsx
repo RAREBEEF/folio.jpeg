@@ -14,11 +14,20 @@ const ManageImage = ({ id }: { id: string }) => {
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
-  const resetUserGrid = useResetGrid({
-    gridType: "user-" + authStatus.data?.uid,
+  const resetUserCreatedAtGrid = useResetGrid({
+    gridType: "user-" + authStatus.data?.uid + "-" + "createdAt",
   });
-  const resetHomeGrid = useResetGrid({ gridType: "home" });
-  const resetFollowingGrid = useResetGrid({ gridType: "following" });
+  const resetUserPopularityGrid = useResetGrid({
+    gridType: "user-" + authStatus.data?.uid + "-" + "Popularity",
+  });
+  const resetHomeCreatedAtGrid = useResetGrid({ gridType: "home-createdAt" });
+  const resetHomePopularityGrid = useResetGrid({ gridType: "home-popularity" });
+  const resetFollowingCreatedAtGrid = useResetGrid({
+    gridType: "following-createdAt",
+  });
+  const resetFollowingPopularityGrid = useResetGrid({
+    gridType: "following-popularity",
+  });
   const [imageItem, setImageItem] = useRecoilState(imageItemState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -40,9 +49,12 @@ const ManageImage = ({ id }: { id: string }) => {
     )
       .then(() => {
         setImageItem(null);
-        resetHomeGrid();
-        resetFollowingGrid();
-        resetUserGrid();
+        resetHomeCreatedAtGrid();
+        resetHomePopularityGrid();
+        resetFollowingCreatedAtGrid();
+        resetFollowingPopularityGrid();
+        resetUserCreatedAtGrid();
+        resetUserPopularityGrid();
         setAlert({
           show: true,
           type: "success",
@@ -68,16 +80,12 @@ const ManageImage = ({ id }: { id: string }) => {
     imageItem &&
     authStatus.data &&
     imageItem.uid === authStatus.data.uid && (
-      <div className="bg-astronaut-50 flex gap-2 rounded-l p-2 pr-2 text-xs">
+      <div className="flex gap-2 rounded-l bg-astronaut-50 p-2 pr-2 text-xs">
         <Link href={`/edit/${imageItem.id}`}>
-          <PenIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-7 p-1 transition-all" />
+          <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
         </Link>
         <button onClick={onDeleteClick} disabled={isLoading}>
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <TrashIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-7 p-1 transition-all" />
-          )}
+          <TrashIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
         </button>
       </div>
     )

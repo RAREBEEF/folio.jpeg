@@ -231,6 +231,7 @@ const ProfileForm = () => {
               follower: [],
               following: [],
               fcmToken: "",
+              tagScore: {},
             }),
         updateProfile(user, {
           displayName,
@@ -303,7 +304,7 @@ const ProfileForm = () => {
                     : authStatus.data?.photoURL || ""
               }
             />
-            <div className="bg-astronaut-100 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl px-2 py-1  opacity-0 group-hover:opacity-80">
+            <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 px-2 py-1  opacity-0 group-hover:opacity-80">
               이미지 변경
             </div>
             <input
@@ -317,33 +318,33 @@ const ProfileForm = () => {
           </label>
           <button
             onClick={onDefaultImgClick}
-            className="text-astronaut-500 mb-4 text-xs underline"
+            className="mb-4 text-xs text-astronaut-500 underline"
           >
             기본 이미지로
           </button>
           <label className="flex flex-col">
-            <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">닉네임</h4>
+            <h4 className="pb-1 pl-2 text-xs text-astronaut-700">닉네임</h4>
             <input
               type="string"
               placeholder="2~16 글자"
               value={displayName}
               onChange={onDisplayNameChange}
-              className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+              className="rounded-lg border border-astronaut-200 bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
           </label>
           <label className="flex flex-col">
-            <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">사용자명</h4>
+            <h4 className="pb-1 pl-2 text-xs text-astronaut-700">사용자명</h4>
             <input
               onKeyDown={restrictingInputChar}
               type="string"
               value={displayId}
               placeholder="2~16 글자"
               onChange={onDisplayIdChange}
-              className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+              className="rounded-lg border border-astronaut-200 bg-white py-1 pl-2  outline-none"
               maxLength={20}
             />
-            <p className="text-astronaut-500 ml-2 mt-1 text-xs">
+            <p className="ml-2 mt-1 text-xs text-astronaut-500">
               folio-jpeg.rarebeef.co.kr/{displayId || "사용자명"}
             </p>
           </label>

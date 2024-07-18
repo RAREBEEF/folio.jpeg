@@ -34,8 +34,6 @@ const LayoutNav = () => {
     null | "home" | "image" | "upload" | "edit" | "profile" | "notification"
   >(null);
 
-  console.log(curPath);
-
   useEffect(() => {
     if (showNotificationModal) {
       setCurPath("notification");
@@ -141,10 +139,10 @@ const LayoutNav = () => {
   return (
     <div
       id="nav"
-      className={`xs:bg-astronaut-800 fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
+      className={`fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:bg-astronaut-800 xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`bg-astronaut-800 text-astronaut-50 relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll transition-all xs:h-16 xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
+        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-astronaut-800 text-astronaut-50 transition-all xs:h-16 xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
         <button
           onClick={(e) => {
@@ -162,7 +160,7 @@ const LayoutNav = () => {
           className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-astronaut-50 "}`} xs:inline xs:aspect-auto xs:bg-astronaut-800`}
           >
             <Link
               href="/"
@@ -182,7 +180,7 @@ const LayoutNav = () => {
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-astronaut-50 "}`} xs:inline xs:aspect-auto xs:bg-astronaut-800`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -203,7 +201,7 @@ const LayoutNav = () => {
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-astronaut-50 "}`} xs:inline xs:aspect-auto xs:bg-astronaut-800`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -224,7 +222,7 @@ const LayoutNav = () => {
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-astronaut-50 "}`} xs:bg-astronaut-800 xs:inline xs:aspect-auto`}
+            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-astronaut-50 "}`} xs:inline xs:aspect-auto xs:bg-astronaut-800`}
           >
             <button
               onClick={onNotificationClick}
@@ -242,7 +240,7 @@ const LayoutNav = () => {
                 />
               )}
               <div
-                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} bg-astronaut-800 top-0 aspect-square w-4 rounded-full text-xs tracking-tighter`}
+                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} top-0 aspect-square w-4 rounded-full bg-astronaut-800 text-xs tracking-tighter`}
               >
                 {Math.min(notificationCount, 99)}
               </div>

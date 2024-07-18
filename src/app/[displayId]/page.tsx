@@ -42,6 +42,7 @@ export async function generateMetadata(
     follower: [],
     following: [],
     fcmToken: "",
+    tagScore: {},
   };
   let uid: string = "";
 

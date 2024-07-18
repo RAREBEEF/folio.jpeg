@@ -9,6 +9,7 @@ import useSendFcm from "./useSendFcm";
 import { useRecoilValue } from "recoil";
 import { authStatusState } from "@/recoil/states";
 import useImagePopularity from "./useImagePopularity";
+import useTagScore from "./useTagScore";
 
 const useSetComment = ({
   imageItem,
@@ -19,6 +20,7 @@ const useSetComment = ({
   author: UserData | null;
   parentId: string | null;
 }) => {
+  const { adjustTagScore } = useTagScore({ imageItem });
   const { adjustPopularity } = useImagePopularity({
     imageId: imageItem?.id || "",
   });
@@ -46,18 +48,21 @@ const useSetComment = ({
       const docRef = doc(db, "images", imageItem.id, "comments", comment.id);
       await setDoc(docRef, comment).then(async () => {
         // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
-        await sendFcm({
-          data: {
-            title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
-            body: `${authStatus.data?.displayName}님: ${comment.content}`,
-            profileImage: authStatus.data?.photoURL,
-            targetImage: imageItem?.URL,
-            click_action: `/image/${imageItem.id}`,
-            fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
-            tokenPath: author?.fcmToken ? null : `users/${imageItem?.uid}`,
-            uids: author?.uid ? [author.uid] : null,
-          },
-        });
+        await Promise.all([
+          adjustTagScore({ action: "comment" }),
+          sendFcm({
+            data: {
+              title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
+              body: `${authStatus.data?.displayName}님: ${comment.content}`,
+              profileImage: authStatus.data?.photoURL,
+              targetImage: imageItem?.URL,
+              click_action: `/image/${imageItem.id}`,
+              fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
+              tokenPath: author?.fcmToken ? null : `users/${imageItem?.uid}`,
+              uids: author?.uid ? [author.uid] : null,
+            },
+          }),
+        ]);
       });
       // 답글
     } else {

@@ -2,6 +2,7 @@
 
 import {
   commentsState,
+  deviceState,
   imageItemState,
   lastVisibleState,
   userDataState,
@@ -10,7 +11,7 @@ import {
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import CommentList from "@/components/comment/CommentList";
 import Like from "./Like";
 import useGetImage from "@/hooks/useGetImage";
@@ -31,8 +32,20 @@ import ManageImage from "./ManageImage";
 import RefreshIcon from "@/icons/rotate-right-solid.svg";
 import BrokenSvg from "@/icons/link-slash-solid.svg";
 import SaveButton from "../saveImage/SaveButton";
+import InfoSvg from "@/icons/circle-info-solid.svg";
+import XSvg from "@/icons/xmark-solid.svg";
+import _ from "lodash";
+import MetadataInfo from "./MetadataInfo";
+import useTagScore from "@/hooks/useTagScore";
+import useImagePopularity from "@/hooks/useImagePopularity";
 
 const ImageDetail = () => {
+  const device = useRecoilValue(deviceState);
+  const [smallViewport, setSmallViewprot] = useState<boolean>(false);
+  const disableHoverInfo = useMemo(
+    () => device === "mobile" || smallViewport,
+    [device, smallViewport],
+  );
   const isInitialMount = useRef(true);
   const { replace } = useRouter();
   const [displayId, setDisplayId] = useState<string>("");
@@ -50,18 +63,31 @@ const ImageDetail = () => {
     DocumentData
   > | null>(lastVisibleState("comments-" + imageId));
   const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
-  const [mousePos, setMousePos] = useState<[number, number]>([0, 0]);
-  const [metadataDirection, setMetadataDirection] = useState<"left" | "right">(
-    "right",
-  );
-  const [showMetadata, setShowMetadata] = useState<boolean>(false);
+  const [infoPos, setInfoPos] = useState<[number, number]>([0, 0]);
+  const [showInfo, setShowInfo] = useState<boolean>(false);
   const [zoomIn, setZoomIn] = useState<boolean>(false);
+  const { adjustTagScore } = useTagScore({
+    imageItem,
+  });
+  const { adjustPopularity } = useImagePopularity({
+    imageId,
+  });
+  const [viewActionDone, setViewActionDone] = useState<boolean>(false);
 
   // imageItem이 null이면 직접 불러오기
   useEffect(() => {
     if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
       return;
+    }
+    if (!viewActionDone) {
+      setViewActionDone(true);
+      (async () => {
+        await Promise.all([
+          adjustTagScore({ action: "view" }),
+          adjustPopularity(1),
+        ]);
+      })();
     }
     if (imageId && !imageItem && !isLoading) {
       (async () => {
@@ -73,7 +99,17 @@ const ImageDetail = () => {
         }
       })();
     }
-  }, [imageItem, imageId, getImageItem, setImageItem, isLoading, replace]);
+  }, [
+    imageItem,
+    imageId,
+    getImageItem,
+    setImageItem,
+    isLoading,
+    replace,
+    viewActionDone,
+    adjustTagScore,
+    adjustPopularity,
+  ]);
 
   // 작성자 상태 업데이트
   useEffect(() => {
@@ -127,28 +163,53 @@ const ImageDetail = () => {
     setComments(null);
   };
 
-  const onImageMouseEnter = (e: MouseEvent<HTMLImageElement>) => {
-    e.preventDefault();
-    console.log("enter");
-    setShowMetadata(true);
-  };
+  // const onImageMouseEnter = (e: MouseEvent<HTMLImageElement>) => {
+  //   e.preventDefault();
+  //   if (disableHoverInfo) return;
+
+  // };
 
   const onImageMouseMove = (e: MouseEvent<HTMLImageElement>) => {
     e.preventDefault();
-    console.log("move");
-    if (e.clientX + 250 > window.innerWidth) {
-      setMetadataDirection("left");
-    } else if (e.clientX - 250 < 0) {
-      setMetadataDirection("right");
-    }
-    setMousePos([e.clientX, e.clientY]);
+
+    const info = document.getElementById("metadata-info");
+    if (disableHoverInfo || !info) return;
+
+    setShowInfo(true);
+
+    const infoWidth = info.clientWidth || 0;
+    const infoHeight = info.clientHeight || 0;
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    const imgClientRect = e.currentTarget.getBoundingClientRect();
+    const imgX = imgClientRect.x;
+    const imgY = imgClientRect.y;
+    const imgWidth = imgClientRect.width;
+    const imgHeight = imgClientRect.height;
+    const imgXEnd = imgX + imgWidth;
+    const imgYEnd = imgY + imgHeight;
+
+    const xPos = mouseX - infoWidth / 2;
+    const maxXPos = imgXEnd - infoWidth;
+    const minXPos = imgX;
+
+    const yPos = mouseY - infoHeight / 2;
+    const maxYPos = imgYEnd - infoHeight;
+    const minYPos = imgY;
+
+    setInfoPos([
+      Math.max(minXPos, Math.min(xPos, maxXPos)),
+      Math.max(minYPos, Math.min(yPos, maxYPos)),
+    ]);
   };
 
   const onImageMouseOut = (e: MouseEvent<HTMLImageElement>) => {
     e.preventDefault();
-    console.log("out");
-    setShowMetadata(false);
+    if (disableHoverInfo) return;
+
+    setShowInfo(false);
   };
+
   const onZoomIn = (e: MouseEvent<HTMLImageElement>) => {
     e.preventDefault();
     setZoomIn(true);
@@ -160,18 +221,54 @@ const ImageDetail = () => {
     document.body.style.overflow = "auto";
   };
 
+  const onShowMetadataClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const btnClientRect = e.currentTarget.getBoundingClientRect();
+    const btnX = btnClientRect.x;
+    const btnY = btnClientRect.y;
+
+    setShowInfo((show) => {
+      if (!show) {
+        setInfoPos([btnX, btnY]);
+
+        const close = () => {
+          setShowInfo(false);
+        };
+
+        window.addEventListener("scroll", close, { once: true });
+      }
+
+      return !show;
+    });
+  };
+
+  useEffect(() => {
+    const windowResizeHandler = _.debounce(() => {
+      if (window.innerWidth <= 550) {
+        setSmallViewprot(true);
+      } else {
+        setSmallViewprot(false);
+      }
+    }, 100);
+    window.addEventListener("resize", windowResizeHandler);
+    windowResizeHandler();
+    return () => {
+      window.removeEventListener("resize", windowResizeHandler);
+    };
+  }, []);
+
   return (
-    <div className="bg-astronaut-50 relative h-full px-10 xs:px-4">
+    <div className="relative h-full bg-astronaut-50 px-10 xs:px-4">
       {imageItem ? (
         <div>
           <nav className="sticky top-16 z-10 flex items-center justify-between py-4 xs:hidden">
             <button
-              className="bg-astronaut-50 text-astronaut-700 flex aspect-square h-fit items-center gap-2 rounded-full px-2 py-1 font-semibold"
+              className="flex aspect-square h-fit items-center gap-2 rounded-full bg-astronaut-50 px-2 py-1 font-semibold text-astronaut-700"
               onClick={() => {
                 back();
               }}
             >
-              <ArrowIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-5 transition-all" />
+              <ArrowIcon className="h-5 fill-astronaut-700 transition-all hover:fill-astronaut-500" />
             </button>
           </nav>
 
@@ -184,14 +281,14 @@ const ImageDetail = () => {
                       aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
                       maxHeight: "calc(100vh - 150px)",
                     }}
-                    className="from-astronaut-100 to-astronaut-300 sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br"
+                    className="sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br from-astronaut-100 to-astronaut-300"
                   >
                     {isImageBroken ? (
                       <BrokenSvg
                         style={{
                           aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
                         }}
-                        className={`fill-astronaut-500 rounded-xl p-[20%]`}
+                        className={`rounded-xl fill-astronaut-500 p-[20%]`}
                       />
                     ) : (
                       <Image
@@ -204,7 +301,7 @@ const ImageDetail = () => {
                         alt={imageItem.title || imageItem.fileName}
                         layout="fill"
                         objectFit="contain"
-                        onMouseEnter={onImageMouseEnter}
+                        // onMouseEnter={onImageMouseEnter}
                         onMouseMove={onImageMouseMove}
                         onMouseOut={onImageMouseOut}
                         onError={() => {
@@ -212,14 +309,33 @@ const ImageDetail = () => {
                         }}
                       />
                     )}
+                    {disableHoverInfo && (
+                      <button
+                        onClick={onShowMetadataClick}
+                        className="absolute right-2 top-2 z-40 aspect-square h-5 w-5 rounded-full"
+                      >
+                        {showInfo ? (
+                          <XSvg className="h-5 w-5 fill-astronaut-50" />
+                        ) : (
+                          <InfoSvg className="h-5 w-5 fill-astronaut-50" />
+                        )}
+                      </button>
+                    )}
                   </div>
+                  <MetadataInfo
+                    imageItem={imageItem}
+                    showInfo={showInfo}
+                    disableHoverInfo={disableHoverInfo}
+                    infoPos={infoPos}
+                  />
                 </div>
+
                 <div className="basis-[50%] p-2">
                   <div className="flex justify-between">
                     {<ProfileCard profileData={author} />}
                     <div className="flex">
                       <button onClick={refreshImage}>
-                        <RefreshIcon className="fill-astronaut-700 hover:fill-astronaut-500 h-7 p-1 transition-all" />
+                        <RefreshIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
                       </button>
                       <ManageImage id={imageItem.id} />
                     </div>
@@ -227,7 +343,7 @@ const ImageDetail = () => {
 
                   <div className="z-20 my-4 break-keep ">
                     <h2 className="text-xl font-semibold">{imageItem.title}</h2>
-                    <div className="text-astronaut-900 whitespace-pre-line">
+                    <div className="whitespace-pre-line text-astronaut-900">
                       {imageItem.description}
                     </div>
                   </div>
@@ -241,7 +357,7 @@ const ImageDetail = () => {
 
                   <div
                     id="image-detail__sticky-comment-form"
-                    className="bg-astronaut-50 sticky bottom-0 z-10 mt-4 border-t px-4 pb-8 pt-4"
+                    className="sticky bottom-0 z-10 mt-4 border-t bg-astronaut-50 px-4 pb-8 pt-4"
                   >
                     <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />
@@ -269,59 +385,10 @@ const ImageDetail = () => {
           <Loading />
         </div>
       )}
-      {showMetadata && (
-        <div
-          style={{
-            top: `${mousePos[1]}px`,
-            left: `${metadataDirection === "right" ? mousePos[0] : mousePos[0] - 250}px`,
-          }}
-          className="pointer-events-none fixed z-40 w-[250px] rounded-lg p-2 text-xs"
-        >
-          <div className="bg-astronaut-950 absolute left-0 top-0 h-full w-full rounded-lg opacity-90"></div>
-          <div className="text-astronaut-50 flex flex-col gap-1 ">
-            <div className="relative z-50 flex">
-              <h3>카메라 모델명: </h3>
-              <span className="pl-2 font-semibold">
-                {imageItem?.metadata?.model || "--"}
-              </span>
-            </div>
-            <div className="relative z-50 flex flex-wrap">
-              <h3>렌즈 모델명: </h3>
-              <span className="pl-2 font-semibold">
-                {imageItem?.metadata?.lensModel || "--"}
-              </span>
-            </div>
-            <div className="relative z-50 flex">
-              <h3>초점 거리: </h3>
-              <span className="pl-2 font-semibold">
-                {imageItem?.metadata?.focalLength || "--"}mm
-              </span>
-            </div>
-            <div className="relative z-50 flex">
-              <h3>셔터스피드: </h3>
-              <span className="pl-2 font-semibold">
-                {imageItem?.metadata?.shutterSpeed || "--"}s
-              </span>
-            </div>
-            <div className="relative z-50 flex">
-              <h3>조리개: </h3>
-              <span className="pl-2 font-semibold">
-                f{imageItem?.metadata?.fNumber || "--"}
-              </span>
-            </div>
-            <div className="relative z-50 flex">
-              <h3>ISO: </h3>
-              <span className="pl-2 font-semibold">
-                {imageItem?.metadata?.ISO || "--"}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
       {imageItem && zoomIn && (
         <div
           onClick={onZoomOut}
-          className="bg-astronaut-950 fixed left-0 top-0 z-50 h-screen w-screen cursor-zoom-out"
+          className="fixed left-0 top-0 z-50 h-screen w-screen cursor-zoom-out bg-astronaut-950"
         >
           <Image
             priority
@@ -332,9 +399,6 @@ const ImageDetail = () => {
             alt={imageItem.title || imageItem.fileName}
             layout="fill"
             objectFit="contain"
-            onMouseEnter={onImageMouseEnter}
-            onMouseMove={onImageMouseMove}
-            onMouseOut={onImageMouseOut}
             quality={100}
             onError={() => {
               setIsImageBroken(true);

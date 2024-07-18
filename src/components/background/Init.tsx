@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Auth from "./Auth";
 import PushRequest from "../PushRequest";
 import ExtraUserDataListener from "./ExtraUserDataListener";
@@ -8,8 +8,35 @@ import InAppNotificationListener from "./InAppNotificationListener";
 import SaveImageListener from "./SaveImageListener";
 import Alert from "./Alert";
 import AuthModal from "../modal/AuthModal";
+import { useRecoilState } from "recoil";
+import { deviceState } from "@/recoil/states";
+import Router from "next/router";
+import { usePathname } from "next/navigation";
 
 const Init = () => {
+  const pathname = usePathname();
+  const [device, setDevice] = useRecoilState(deviceState);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent;
+    const isMobile = userAgent.match(
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i,
+    );
+    setDevice(isMobile ? "mobile" : "pc");
+  }, [setDevice]);
+
+  useEffect(() => {
+    const routeChangeHandler = () => {
+      sessionStorage.setItem("prevPath", pathname);
+    };
+
+    Router.events.on("routeChangeStart", routeChangeHandler);
+
+    return () => {
+      Router.events.emit("routeChangeStart", routeChangeHandler);
+    };
+  }, [pathname]);
+
   return (
     <Fragment>
       <Auth />

@@ -15,13 +15,13 @@ const Select = ({
       <select
         onChange={onChange}
         value={value}
-        className="text-astronaut-900 h-9 cursor-pointer rounded-lg pl-2 pr-6 outline-none"
+        className="h-9 cursor-pointer rounded-lg bg-astronaut-100 pl-2 pr-6 text-astronaut-950 outline-none"
         name="folder"
         id="folder-select"
       >
         {children}
       </select>
-      <ArrowSvg className="fill-astronaut-500 pointer-events-none absolute bottom-0 right-1 top-0 m-auto h-4 w-4 rotate-[270deg] transition-transform group-hover:translate-y-1" />
+      <ArrowSvg className="pointer-events-none absolute bottom-0 right-1 top-0 m-auto h-4 w-4 rotate-[270deg] fill-astronaut-500 transition-transform group-hover:translate-y-1 group-hover:fill-astronaut-700" />
     </div>
   );
 };

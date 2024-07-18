@@ -47,6 +47,7 @@ const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
         )}
       </ol>
       {!lastPage &&
+        (!comments || Object.keys(comments).length !== 0) &&
         (isLoading ? (
           <div className="mt-4">
             <Loading />
@@ -55,7 +56,7 @@ const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
           <div className="mt-4 w-full text-center">
             <button
               onClick={onLoadClick}
-              className="text-astronaut-500 m-auto text-center text-xs"
+              className="m-auto text-center text-xs text-astronaut-500"
             >
               댓글 더 보기
             </button>

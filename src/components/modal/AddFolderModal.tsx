@@ -141,7 +141,7 @@ const AddFolder = ({
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input
-          className="border-astronaut-200 w-full rounded-lg border bg-white py-1 pl-2 outline-none"
+          className="w-full rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none"
           type="text"
           value={name}
           onChange={onnameChange}
@@ -150,7 +150,10 @@ const AddFolder = ({
         />
       </label>
       <div>
-        <h3 className="pb-1 font-semibold">공개 여부</h3>
+        <h3 className="font-semibold">공개 여부</h3>
+        <p className="pb-1 text-xs">
+          비공개 폴더는 다른 유저에게 보여지지 않습니다.
+        </p>
         <div className="ml-2 flex gap-8">
           <label className="inline-flex gap-1">
             <input

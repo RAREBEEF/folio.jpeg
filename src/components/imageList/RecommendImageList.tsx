@@ -14,16 +14,16 @@ const RecommendImageList = ({ imageItem }: { imageItem: ImageItem }) => {
   const grid = useRecoilValue(gridState);
 
   return (
-    <div className="bg-astronaut-50 relative h-full">
+    <div className="relative h-full bg-astronaut-50">
       <ImageGrid type={`recommend-${id}`} />
       {grid && (
         <ImageInfiniteScroller
           type={`recommend-${id}`}
           filter={{
-            orderBy: ["createdAt", "desc"],
-            limit: grid.colCount * 2,
+            // orderBy: ["createdAt", "desc"],
+            limit: Math.min(grid.colCount * 2, 1),
             where: and(
-              where("tags", "array-contains-any", imageItem.tags),
+              where("tags", "array-contains-any", imageItem.aiTags),
               where("id", "!=", imageItem.id),
             ),
           }}

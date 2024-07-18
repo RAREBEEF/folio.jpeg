@@ -15,6 +15,7 @@ export interface UserData extends User {
   following?: Array<string>;
   follower?: Array<string>;
   fcmToken?: string | null;
+  tagScore?: { [key in string]: number };
 }
 export interface ExtraUserData {
   displayId: string;
@@ -22,6 +23,7 @@ export interface ExtraUserData {
   following: Array<string>;
   follower: Array<string>;
   fcmToken: string | null;
+  tagScore: { [key in string]: number };
 }
 
 type AuthStatusUserData = {

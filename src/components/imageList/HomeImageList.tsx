@@ -45,7 +45,7 @@ const HomeImageList = () => {
   };
 
   return (
-    <div className="bg-astronaut-50 relative h-full">
+    <div className="relative h-full bg-astronaut-50">
       <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold  xs:pt-8">
         <Link
           href={`?where=all&orderBy=${orderBy}`}
@@ -82,11 +82,11 @@ const HomeImageList = () => {
                       ? authStatus.data.following
                       : [""],
                   ),
-                  limit: grid.colCount * 2,
+                  limit: Math.min(grid.colCount * 2, 1),
                 }
               : {
                   orderBy: [orderBy, "desc"],
-                  limit: grid.colCount * 2,
+                  limit: Math.min(grid.colCount * 2, 1),
                 }
           }
         />

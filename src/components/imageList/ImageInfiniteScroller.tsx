@@ -10,6 +10,7 @@ import {
 } from "@/recoil/states";
 import { Filter, Folder } from "@/types";
 import HandleDeletedImage from "./HandleDeletedImage";
+import ArrowSvg from "@/icons/arrow-left-solid.svg";
 
 const ImageInfiniteScroller = ({
   filter,
@@ -67,21 +68,22 @@ const ImageInfiniteScroller = ({
   return !lastPage && !isError ? (
     <div
       ref={loadRef}
-      className="text-astronaut-500 pb-24 pt-12 text-center text-sm"
+      className="pb-24 pt-12 text-center text-sm text-astronaut-500"
     >
       <Loading />
     </div>
   ) : (
     grid && (
-      <div className="text-astronaut-500 h-[168px] pb-24 pt-12 text-center text-sm">
+      <div className="h-[168px] pb-24 pt-12 text-center text-sm text-astronaut-500">
         {imageCount > 0 ? (
           <div className="flex flex-col">
-            <p>{imageCount} 이미지.</p>
+            <p>{imageCount} 이미지</p>
             <button
-              className="text-astronaut-500 m-auto mt-4 w-fit font-semibold"
+              className="group m-auto mt-4 flex items-center gap-1 whitespace-nowrap text-astronaut-500"
               onClick={onScrollToTopClick}
             >
-              맨 위로
+              <ArrowSvg className="h-3 w-3 rotate-90 fill-astronaut-500 transition-transform  group-hover:translate-y-[-5px]" />
+              <div>맨 위로</div>
             </button>
           </div>
         ) : (

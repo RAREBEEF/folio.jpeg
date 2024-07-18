@@ -115,3 +115,8 @@ export const inAppNotificationState = atom<{
     lastCheck: 0,
   },
 });
+
+export const deviceState = atom<"mobile" | "pc">({
+  key: "deviceState",
+  default: "pc",
+});

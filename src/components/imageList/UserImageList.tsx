@@ -24,7 +24,7 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
   };
 
   return (
-    <div className="bg-astronaut-50 relative h-full">
+    <div className="relative h-full bg-astronaut-50">
       <div className="flex justify-end px-4 pt-4 opacity-50">
         <OrderByFilter onChange={onOrderByChange} value={orderBy} />
       </div>
@@ -35,7 +35,7 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
           filter={{
             orderBy: [orderBy, "desc"],
             where: where("uid", "==", userData.uid),
-            limit: grid.colCount * 2,
+            limit: Math.min(grid.colCount * 2, 1),
           }}
         />
       )}

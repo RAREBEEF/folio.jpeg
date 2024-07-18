@@ -43,6 +43,7 @@ export async function generateMetadata(
     follower: [],
     following: [],
     fcmToken: "",
+    tagScore: {},
   };
 
   userDocSnap.forEach((doc) => {
