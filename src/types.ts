@@ -53,8 +53,8 @@ export interface ImageDocData {
     width: number;
     height: number;
   };
-  aiTags: Array<string>;
-  customTags: Array<string>;
+  imgTags: Array<string>;
+  contentTags: Array<string>;
   tags: Array<string>;
   feedback: Feedback;
   likes: Array<string>;
@@ -75,8 +75,8 @@ export type ImageItem = {
   createdAt: number;
   uid: string;
   likes: Array<string>;
-  aiTags: Array<string>;
-  customTags: Array<string>;
+  imgTags: Array<string>;
+  contentTags: Array<string>;
   tags: Array<string>;
   feedback: Feedback;
   byte: number;
@@ -138,10 +138,15 @@ export type Folders = Array<Folder>;
 
 // alert
 export interface Alert {
-  text: string | null;
-  createdAt: number | null;
+  id: string;
+  text: string;
+  createdAt: number;
+  duration?: number | null | undefined;
   type: "default" | "success" | "warning";
   show: boolean;
+  cleanUp?: any;
+  fixed?: boolean;
+  img?: string;
 }
 export interface InAppNotification {
   title: string;
@@ -154,7 +159,8 @@ export interface InAppNotification {
 
 export type AnalysisResult =
   | {
-      tags: Array<string>;
+      imgTags: Array<string>;
+      contentTags: Array<string>;
       themeColor: string;
       feedback: Feedback;
     }

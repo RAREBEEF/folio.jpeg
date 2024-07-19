@@ -159,7 +159,7 @@ const useSetImageFile = () => {
     fileName: string;
     img: File;
   }) => {
-    if (error || isLoading) return null;
+    if (error) return null;
     setIsLoading(true);
 
     try {

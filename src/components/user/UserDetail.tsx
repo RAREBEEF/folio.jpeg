@@ -100,7 +100,7 @@ const UserDetail = () => {
   };
 
   return (
-    <div className="bg-astronaut-50 h-full">
+    <div className="h-full bg-astronaut-50">
       {!isLoading && userData ? (
         <div className="flex flex-col gap-4 pb-12">
           <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">
@@ -118,7 +118,7 @@ const UserDetail = () => {
               <span className="text-2xl font-bold ">
                 {userData.displayName}
               </span>
-              <span className="text-astronaut-500 text-base">
+              <span className="text-base text-astronaut-500">
                 @{userData.displayId}
               </span>
             </h3>

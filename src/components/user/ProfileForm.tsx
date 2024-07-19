@@ -14,14 +14,14 @@ import {
 import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import useSetImageFile from "@/hooks/useSetImageFile";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
 import ProfileImage from "@/components/user/ProfileImage";
 import {
-  alertState,
+  alertsState,
   authStatusState,
   userDataState,
   usersDataState,
@@ -34,7 +34,7 @@ const ProfileForm = () => {
     userDataState(authStatus.data?.displayId || ""),
   );
   const setUsersData = useSetRecoilState(usersDataState);
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
@@ -64,28 +64,40 @@ const ProfileForm = () => {
 
     // 닉네임 / 사용자명 최소 조건 확인
     if (!displayName) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "사용하실 닉네임을 입력해 주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "사용하실 닉네임을 입력해 주세요.",
+        },
+      ]);
       return;
     } else if (displayName.length < 2 || displayName.length > 16) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "닉네임은 2~16 글자 사이로 정해주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "닉네임은 2~16 글자 사이로 정해주세요.",
+        },
+      ]);
       return;
     } else if (!displayId) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "사용하실 사용자명을 입력해 주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "사용하실 사용자명을 입력해 주세요.",
+        },
+      ]);
       return;
     } else if (
       displayId.includes(" ") ||
@@ -93,20 +105,28 @@ const ProfileForm = () => {
       displayId.includes("-") ||
       ["edit", "image", "upload"].includes(displayId)
     ) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "사용자명에 사용할 수 없는 문자가 포함되어 있습니다. (예약어, 공백 또는 /,- 등)",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "사용자명에 사용할 수 없는 문자가 포함되어 있습니다. (예약어, 공백 또는 /,- 등)",
+        },
+      ]);
       return;
     } else if (displayId.length < 2 || displayId.length > 16) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "사용자명은 2~16 글자 사이로 정해주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "사용자명은 2~16 글자 사이로 정해주세요.",
+        },
+      ]);
       return;
     } else if (
       authStatus.data?.displayId === displayId &&
@@ -114,12 +134,16 @@ const ProfileForm = () => {
       ((authStatus.data.photoURL && !file && !defaultImg) ||
         (!authStatus.data.photoURL && !file))
     ) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "변경사항이 존재하지 않습니다.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "변경사항이 존재하지 않습니다.",
+        },
+      ]);
       return;
     }
 
@@ -135,19 +159,19 @@ const ProfileForm = () => {
         extraUserData?.status === "success" &&
         extraUserData.data?.uid !== authStatus.data?.uid
       ) {
-        setAlert({
-          show: true,
-          type: "warning",
-          createdAt: Date.now(),
-          text: "이미 사용 중인 사용자명입니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "이미 사용 중인 사용자명입니다.",
+          },
+        ]);
         return;
       }
 
-      // let photoURL: string | null =
-      //   !defaultImg && authStatus.data?.photoURL
-      //     ? authStatus.data?.photoURL
-      //     : "";
       let photoURL: string | null = authStatus.data?.photoURL
         ? authStatus.data?.photoURL
         : "";
@@ -239,12 +263,16 @@ const ProfileForm = () => {
         }),
       ])
         .then(() => {
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "프로필 설정이 완료되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "프로필 설정이 완료되었습니다.",
+            },
+          ]);
         })
         .catch((error) => {
           // 오류시 상태 롤백
@@ -253,12 +281,16 @@ const ProfileForm = () => {
           setUsersData(prevUsersData);
         });
     } catch (error) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "프로필 설정 중 오류가 발생하였습니다. 다시 시도해 주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "프로필 설정 중 오류가 발생하였습니다. 다시 시도해 주세요.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }

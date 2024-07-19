@@ -23,7 +23,7 @@ const RecommendImageList = ({ imageItem }: { imageItem: ImageItem }) => {
             // orderBy: ["createdAt", "desc"],
             limit: Math.min(grid.colCount * 2, 1),
             where: and(
-              where("tags", "array-contains-any", imageItem.aiTags),
+              where("tags", "array-contains-any", imageItem.imgTags),
               where("id", "!=", imageItem.id),
             ),
           }}

@@ -3,7 +3,7 @@ import { Feedback as FeedbackType, UserData, UserFeedback } from "@/types";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { alertState, authStatusState } from "@/recoil/states";
+import { alertsState, authStatusState } from "@/recoil/states";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
 import geminiLogo from "@/images/gemini-logo.png";
 import Image from "next/image";
@@ -11,12 +11,13 @@ import InformationSvg from "@/icons/circle-question-regular.svg";
 import Modal from "@/components/modal/Modal";
 import UploadLoading from "@/components/loading/UploadLoading";
 import useGetFeedback from "@/hooks/useGetFeedback";
+import { uniqueId } from "lodash";
 
 const AiFeedback = ({ userData }: { userData: UserData }) => {
   const isInitialMount = useRef(true);
   const [showInformationModal, setShowInformationModal] =
     useState<boolean>(false);
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const dateDiffNow = useDateDiffNow();
   const authStatus = useRecoilValue(authStatusState);
   const { analyzingRecentImages, isLoading: isAnalyzing } =
@@ -40,24 +41,32 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
 
     // 하루가 지나지 않았다면
     if (diffDays <= 0) {
-      setAlert({
-        type: "warning",
-        createdAt: Date.now(),
-        text: "AI 분석은 1일 1회만 가능합니다.",
-        show: true,
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          type: "warning",
+          createdAt: Date.now(),
+          text: "AI 분석은 1일 1회만 가능합니다.",
+          show: true,
+        },
+      ]);
     } else if (
       window.confirm("분석은 1일 1회로 제한됩니다. 지금 분석하시겠습니까?")
     ) {
       const result = await analyzingRecentImages({ prevFeedback });
       // 신규 이미지가 5장보다 적으면
       if (result === "Less than 5 new images") {
-        setAlert({
-          type: "warning",
-          createdAt: Date.now(),
-          text: "최근 분석 이후에 업로드 된 이미지가 5장 이상 필요합니다.",
-          show: true,
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            type: "warning",
+            createdAt: Date.now(),
+            text: "최근 분석 이후에 업로드 된 이미지가 5장 이상 필요합니다.",
+            show: true,
+          },
+        ]);
       } else {
         setFeedback(result);
       }
@@ -89,12 +98,12 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
   };
 
   return (
-    <div className="bg-astronaut-100 m-auto mb-8 w-[80%] break-keep rounded p-4">
+    <div className="m-auto mb-8 w-[80%] break-keep rounded bg-astronaut-100 p-4">
       <h3 className="mb-2 flex items-center gap-2 font-semibold leading-tight">
         <Image src={geminiLogo} alt="Gemini AI logo" width="30" height="30" />
         Google Gemini AI 이미지 분석
         <button onClick={onImformationClick}>
-          <InformationSvg className="fill-astronaut-700 h-[15px]" />
+          <InformationSvg className="h-[15px] fill-astronaut-700" />
         </button>
       </h3>
       <div className="p-2">
@@ -181,10 +190,10 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
       )}
       {isAnalyzing && (
         <div className="fixed left-0 top-0 z-50 h-screen w-screen">
-          <div className="bg-astronaut-800 h-full w-full opacity-30" />
-          <div className="bg-astronaut-50 absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg">
+          <div className="h-full w-full bg-astronaut-800 opacity-30" />
+          <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg bg-astronaut-50">
             <UploadLoading />
-            <div className="text-astronaut-700 text-balance break-keep px-8 pb-8 text-center leading-tight">
+            <div className="text-balance break-keep px-8 pb-8 text-center leading-tight text-astronaut-700">
               최근 피드백을 종합하고 있습니다.
               <br />
               창을 닫지 마세요.

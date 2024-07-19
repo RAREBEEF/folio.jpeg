@@ -99,9 +99,9 @@ export const gridState = atom<Grid>({
 });
 
 // alert(앱 내 오류, 경고, 작업 성공 등의 안내창)
-export const alertState = atom<Alert>({
-  key: "alertState",
-  default: { text: null, createdAt: null, type: "default", show: false },
+export const alertsState = atom<Array<Alert>>({
+  key: "alertsState",
+  default: [],
 });
 
 // 유저간 커뮤니케이션으로 발생하는 알림

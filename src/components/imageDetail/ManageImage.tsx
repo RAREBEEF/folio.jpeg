@@ -1,16 +1,15 @@
 import { MouseEvent, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { alertState, authStatusState, imageItemState } from "@/recoil/states";
+import { alertsState, authStatusState, imageItemState } from "@/recoil/states";
 import { useRouter } from "next/navigation";
-import Loading from "@/components/loading/Loading";
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
 import TrashIcon from "@/icons/trash-solid.svg";
 import PenIcon from "@/icons/pen-solid.svg";
 import Link from "next/link";
 
 const ManageImage = ({ id }: { id: string }) => {
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
@@ -55,21 +54,29 @@ const ManageImage = ({ id }: { id: string }) => {
         resetFollowingPopularityGrid();
         resetUserCreatedAtGrid();
         resetUserPopularityGrid();
-        setAlert({
-          show: true,
-          type: "success",
-          createdAt: Date.now(),
-          text: "삭제가 완료되었습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "삭제가 완료되었습니다.",
+          },
+        ]);
         back();
       })
       .catch((error) => {
-        setAlert({
-          show: true,
-          type: "warning",
-          createdAt: Date.now(),
-          text: "삭제 중 문제가 발생하였습니다. 다시 시도해 주세요.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "삭제 중 문제가 발생하였습니다. 다시 시도해 주세요.",
+          },
+        ]);
       })
       .finally(() => {
         setIsLoading(false);

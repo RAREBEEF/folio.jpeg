@@ -1,4 +1,4 @@
-import { Comment as CommentType, Comments, ImageItem, UserData } from "@/types";
+import { Comment as CommentType, ImageItem, UserData } from "@/types";
 import CommentForm from "@/components/comment/CommentForm";
 import {
   ChangeEvent,
@@ -8,10 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/fb";
 import {
-  alertState,
   authStatusState,
   commentsState,
   userDataState,
@@ -38,7 +35,6 @@ const Comment = ({
   const { adjustPopularity } = useImagePopularity({ imageId: imageItem.id });
   const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
-  const setAlert = useSetRecoilState(alertState);
   const [summaryText, setSummaryText] = useState<string>(
     comment.replies.length <= 0
       ? "답글 달기"
@@ -145,7 +141,7 @@ const Comment = ({
             {author?.displayName}
           </Link>
           <span>{comment.content}</span>
-          <div className="text-astronaut-500 mt-1 text-xs">
+          <div className="mt-1 text-xs text-astronaut-500">
             {dateDiffNow(comment.createdAt).diffSummary}
             {authStatus.data?.uid === comment.uid && (
               <Fragment>
@@ -161,23 +157,23 @@ const Comment = ({
           </div>
         </div>
       </div>
-      <div className="bg-astronaut-100 relative mt-2 rounded-lg">
+      <div className="relative mt-2 rounded-lg bg-astronaut-100">
         {!parentId && (
           <details onToggle={onRepliesToggle} className="p-2">
             {comment.replies.length <= 0 ? (
               <Fragment>
-                <summary className="text-astronaut-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
+                <summary className="pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs text-astronaut-500">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>
                 </summary>
-                <div className="text-astronaut-500 ml-2 text-sm">
+                <div className="ml-2 text-sm text-astronaut-500">
                   아직 답글이 없습니다.
                 </div>
               </Fragment>
             ) : (
               <Fragment>
-                <summary className="text-astronaut-500 pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs">
+                <summary className="pointer-events-none mr-3 flex cursor-pointer justify-end text-end text-xs text-astronaut-500">
                   <div className="pointer-events-auto select-none">
                     {summaryText}
                   </div>

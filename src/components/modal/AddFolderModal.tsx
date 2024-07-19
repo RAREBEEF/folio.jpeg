@@ -5,11 +5,12 @@ import Button from "../Button";
 import useInput from "@/hooks/useInput";
 import Loading from "@/components/loading/Loading";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { alertState, authStatusState, foldersState } from "@/recoil/states";
+import { alertsState, authStatusState, foldersState } from "@/recoil/states";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { Folders, UserData } from "@/types";
 import { v4 as uuidv4 } from "uuid";
+import { uniqueId } from "lodash";
 
 const AddFolder = ({
   userData,
@@ -22,7 +23,7 @@ const AddFolder = ({
   const [folders, setFolders] = useRecoilState(
     foldersState(authStatus.data!.uid),
   );
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { value: name, onChange: onnameChange } = useInput("");
   const [isPrivate, setIsPrivate] = useState<"true" | "false">("false");
@@ -41,39 +42,55 @@ const AddFolder = ({
       return;
       // 인증 상태가 유효하지 않으면
     } else if (!authStatus.data || authStatus.data.uid !== userData.uid) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "폴더 생성 권한이 없습니다.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "폴더 생성 권한이 없습니다.",
+        },
+      ]);
       return;
       // 폴더명 입력은 필수
     } else if (!name) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "폴더명을 입력해 주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "폴더명을 입력해 주세요.",
+        },
+      ]);
       return;
       // 사용 불가능한 문자 필터링
     } else if (name.includes("-" || name.includes("/"))) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "폴더명에 사용할 수 없는 문자가 포함되어 있습니다. (-,/)",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "폴더명에 사용할 수 없는 문자가 포함되어 있습니다. (-,/)",
+        },
+      ]);
       return;
       // 폴더명은 중복될 수 없다.
     } else if (folders?.filter((folder) => folder.name === name).length !== 0) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "중복된 폴더명입니다.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "중복된 폴더명입니다.",
+        },
+      ]);
       return;
     }
 
@@ -114,12 +131,16 @@ const AddFolder = ({
       await setDoc(docRef, newFolder)
         .then(() => {
           closeModal();
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "폴더가 생성되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "폴더가 생성되었습니다.",
+            },
+          ]);
         })
         .catch((error) => {
           // 에러 시 백업 상태로 롤백

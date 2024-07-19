@@ -16,16 +16,16 @@ import { FormEvent, MouseEvent, useState } from "react";
 import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import useHandleAuthError from "@/hooks/useHandleAuthError";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { alertState, authStatusState, loginModalState } from "@/recoil/states";
-import _ from "lodash";
+import { useSetRecoilState } from "recoil";
+import { alertsState, authStatusState, loginModalState } from "@/recoil/states";
+import _, { uniqueId } from "lodash";
 import { UserData } from "@/types";
 
 const SignInForm = () => {
   const handleAuthError = useHandleAuthError();
   const setLoginModal = useSetRecoilState(loginModalState);
   const setAuthStatus = useSetRecoilState(authStatusState);
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
   const [pwReset, setPwReset] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -128,12 +128,16 @@ const SignInForm = () => {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: "이메일을 입력해 주세요.",
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "이메일을 입력해 주세요.",
+        },
+      ]);
       return;
     }
 
@@ -143,52 +147,72 @@ const SignInForm = () => {
       // 비밀번호 재설정
       if (pwReset) {
         await sendPasswordResetEmail(auth, email).then(() => {
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "메일이 발송되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "메일이 발송되었습니다.",
+            },
+          ]);
         });
         // 회원가입
       } else if (createAccount) {
         if (pw !== pwCheck) {
-          setAlert({
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "비밀번호 확인이 일치하지 않습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "warning",
+              createdAt: Date.now(),
+              text: "비밀번호 확인이 일치하지 않습니다.",
+            },
+          ]);
           return;
         }
         await createUserWithEmailAndPassword(auth, email, pw).then(() => {
           setLoginModal({ show: false });
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "회원가입이 완료되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "회원가입이 완료되었습니다.",
+            },
+          ]);
         });
         // 로그인
       } else {
         await signInWithEmailAndPassword(auth, email, pw).then(() => {
           setLoginModal({ show: false });
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "로그인 되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "로그인 되었습니다.",
+            },
+          ]);
         });
       }
     } catch (error) {
-      setAlert({
-        show: true,
-        type: "warning",
-        createdAt: Date.now(),
-        text: handleAuthError(error),
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: handleAuthError(error),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -197,39 +221,39 @@ const SignInForm = () => {
   return (
     <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
       {(createAccount || pwReset) && (
-        <h3 className="text-astronaut-700 text-center text-lg font-semibold">
+        <h3 className="text-center text-lg font-semibold text-astronaut-700">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}
         </h3>
       )}
       <div className="mt-10 flex grow flex-col justify-between gap-12">
         <form className="flex w-72 flex-col gap-y-4" onSubmit={onSubmit}>
           <label className="flex flex-col">
-            <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">이메일</h4>
+            <h4 className="pb-1 pl-2 text-xs text-astronaut-700">이메일</h4>
             <input
               type="email"
               placeholder="example@email.com"
               value={email}
               onChange={onEmailChange}
-              className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+              className="rounded-lg border border-astronaut-200 bg-white py-1 pl-2  outline-none"
               maxLength={50}
             />
           </label>
           {!pwReset && (
             <label className="flex flex-col">
-              <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">비밀번호</h4>
+              <h4 className="pb-1 pl-2 text-xs text-astronaut-700">비밀번호</h4>
               <input
                 type="password"
                 value={pw}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwChange}
-                className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+                className="rounded-lg border border-astronaut-200 bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
           {createAccount && (
             <label className="flex flex-col">
-              <h4 className="text-astronaut-700 pb-1 pl-2 text-xs">
+              <h4 className="pb-1 pl-2 text-xs text-astronaut-700">
                 비밀번호 확인
               </h4>
               <input
@@ -237,16 +261,16 @@ const SignInForm = () => {
                 value={pwCheck}
                 placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
                 onChange={onPwCheckChange}
-                className="border-astronaut-200 rounded-lg border bg-white py-1 pl-2  outline-none"
+                className="rounded-lg border border-astronaut-200 bg-white py-1 pl-2  outline-none"
                 maxLength={50}
               />
             </label>
           )}
-          <div className="itmes-center text-astronaut-200 text-astronaut-700 flex justify-center gap-2 text-center text-sm">
+          <div className="itmes-center flex justify-center gap-2 text-center text-sm text-astronaut-200 text-astronaut-700">
             <button
               type="button"
               onClick={onCovertSignInUpClick}
-              className="text-astronaut-500 text-xs hover:underline"
+              className="text-xs text-astronaut-500 hover:underline"
             >
               {createAccount ? "기존 계정으로 로그인" : "회원가입"}
             </button>{" "}
@@ -254,7 +278,7 @@ const SignInForm = () => {
             <button
               type="button"
               onClick={onConvertPwResetClick}
-              className="text-astronaut-500 text-xs hover:underline"
+              className="text-xs text-astronaut-500 hover:underline"
             >
               {pwReset ? "기존 계정으로 로그인" : "비밀번호 재설정"}
             </button>
@@ -284,29 +308,29 @@ const SignInForm = () => {
         <div>
           <div className="mb-12 flex items-center gap-2">
             <hr className="grow" />
-            <span className="text-astronaut-500 text-xs">
+            <span className="text-xs text-astronaut-500">
               다른 방법으로 로그인
             </span>
             <hr className="grow" />
           </div>
           <div className="flex justify-center gap-2">
             <button
-              className="bg-astronaut-800 aspect-square rounded-lg p-2"
+              className="aspect-square rounded-lg bg-astronaut-800 p-2"
               onClick={onGoogleSignInClick}
             >
-              <GoogleSvg className="fill-astronaut-50 h-6 w-6" />
+              <GoogleSvg className="h-6 w-6 fill-astronaut-50" />
             </button>
             <button
-              className="bg-astronaut-800 aspect-square rounded-lg p-2"
+              className="aspect-square rounded-lg bg-astronaut-800 p-2"
               onClick={onGithubSignInClick}
             >
-              <GithubSvg className="fill-astronaut-50 h-6 w-6" />
+              <GithubSvg className="h-6 w-6 fill-astronaut-50" />
             </button>
             <button
-              className="bg-astronaut-800 aspect-square rounded-lg p-2"
+              className="aspect-square rounded-lg bg-astronaut-800 p-2"
               onClick={onFacebookSignInClick}
             >
-              <FacebookSvg className="fill-astronaut-50 h-6 w-6" />
+              <FacebookSvg className="h-6 w-6 fill-astronaut-50" />
             </button>
           </div>
         </div>

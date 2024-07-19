@@ -1,16 +1,21 @@
-import { alertState } from "@/recoil/states";
+import { alertsState } from "@/recoil/states";
+import { uniqueId } from "lodash";
 import { useSetRecoilState } from "recoil";
 
 const useErrorAlert = () => {
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
 
   const showErrorAlert = () => {
-    setAlert({
-      text: "문제가 발생하였습니다.",
-      show: true,
-      createdAt: Date.now(),
-      type: "warning",
-    });
+    setAlerts((prev) => [
+      ...prev,
+      {
+        id: uniqueId(),
+        text: "문제가 발생하였습니다.",
+        show: true,
+        createdAt: Date.now(),
+        type: "warning",
+      },
+    ]);
   };
 
   return showErrorAlert;

@@ -31,7 +31,7 @@ const HomeImageList = () => {
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOrderBy(e.target.value as "popularity" | "createdAt");
-    replace(`?where=${listType}&orderBy=${orderBy}`, { scroll: false });
+    replace(`?where=${listType}&orderBy=${e.target.value}`, { scroll: false });
   };
 
   const needLogin = (e: MouseEvent<HTMLAnchorElement>) => {

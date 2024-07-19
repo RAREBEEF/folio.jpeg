@@ -13,6 +13,7 @@ const config: Config = {
         "loading-dot-1": "loadingDot1 0.6s 0s linear infinite",
         "loading-dot-2": "loadingDot1 0.6s 0.2s linear infinite",
         "loading-dot-3": "loadingDot1 0.6s 0.4s linear infinite",
+        alert: "alertKeyframe 0.5s 0s ease-in-out",
       },
       keyframes: {
         loadingDot1: {
@@ -20,6 +21,16 @@ const config: Config = {
           "25%": { transform: "translateY(-25%)" },
           "50%": { transform: "translateY(0%)" },
           "75%": { transform: "translateY(25%)" },
+        },
+        alertKeyframe: {
+          // "0%": { transform: "scale(0%)" },
+          // "100%": { transform: "scale(100%)" },
+          "0%": {
+            "max-height": "0",
+            "min-height": "0",
+            // transform: "translateY(50px)",
+          },
+          "100%": { "max-height": "100vh" },
         },
       },
       screens: {

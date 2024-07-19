@@ -1,41 +1,83 @@
 "use client";
-import { alertState } from "@/recoil/states";
-import { useCallback, useEffect } from "react";
+import { alertsState } from "@/recoil/states";
+import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import CircleCheckIcon from "@/icons/circle-check-solid.svg";
 import CircleExclamationIcon from "@/icons/circle-exclamation-solid.svg";
+import _ from "lodash";
 
 const Alert = () => {
-  const [alert, setAlert] = useRecoilState(alertState);
-
-  // 알림이 뜬 뒤 3초가 지났으면 알림창이 꺼지도록
-  const alertCountdown = useCallback(() => {
-    const { createdAt } = alert;
-
-    if (createdAt && createdAt + 3000 <= Date.now()) {
-      setAlert((prev) => ({ ...prev, createdAt: null, show: false }));
-    }
-  }, [alert, setAlert]);
+  const [alerts, setAlerts] = useRecoilState(alertsState);
+  const [needToSetCleanUp, setNeedToSetCleanUp] = useState<boolean>(false);
 
   useEffect(() => {
-    // 0.5초 간격으로 알림창 카운트다운 체크
-    const interval = setInterval(alertCountdown, 500);
+    if (alerts.filter((alert) => !alert.cleanUp).length > 0) {
+      setNeedToSetCleanUp(true);
+    } else {
+      setNeedToSetCleanUp(false);
+    }
+  }, [alerts]);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [alertCountdown]);
+  useEffect(() => {
+    if (needToSetCleanUp) {
+      setAlerts((prev) => {
+        const newAlerts = prev.map((alert) => {
+          const { id, cleanUp, duration } = alert;
+          if (!cleanUp && duration !== -1) {
+            setTimeout(() => {
+              setAlerts((prev) => prev.filter((alert) => alert.id !== id));
+            }, duration || 3000);
+          }
+          return {
+            ...alert,
+            cleanUp: true,
+          };
+        });
+
+        return newAlerts;
+      });
+    }
+  }, [setAlerts, needToSetCleanUp]);
 
   return (
-    <div
-      className={`text-astronaut-800 bg-astronaut-100 pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex min-h-12 w-fit max-w-[90vw] select-none items-center justify-center gap-4 break-keep rounded-xl px-8 py-4 text-lg font-semibold shadow-lg transition-all ${!alert.show ? "translate-y-[300%]" : "translate-y-0"}`}
-    >
-      {alert.type === "success" ? (
-        <CircleCheckIcon className="fill-astronaut-500 aspect-square h-8" />
-      ) : alert.type === "warning" ? (
-        <CircleExclamationIcon className="fill-astronaut-500 aspect-square h-8" />
-      ) : null}
-      <div className="whitespace-pre-line leading-tight">{alert.text}</div>
+    <div className="oveerflow-visible pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex w-screen flex-col items-center justify-end gap-4 xs:bottom-[80px]">
+      <div className="flex w-full flex-col items-center">
+        {alerts
+          .filter((alert) => alert.fixed)
+          .map((alert) => (
+            <div
+              key={alert.createdAt}
+              className={`animate-alert mt-4 flex w-fit max-w-[90vw] select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-100 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
+            >
+              {alert.type === "success" ? (
+                <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
+              ) : alert.type === "warning" ? (
+                <CircleExclamationIcon className="aspect-square h-8 fill-astronaut-500" />
+              ) : null}
+              <div className="my-4 whitespace-pre-line leading-tight">
+                {alert.text}
+              </div>
+            </div>
+          ))}
+        {alerts
+          .filter((alert) => !alert.fixed)
+          .splice(-5)
+          .map((alert) => (
+            <div
+              key={alert.createdAt}
+              className={`animate-alert mt-4 flex w-fit max-w-[90vw] select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-100 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
+            >
+              {alert.type === "success" ? (
+                <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
+              ) : alert.type === "warning" ? (
+                <CircleExclamationIcon className="aspect-square h-8 fill-astronaut-500" />
+              ) : null}
+              <div className="my-4 whitespace-pre-line leading-tight">
+                {alert.text}
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };

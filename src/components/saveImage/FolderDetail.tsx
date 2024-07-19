@@ -1,6 +1,6 @@
 "use client";
 
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import { Folder, Folders, UserData } from "@/types";
 import SavedImageList from "../imageList/SavedImageList";
 import Button from "../Button";
@@ -9,7 +9,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/fb";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
-  alertState,
+  alertsState,
   authStatusState,
   foldersState,
   usersDataState,
@@ -39,7 +39,7 @@ const FolderDetail = ({}: {}) => {
 
   const { replace } = useRouter();
   const authStatus = useRecoilValue(authStatusState);
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
   const usersData = useRecoilValue(usersDataState);
@@ -153,12 +153,16 @@ const FolderDetail = ({}: {}) => {
       authStatus.data!.uid !== currentFolder.uid ||
       !authorUid
     ) {
-      setAlert({
-        text: "폴더를 삭제할 수 없습니다.",
-        createdAt: Date.now(),
-        type: "warning",
-        show: true,
-      });
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          text: "폴더를 삭제할 수 없습니다.",
+          createdAt: Date.now(),
+          type: "warning",
+          show: true,
+        },
+      ]);
       return;
     }
 
@@ -188,23 +192,31 @@ const FolderDetail = ({}: {}) => {
     const docRef = doc(db, "users", authorUid, "folders", currentFolder.id);
     await deleteDoc(docRef)
       .then(() => {
-        setAlert({
-          text: "폴더를 삭제하였습니다.",
-          createdAt: Date.now(),
-          type: "success",
-          show: true,
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            text: "폴더를 삭제하였습니다.",
+            createdAt: Date.now(),
+            type: "success",
+            show: true,
+          },
+        ]);
         replace(`/${displayId}`);
       })
       .catch((error) => {
         // 오류 시 백업 상태로 롤백
         setFolders(prevFolders);
-        setAlert({
-          text: "폴더 삭제 중 문제가 발생하였습니다..",
-          createdAt: Date.now(),
-          type: "warning",
-          show: true,
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            text: "폴더 삭제 중 문제가 발생하였습니다..",
+            createdAt: Date.now(),
+            type: "warning",
+            show: true,
+          },
+        ]);
       });
   };
 
@@ -226,11 +238,11 @@ const FolderDetail = ({}: {}) => {
   };
 
   return (
-    <div className="bg-astronaut-50 relative h-full">
+    <div className="relative h-full bg-astronaut-50">
       {currentFolder && (
         <div className="flex h-full flex-col">
-          <div className="border-astronaut-950 flex min-h-20 items-center border-b p-4 pl-10">
-            <h2 className="text-astronaut-700 text-2xl font-semibold">
+          <div className="flex min-h-20 items-center border-b border-astronaut-950 p-4 pl-10">
+            <h2 className="text-2xl font-semibold text-astronaut-700">
               {currentFolder.name}
             </h2>
             {authStatus.data?.uid === currentFolder.uid && (

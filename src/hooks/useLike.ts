@@ -21,7 +21,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
   const [imageItem, setImageItem] = useRecoilState(
     imageItemState(imageId as string),
   );
-  const { adjustTagScore } = useTagScore({ imageItem });
+  // const { adjustTagScore } = useTagScore({ imageItem });
   const authStatus = useRecoilValue(authStatusState);
   const [alreadyLiked, setAlreadyLiked] = useState<boolean>(false);
   const checkAlreadyLiked = useCallback(
@@ -93,7 +93,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
       .finally(async () => {
         await Promise.all([
           adjustPopularity(2),
-          adjustTagScore({ action: "like" }),
+          // adjustTagScore({ action: "like" }),
         ]);
         setIsLoading(false);
       });

@@ -20,7 +20,7 @@ const useSetComment = ({
   author: UserData | null;
   parentId: string | null;
 }) => {
-  const { adjustTagScore } = useTagScore({ imageItem });
+  // const { adjustTagScore } = useTagScore({ imageItem });
   const { adjustPopularity } = useImagePopularity({
     imageId: imageItem?.id || "",
   });
@@ -49,7 +49,7 @@ const useSetComment = ({
       await setDoc(docRef, comment).then(async () => {
         // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
         await Promise.all([
-          adjustTagScore({ action: "comment" }),
+          // adjustTagScore({ action: "comment" }),
           sendFcm({
             data: {
               title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,

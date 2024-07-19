@@ -41,9 +41,11 @@ const AnalysisResultModal = ({
       <div>
         <h3 className="mb-2 text-lg font-semibold ">이미지 키워드</h3>
         <ul className="mx-2 flex flex-wrap gap-1">
-          {result.tags.map((tag, i) => (
-            <li key={i}>#{tag}</li>
-          ))}
+          {Array.from(new Set(result.imgTags.concat(result.contentTags))).map(
+            (tag, i) => (
+              <li key={i}>#{tag}</li>
+            ),
+          )}
         </ul>
       </div>
       <div>

@@ -6,7 +6,8 @@ import { db } from "@/fb";
 import { Comment, Comments, ImageItem, UserData } from "@/types";
 import useImagePopularity from "./useImagePopularity";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { alertState, authStatusState, commentsState } from "@/recoil/states";
+import { alertsState, authStatusState, commentsState } from "@/recoil/states";
+import { uniqueId } from "lodash";
 
 const useDeleteComment = ({ imageId }: { imageId: string }) => {
   const setComments = useSetRecoilState(commentsState(imageId));
@@ -14,7 +15,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
   const { adjustPopularity } = useImagePopularity({ imageId });
   const authStatus = useRecoilValue(authStatusState);
   const showErrorAlert = useErrorAlert();
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const { fetchWithRetry } = useFetchWithRetry();
 
   const deleteCommentAsync = async ({
@@ -46,21 +47,29 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
       await deleteDoc(docRef)
         .then(async () => {
           if (comment.uid !== imageItem.uid) await adjustPopularity(-5);
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "삭제가 완료되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "삭제가 완료되었습니다.",
+            },
+          ]);
         })
         .catch((error) => {
           setComments(prevComments);
-          setAlert({
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "삭제 중 문제가 발생하였습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "warning",
+              createdAt: Date.now(),
+              text: "삭제 중 문제가 발생하였습니다.",
+            },
+          ]);
         });
     } else {
       const docRef = doc(db, "images", imageItem.id, "comments", parentId);
@@ -85,22 +94,30 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
       await updateDoc(docRef, { replies: newReplies })
         .then(async () => {
           if (comment.uid !== imageItem.uid) await adjustPopularity(-5);
-          setAlert({
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "삭제가 완료되었습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "success",
+              createdAt: Date.now(),
+              text: "삭제가 완료되었습니다.",
+            },
+          ]);
         })
         .catch((error) => {
           // 에러 시 이전 상태로 롤백
           setComments(prevComments);
-          setAlert({
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "삭제 중 문제가 발생하였습니다.",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              show: true,
+              type: "warning",
+              createdAt: Date.now(),
+              text: "삭제 중 문제가 발생하였습니다.",
+            },
+          ]);
         });
     }
   };

@@ -3,13 +3,14 @@ import Modal from "@/components/modal/Modal";
 import Button from "./Button";
 import { getMessaging, getToken } from "firebase/messaging";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { alertState, authStatusState } from "@/recoil/states";
+import { alertsState, authStatusState } from "@/recoil/states";
 import { UserData } from "@/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
+import { uniqueId } from "lodash";
 
 const PushRequest = () => {
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
   const [showPushRequestModal, setShowPushRequestModal] =
     useState<boolean>(false);
@@ -84,12 +85,16 @@ const PushRequest = () => {
                     },
                   };
                 });
-                setAlert({
-                  createdAt: Date.now(),
-                  text: "푸시 허용이 완료되었습니다.",
-                  show: true,
-                  type: "success",
-                });
+                setAlerts((prev) => [
+                  ...prev,
+                  {
+                    id: uniqueId(),
+                    createdAt: Date.now(),
+                    text: "푸시 허용이 완료되었습니다.",
+                    show: true,
+                    type: "success",
+                  },
+                ]);
 
                 const data = {
                   title: "푸시를 허용이 완료되었습니다.",
@@ -110,12 +115,16 @@ const PushRequest = () => {
           });
         } catch (error) {
           localStorage.setItem("pushRequest", "not now");
-          setAlert({
-            createdAt: Date.now(),
-            text: "푸시 토큰 생성 중 문제가 발생하였습니다.",
-            show: true,
-            type: "warning",
-          });
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              createdAt: Date.now(),
+              text: "푸시 토큰 생성 중 문제가 발생하였습니다.",
+              show: true,
+              type: "warning",
+            },
+          ]);
         }
       }
     });
@@ -161,7 +170,7 @@ const PushRequest = () => {
               {secondRequest && (
                 <button
                   onClick={ondeniClick}
-                  className="text-astronaut-700 pt-4 underline"
+                  className="pt-4 text-astronaut-700 underline"
                 >
                   <div>다시 보지 않기</div>
                 </button>

@@ -41,8 +41,10 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
 
   // 다른 타입이 들어오면 lastPage를 초기화한다.
   useEffect(() => {
-    setLastPage(false);
-  }, [gridType]);
+    if (lastVisible === null) {
+      setLastPage(false);
+    }
+  }, [gridType, lastVisible]);
 
   // 로딩에 딜레이 발생시키기
   const delay = (ms: number) => {

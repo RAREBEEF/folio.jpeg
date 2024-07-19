@@ -1,6 +1,13 @@
 import { db, storage } from "@/fb";
 import { ImageDocData } from "@/types";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  arrayUnion,
+  doc,
+  FieldValue,
+  increment,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useState } from "react";
 import useErrorAlert from "./useErrorAlert";
 import { deleteObject, ref } from "firebase/storage";
@@ -20,20 +27,29 @@ const useSetImageData = () => {
     data: ImageDocData;
     update: boolean;
   }): Promise<"success" | "error"> => {
-    console.log("useSetImageData");
-    const docRef = doc(db, "images", id);
+    console.log("useSetImageData", data);
+    const imageDocRef = doc(db, "images", id);
+    const tagsDocRef = doc(db, "tags", "data");
+
+    const newTags: { [key in string]: FieldValue } = {};
+    data.tags.forEach((tag) => {
+      newTags["list." + tag] = increment(1);
+    });
+
+    const promises = [updateDoc(tagsDocRef, newTags)];
 
     if (update) {
       const updateData: any = { ...data };
       delete updateData.likes;
-      await updateDoc(docRef, { ...updateData }).then(() => {
-        setIsLoading(false);
-      });
+      promises.push(updateDoc(imageDocRef, { ...updateData }));
     } else {
-      await setDoc(docRef, data).then(() => {
-        setIsLoading(false);
-      });
+      promises.push(setDoc(imageDocRef, data));
     }
+
+    await Promise.all(promises).then(() => {
+      setIsLoading(false);
+    });
+
     return "success";
   };
 
@@ -46,8 +62,6 @@ const useSetImageData = () => {
     data: ImageDocData;
     update: boolean;
   }): Promise<"success" | "error" | ""> => {
-    if (isLoading) return "error";
-
     setIsLoading(true);
 
     try {
@@ -62,6 +76,7 @@ const useSetImageData = () => {
       return "success";
     } catch (error) {
       // 스토리지에서 이미지 삭제
+      console.log(error);
       const storageRef = ref(storage, `images/${data.uid}/${data.fileName}`);
       await deleteObject(storageRef);
       showErrorAlert();

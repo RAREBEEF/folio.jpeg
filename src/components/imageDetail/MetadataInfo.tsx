@@ -30,37 +30,50 @@ const MetadataInfo = ({
         <div className="relative z-50 flex">
           <h3>카메라 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.model || "--"}
+            {imageItem?.metadata?.model ||
+              imageItem?.customMetadata?.model ||
+              "--"}
           </span>
         </div>
         <div className="relative z-50 flex flex-wrap">
           <h3>렌즈 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.lensModel || "--"}
+            {imageItem?.metadata?.lensModel ||
+              imageItem?.customMetadata?.lensModel ||
+              "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>초점 거리: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.focalLength || "--"}mm
+            {imageItem?.metadata?.focalLength ||
+              imageItem?.customMetadata?.focalLength ||
+              "--"}
+            mm
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>셔터스피드: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.shutterSpeed || "--"}s
+            {imageItem?.metadata?.shutterSpeed ||
+              imageItem?.customMetadata?.shutterSpeed ||
+              "--"}
+            s
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>조리개: </h3>
           <span className="pl-2 font-semibold">
-            f{imageItem?.metadata?.fNumber || "--"}
+            f
+            {imageItem?.metadata?.fNumber ||
+              imageItem?.customMetadata?.fNumber ||
+              "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>ISO: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.ISO || "--"}
+            {imageItem?.metadata?.ISO || imageItem?.customMetadata?.ISO || "--"}
           </span>
         </div>
       </div>

@@ -4,7 +4,7 @@ import useFetchWithRetry from "./useFetchWithRetry";
 import { Folders, ImageDataPages, ImageItem } from "@/types";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
-  alertState,
+  alertsState,
   authStatusState,
   foldersState,
   gridImageIdsState,
@@ -15,13 +15,13 @@ import {
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import useImagePopularity from "./useImagePopularity";
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import useTagScore from "./useTagScore";
 
 const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
-  const { adjustTagScore } = useTagScore({ imageItem });
+  // const { adjustTagScore } = useTagScore({ imageItem });
   const [isSaved, setIsSaved] = useState<boolean>(false);
-  const setAlert = useSetRecoilState(alertState);
+  const setAlerts = useSetRecoilState(alertsState);
   const setLoginModal = useSetRecoilState(loginModalState);
   const [saveModal, setSaveModal] = useRecoilState(saveModalState);
   const savedFolder = useMemo(
@@ -163,16 +163,20 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
         if (authStatus.data && imageItem.uid !== authStatus.data.uid) {
           await Promise.all([
             adjustPopularity(2),
-            adjustTagScore({ action: "save" }),
+            // adjustTagScore({ action: "save" }),
           ]);
         }
         // 저장 완료 알림 띄우기
-        setAlert({
-          show: true,
-          type: "success",
-          createdAt: Date.now(),
-          text: "저장되었습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "저장되었습니다.",
+          },
+        ]);
       });
   };
 
@@ -238,12 +242,16 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
     await updateDoc(docRef, { images: arrayRemove(imageId), updatedAt })
       .then(async () => {
         await adjustPopularity(-2);
-        setAlert({
-          show: true,
-          type: "success",
-          createdAt: Date.now(),
-          text: "저장 목록에서 삭제되었습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "저장 목록에서 삭제되었습니다.",
+          },
+        ]);
         setSaveModal({ show: false, image: null, imageSavedFolder: null });
       })
       .catch((error) => {
@@ -251,12 +259,16 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
         setFolders(prevFolders);
         setPrevFolderImagePage(prevFolderImagePage);
         setPrevFolderGridImageIds(prevFolderGridImageIds);
-        setAlert({
-          show: true,
-          type: "warning",
-          createdAt: Date.now(),
-          text: "목록 업데이트 중 문제가 발생했습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "목록 업데이트 중 문제가 발생했습니다.",
+          },
+        ]);
       });
   };
 
@@ -378,12 +390,16 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
       }),
     ])
       .then(() => {
-        setAlert({
-          show: true,
-          type: "success",
-          createdAt: Date.now(),
-          text: "폴더가 변경되었습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "폴더가 변경되었습니다.",
+          },
+        ]);
         setSaveModal({ show: false, image: null, imageSavedFolder: null });
       })
       .catch((error) => {
@@ -393,12 +409,16 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
         setPrevFolderGridImageIds(prevFolderGridImageIds);
         setSelectedFolderImagePage(selectedFolderImagePage);
         setSelectedFolderGridImageIds(selectedFolderGridImageIds);
-        setAlert({
-          show: true,
-          type: "warning",
-          createdAt: Date.now(),
-          text: "폴더 변경 중 문제가 발생했습니다.",
-        });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "폴더 변경 중 문제가 발생했습니다.",
+          },
+        ]);
       });
   };
 

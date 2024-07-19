@@ -11,7 +11,7 @@ const amountDict = { view: 1, save: 1, like: 2, comment: 3 };
 const useTagScore = ({ imageItem }: { imageItem: ImageItem | null }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [updated, setUpdated] = useState<boolean>(false);
-  const currentSeenTags = imageItem?.aiTags;
+  const currentSeenTags = imageItem?.tags;
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
 
   const adjustTagScore = async ({

@@ -66,9 +66,9 @@ const ImageDetail = () => {
   const [infoPos, setInfoPos] = useState<[number, number]>([0, 0]);
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [zoomIn, setZoomIn] = useState<boolean>(false);
-  const { adjustTagScore } = useTagScore({
-    imageItem,
-  });
+  // const { adjustTagScore } = useTagScore({
+  //   imageItem,
+  // });
   const { adjustPopularity } = useImagePopularity({
     imageId,
   });
@@ -84,7 +84,7 @@ const ImageDetail = () => {
       setViewActionDone(true);
       (async () => {
         await Promise.all([
-          adjustTagScore({ action: "view" }),
+          // adjustTagScore({ action: "view" }),
           adjustPopularity(1),
         ]);
       })();
@@ -107,7 +107,7 @@ const ImageDetail = () => {
     isLoading,
     replace,
     viewActionDone,
-    adjustTagScore,
+    // adjustTagScore,
     adjustPopularity,
   ]);
 
@@ -162,12 +162,6 @@ const ImageDetail = () => {
     setLastVisible(null);
     setComments(null);
   };
-
-  // const onImageMouseEnter = (e: MouseEvent<HTMLImageElement>) => {
-  //   e.preventDefault();
-  //   if (disableHoverInfo) return;
-
-  // };
 
   const onImageMouseMove = (e: MouseEvent<HTMLImageElement>) => {
     e.preventDefault();
@@ -246,6 +240,7 @@ const ImageDetail = () => {
     const windowResizeHandler = _.debounce(() => {
       if (window.innerWidth <= 550) {
         setSmallViewprot(true);
+        setShowInfo(false);
       } else {
         setSmallViewprot(false);
       }
@@ -301,7 +296,6 @@ const ImageDetail = () => {
                         alt={imageItem.title || imageItem.fileName}
                         layout="fill"
                         objectFit="contain"
-                        // onMouseEnter={onImageMouseEnter}
                         onMouseMove={onImageMouseMove}
                         onMouseOut={onImageMouseOut}
                         onError={() => {
