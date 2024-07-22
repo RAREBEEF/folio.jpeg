@@ -10,6 +10,7 @@ import {
   ImageDataPages,
   ImageItem,
   InAppNotification,
+  UploadStatus,
   UserData,
 } from "@/types";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
@@ -101,6 +102,11 @@ export const gridState = atom<Grid>({
 // alert(앱 내 오류, 경고, 작업 성공 등의 안내창)
 export const alertsState = atom<Array<Alert>>({
   key: "alertsState",
+  default: [],
+});
+
+export const uploadStatusState = atom<Array<UploadStatus>>({
+  key: "uploadStatusState",
   default: [],
 });
 

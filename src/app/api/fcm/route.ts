@@ -159,7 +159,7 @@ export async function POST(req: Request) {
       ...sendInappNotifications,
     ]).catch((error) => {
       return NextResponse.json({
-        data: "Faild to send fcm.",
+        data: "failed to send fcm.",
         error,
         status: 500,
       });
@@ -171,7 +171,7 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     return NextResponse.json({
-      data: "Faild to send fcm.",
+      data: "failed to send fcm.",
       status: 500,
     });
   }

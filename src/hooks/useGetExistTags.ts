@@ -1,12 +1,5 @@
 import { db } from "@/fb";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
 import useErrorAlert from "./useErrorAlert";
 import useFetchWithRetry from "./useFetchWithRetry";

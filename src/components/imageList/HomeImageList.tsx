@@ -26,7 +26,7 @@ const HomeImageList = () => {
   );
   const grid = useRecoilValue(gridState);
   const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
-    "createdAt",
+    (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
   );
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -61,9 +61,17 @@ const HomeImageList = () => {
           팔로잉
         </Link>
       </nav>
-      <div className="flex justify-end px-4 pt-4 opacity-50">
-        <OrderByFilter onChange={onOrderByChange} value={orderBy} />
-      </div>
+      {grid && (
+        <div
+          style={{
+            width:
+              grid.colCount * grid.colWidth + grid.gap * (grid.colCount + 1),
+          }}
+          className="m-auto flex justify-end px-4 pt-4 opacity-50"
+        >
+          <OrderByFilter onChange={onOrderByChange} value={orderBy} />
+        </div>
+      )}
       <ImageGrid
         type={listType === "following" ? "following" : "home" + "-" + orderBy}
       />

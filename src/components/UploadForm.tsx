@@ -15,8 +15,10 @@ import Loading from "@/components/loading/Loading";
 import _, { uniqueId } from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
 import useAnalyzingImage from "@/hooks/useAnalyzingImage";
+import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
 
 const UploadForm = () => {
+  const { updateUploadStatus } = useUpdateUploadStatus();
   const { getImageItem, isLoading: isImageLoading } = useGetImage();
   const { setImageData, isLoading: isImageDataUploading } = useSetImageData();
   const { analyzingImage, isLoading: isAnalyzing } = useAnalyzingImage();
@@ -225,22 +227,10 @@ const UploadForm = () => {
     return "";
   };
 
-  const abortUpload = (alertId: string, message: string) => {
+  const abortUpload = (id: string, message: string) => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
     setIsEditing(false);
-    setAlerts((prev) => {
-      const newAlerts = prev.filter((alert) => alert.id !== alertId);
-      return [
-        ...newAlerts,
-        {
-          id: alertId,
-          createdAt: Date.now(),
-          type: "warning",
-          show: true,
-          text: message,
-        },
-      ];
-    });
+    updateUploadStatus({ id, status: "fail", failMessage: message });
   };
 
   // 업로드/수정
@@ -367,23 +357,15 @@ const UploadForm = () => {
     }
 
     // 업로드 과정 시작
+    const imageId = isEdit ? imageItem!.id : (id as string);
+    updateUploadStatus({
+      id: imageId,
+      status: "start",
+      previewURL: previewURL,
+    });
 
     isEdit ? setIsEditing(true) : resetAllField();
     window.addEventListener("beforeunload", handleBeforeUnload); // 앱 종료 방지
-    const imageId = isEdit ? imageItem!.id : (id as string);
-
-    setAlerts((prev) => [
-      ...prev,
-      {
-        id: imageId,
-        createdAt: Date.now(),
-        type: "default",
-        show: true,
-        text: "이미지 분석 중입니다. 앱을 종료하지 마세요.",
-        fixed: true,
-        duration: -1,
-      },
-    ]);
 
     // 분석 결과
     let analysisResult: AnalysisResult | null;
@@ -393,6 +375,11 @@ const UploadForm = () => {
     // // // // // // // // //
     // 이미지 분석
     // // // // // // // // //
+
+    updateUploadStatus({
+      id: imageId,
+      status: "analyzing",
+    });
 
     // 수정인 경우 기존 결과 유지
     if (isEdit && imageItem) {
@@ -410,10 +397,7 @@ const UploadForm = () => {
       });
 
       if (!analysisResult) {
-        abortUpload(
-          imageId,
-          "이미지 분석에 실패하였습니다. 업로드를 중단합니다.",
-        );
+        abortUpload(imageId, "이미지 분석에 실패하였습니다.");
         return;
       }
 
@@ -422,31 +406,16 @@ const UploadForm = () => {
 
     // 부적절한 이미지 필터
     if (analysisResult === "inappreciate") {
-      abortUpload(
-        imageId,
-        "부적절한 이미지가 감지되었습니다. 업로드를 중단합니다.",
-      );
+      abortUpload(imageId, "부적절한 이미지가 감지되었습니다.");
       return;
     }
 
     // // // // // // // // //
     // 이미지 업로드
     // // // // // // // // //
-    setAlerts((prev) => {
-      const newAlerts = prev.filter((alert) => alert.id !== imageId);
-
-      return [
-        ...newAlerts,
-        {
-          id: imageId,
-          createdAt: Date.now(),
-          type: "default",
-          show: true,
-          text: "이미지 업로드 중입니다. 앱을 닫지 마세요.",
-          fixed: true,
-          duration: -1,
-        },
-      ];
+    updateUploadStatus({
+      id: imageId,
+      status: "uploadFile",
     });
 
     const downloadURL = isEdit
@@ -461,6 +430,11 @@ const UploadForm = () => {
       abortUpload(imageId, "이미지 업로드 과정에서 문제가 발생하였습니다.");
       return;
     }
+
+    updateUploadStatus({
+      id: imageId,
+      status: "uploadData",
+    });
 
     // 업로드 후 분석 결과에 이미지 띄울 때 필요한 정보
     setImgURL(downloadURL);
@@ -523,19 +497,9 @@ const UploadForm = () => {
     });
 
     if (response === "success") {
-      setAlerts((prev) => {
-        const newAlerts = prev.filter((alert) => alert.id !== imageId);
-
-        return [
-          ...newAlerts,
-          {
-            id: imageId,
-            createdAt: Date.now(),
-            type: "success",
-            show: true,
-            text: "이미지 업로드가 완료되었습니다.",
-          },
-        ];
+      updateUploadStatus({
+        id: imageId,
+        status: "done",
       });
 
       if (isEdit) {
@@ -552,7 +516,7 @@ const UploadForm = () => {
       }
     } else {
       if (isEdit) setImageItem(prevImageItem);
-      abortUpload(imageId, "이미지 업로드 과정에서 문제가 발생하였습니다.");
+      abortUpload(imageId, "게시물 업로드 과정에서 문제가 발생하였습니다.");
     }
   };
 

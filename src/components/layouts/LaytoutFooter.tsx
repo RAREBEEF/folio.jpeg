@@ -1,10 +1,16 @@
+"use client";
+
+import { uploadStatusState } from "@/recoil/states";
 import Link from "next/link";
+import { useRecoilValue } from "recoil";
 
 const LayoutFooter = () => {
+  const uploadStatus = useRecoilValue(uploadStatusState);
+
   return (
     <div
       id="footer"
-      className={`bg-astronaut-800 text-astronaut-50 ml-[50px] px-10 py-4 transition-all xs:ml-0`}
+      className={`ml-[50px] bg-astronaut-800 px-10 py-4 text-astronaut-50 transition-all xs:ml-0 ${uploadStatus.length > 0 && "xs:pb-36"}`}
     >
       <nav className="mx-auto mb-6 max-w-[1300px]">
         <ul className="flex gap-x-24 *:flex *:flex-col *:gap-2">

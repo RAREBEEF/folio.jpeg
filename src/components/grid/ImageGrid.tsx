@@ -43,7 +43,7 @@ const ImageGrid = ({ type }: { type: string }) => {
         initGrid.colCount = Math.max(
           Math.min(
             Math.floor(containerWidth / (initGrid.colWidth + initGrid.gap * 2)),
-            4,
+            5,
           ),
           2,
         );

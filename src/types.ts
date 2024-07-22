@@ -146,7 +146,21 @@ export interface Alert {
   show: boolean;
   cleanUp?: any;
   fixed?: boolean;
-  img?: string;
+}
+
+export type UploadStatuses =
+  | "start"
+  | "analyzing"
+  | "uploadFile"
+  | "uploadData"
+  | "done"
+  | "fail";
+export interface UploadStatus {
+  id: string;
+  createdAt: number;
+  previewURL: string;
+  status: "start" | "analyzing" | "uploadFile" | "uploadData" | "done" | "fail";
+  failMessage: string;
 }
 export interface InAppNotification {
   title: string;
