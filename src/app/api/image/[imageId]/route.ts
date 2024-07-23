@@ -12,6 +12,9 @@ export async function DELETE(
   const uid = searchParams.get("uid");
   const fileName = searchParams.get("fileName");
   const imageId = params.imageId;
+  const tags = searchParams
+    .getAll("tag")
+    .map((value) => decodeURIComponent(value));
 
   if (!imageId || !uid || !fileName) {
     return NextResponse.json({ data: "Missing image ID", status: 400 });
@@ -31,9 +34,15 @@ export async function DELETE(
       });
     }
 
-    // firestore
-    const firestoreRef = admin.firestore().collection("images").doc(imageId);
-    // storage
+    const imgDocRef = admin.firestore().collection("images").doc(imageId);
+    const existTagsDocRef = admin.firestore().collection("tags").doc("data");
+
+    // 태그 목록에서 개수 차감
+    const decrementTags: { [key in string]: admin.firestore.FieldValue } = {};
+    tags.forEach((tag) => {
+      decrementTags["list." + tag] = admin.firestore.FieldValue.increment(-1);
+    });
+
     const storageRef = admin
       .storage()
       .bucket()
@@ -41,12 +50,13 @@ export async function DELETE(
 
     // 삭제
     await Promise.all([
-      admin.firestore().recursiveDelete(firestoreRef),
+      existTagsDocRef.update(decrementTags),
+      admin.firestore().recursiveDelete(imgDocRef),
       storageRef.delete(),
     ]);
 
     return NextResponse.json({
-      data: "Suscces",
+      data: "Success",
       status: 200,
     });
   } catch (err) {

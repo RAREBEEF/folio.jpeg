@@ -1,18 +1,34 @@
 import useInput from "@/hooks/useInput";
 import SearchSvg from "@/icons/magnifying-glass-solid.svg";
 import Link from "next/link";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { hangulIncludes, choseongIncludes } from "es-hangul";
 import useGetExistTags from "@/hooks/useGetExistTags";
 import _ from "lodash";
+import { deleteField, doc, FieldValue, updateDoc } from "firebase/firestore";
+import { db } from "@/fb";
+import { useRouter, useSearchParams } from "next/navigation";
+import useResetGrid from "@/hooks/useResetGrid";
+import { Router } from "next/router";
+
 const Search = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isQueryChanged = useRef(true);
+  const resetSearchPopularityGrid = useResetGrid({
+    gridType: "search-" + "popularity",
+  });
+  const resetSearchCreatedAtGrid = useResetGrid({
+    gridType: "search-" + "createdAt",
+  });
+  const { push } = useRouter();
+  const params = useSearchParams();
   const { getExistTags, isLoading: isExistTagsLoading } = useGetExistTags();
   const isInitialMount = useRef(true);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const [existTagList, setExistTagList] = useState<
     { [key in string]: number } | null
   >(null);
-  const { value, onChange } = useInput("");
+  const { value, onChange } = useInput(params.getAll("query").join(" "));
   const [suggestions, setSuggestions] = useState<{ [key in string]: number }>(
     {},
   );
@@ -32,7 +48,25 @@ const Search = () => {
     })();
   }, [getExistTags, existTagList, isExistTagsLoading]);
 
-  console.log(existTagList);
+  // 개수 체크 및 정리
+  useEffect(() => {
+    if (!existTagList) return;
+
+    const notExistAnymore = Object.entries(existTagList).filter(
+      ([tag, count]) => count <= 0,
+    );
+
+    if (notExistAnymore.length <= 0) return;
+
+    const cleanUpMap: { [key in string]: FieldValue } = Object.fromEntries(
+      notExistAnymore.map(([tag, count]) => ["list." + tag, deleteField()]),
+    );
+
+    const docRef = doc(db, "tags", "data");
+    (async () => {
+      await updateDoc(docRef, cleanUpMap);
+    })();
+  }, [existTagList]);
 
   // 입력값으로 제안 생성
   useEffect(() => {
@@ -45,13 +79,11 @@ const Search = () => {
 
     const newSuggestions = _.cloneDeep(existTagList);
 
-    // const includeChar = Object.entries(existTagList)?.filter(
-    //   ([tag, count]) =>
-    //     hangulIncludes(tag, value) || choseongIncludes(tag, value),
-    // );
-
     for (const [tag, count] of Object.entries(newSuggestions)) {
-      if (!(hangulIncludes(tag, value) || choseongIncludes(tag, value))) {
+      if (
+        count <= 0 ||
+        !(hangulIncludes(tag, value) || choseongIncludes(tag, value))
+      ) {
         delete newSuggestions[tag];
       }
     }
@@ -59,44 +91,78 @@ const Search = () => {
     setSuggestions(newSuggestions);
   }, [existTagList, value]);
 
-  const onInputFocus = () => {
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setShowDropdown(false);
+    inputRef.current?.blur();
+    console.log("/search?query=" + value.split(" ").join("&query="));
+    push("/search?query=" + value.split(" ").join("&query="));
+    isQueryChanged.current = true;
+  };
+
+  const routeChangeHandler = useCallback(() => {
+    if (isQueryChanged.current) {
+      resetSearchPopularityGrid();
+      resetSearchCreatedAtGrid();
+      isQueryChanged.current = false;
+    }
+  }, [isQueryChanged.current]);
+
+  useEffect(() => {
+    Router.events.on("routeChangeStart", routeChangeHandler);
+
+    return () => {
+      Router.events.emit("routeChangeStart", routeChangeHandler);
+    };
+  }, [routeChangeHandler]);
+
+  const onFocusInput = () => {
     setShowDropdown(true);
   };
-  const onInputBlur = () => {
+  const onBlurInput = () => {
     setShowDropdown(false);
-  };
-  const onSuggestionClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    console.log("클릭");
   };
 
   return (
     <div className="relative mr-4 grow">
-      {showDropdown && (
-        <div className="absolute top-7 flex h-[300px] w-full flex-col overflow-scroll bg-astronaut-50 text-astronaut-950">
+      {showDropdown && Object.keys(suggestions).length > 0 && (
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+          className="absolute top-7 flex h-fit max-h-[300px] w-full flex-col overflow-scroll rounded-b-lg bg-astronaut-50 text-astronaut-950 shadow-lg"
+        >
           {Object.entries(suggestions).map(([tag, count], i) => (
             <Link
-              href={`/search/${tag}`}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                console.log(inputRef.current);
+                inputRef.current?.blur();
+                push("/search?query=" + value.split(" ").join("&query="));
+              }}
+              href={"/search?query=" + value.split(" ").join("&query=")}
               key={tag}
               className="p-2 hover:bg-astronaut-100"
-              onClick={onSuggestionClick}
             >
               {tag} ({count})
             </Link>
           ))}
         </div>
       )}
-      <div className="relative">
+      <form onSubmit={onSubmit} className="relative">
         <input
-          onFocus={onInputFocus}
-          onBlur={onInputBlur}
+          ref={inputRef}
+          onFocus={onFocusInput}
+          onBlur={onBlurInput}
           value={value}
           onChange={onChange}
-          type="text"
-          className="h-7 w-full rounded-lg bg-astronaut-500 px-6 text-base text-astronaut-950 outline-none focus:rounded-b-none focus:bg-astronaut-50"
+          minLength={1}
+          maxLength={30}
+          type="search"
+          className={`h-7 w-full pl-6 pr-2 text-base text-astronaut-950 outline-none ${showDropdown ? "bg-astronaut-50" : "bg-astronaut-500"} ${showDropdown && Object.keys(suggestions).length > 0 ? "rounded-t-lg border-b " : "rounded-lg"}`}
         />
-        <SearchSvg className="absolute bottom-0 left-2 top-0 m-auto h-3 w-3 fill-astronaut-700" />
-      </div>
+        <SearchSvg className="pointer-events-none absolute bottom-0 left-2 top-0 m-auto h-3 w-3 fill-astronaut-700" />
+      </form>
     </div>
   );
 };

@@ -2,7 +2,6 @@ import ImageDetail from "@/components/imageDetail/ImageDetail";
 import { ImageData } from "@/types";
 import { Metadata, ResolvingMetadata } from "next";
 import admin from "firebase-admin";
-import logo from "@/images/logo.png";
 
 type Props = {
   params: { id: string };

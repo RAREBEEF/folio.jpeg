@@ -61,9 +61,9 @@ const NotificationsModal = ({ close }: { close: Function }) => {
 
   return (
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
-      <ul className="flex flex-col gap-4 p-4 px-6">
+      <ul className="flex h-full flex-col gap-4 p-4 px-6">
         {notification.list.length <= 0 ? (
-          <div className="text-astronaut-700 text-center">
+          <div className="flex h-[80%] items-center justify-center text-center text-astronaut-700">
             목록이 비어있습니다.
           </div>
         ) : (
@@ -77,7 +77,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                 }}
               >
                 <div className="flex gap-4">
-                  <div className="bg-astronaut-800 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                  <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-astronaut-800">
                     <Image
                       src={notification.profileImage}
                       layout="fill"
@@ -86,12 +86,12 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                   </div>
                   <div className="flex flex-col gap-0 break-keep leading-tight">
                     <div>{notification.title}</div>
-                    <div className="text-astronaut-700 text-sm">
+                    <div className="text-sm text-astronaut-700">
                       {notification.body}
                     </div>
                   </div>
                   {notification.targetImage && (
-                    <div className="bg-astronaut-800 relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+                    <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-astronaut-800">
                       <Image
                         src={notification.targetImage}
                         layout="fill"
@@ -100,7 +100,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
                     </div>
                   )}
                 </div>
-                <div className="text-astronaut-500 w-full pr-2 pt-2 text-end text-xs">
+                <div className="w-full pr-2 pt-2 text-end text-xs text-astronaut-500">
                   {dateDiffNow(notification.createdAt).diffSummary}
                 </div>
               </Link>

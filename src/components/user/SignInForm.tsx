@@ -219,9 +219,9 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="m-auto flex h-full w-fit flex-col pb-12 pt-6">
+    <div className="m-auto flex h-full w-fit flex-col pb-12">
       {(createAccount || pwReset) && (
-        <h3 className="text-center text-lg font-semibold text-astronaut-700">
+        <h3 className="pt-6 text-center text-lg font-semibold text-astronaut-700">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}
         </h3>
       )}

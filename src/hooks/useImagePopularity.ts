@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useFetchWithRetry from "./useFetchWithRetry";
-import { useRecoilState, waitForAllSettled } from "recoil";
-import { imageItemState } from "@/recoil/states";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { authStatusState, imageItemState } from "@/recoil/states";
 import { doc, increment, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import useErrorAlert from "./useErrorAlert";
@@ -12,6 +12,7 @@ const useImagePopularity = ({ imageId }: { imageId: string }) => {
   const [imageItem, setImageItem] = useRecoilState(imageItemState(imageId));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { fetchWithRetry } = useFetchWithRetry();
+  const authStatus = useRecoilValue(authStatusState);
 
   const adjustPopularityAsync = async (amount: number = 1) => {
     console.log("useImagePopularity");
@@ -20,7 +21,7 @@ const useImagePopularity = ({ imageId }: { imageId: string }) => {
   };
 
   const adjustPopularity = async (amount: number = 1) => {
-    if (isLoading) return;
+    if (isLoading || authStatus.status !== "signedIn") return;
     setIsLoading(true);
 
     let prevImageItem: ImageItem | null = null;

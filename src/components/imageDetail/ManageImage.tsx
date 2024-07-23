@@ -27,6 +27,12 @@ const ManageImage = ({ id }: { id: string }) => {
   const resetFollowingPopularityGrid = useResetGrid({
     gridType: "following-popularity",
   });
+  const resetSearchPopularityGrid = useResetGrid({
+    gridType: "search-" + "popularity",
+  });
+  const resetSearchCreatedAtGrid = useResetGrid({
+    gridType: "search-" + "createdAt",
+  });
   const [imageItem, setImageItem] = useRecoilState(imageItemState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -41,7 +47,7 @@ const ManageImage = ({ id }: { id: string }) => {
 
     // 이미지 doc의 하위 컬렉션인 comments도 함께 지우려면 admin-sdk를 이용하는게 좋아서 엔드포인트 구현
     await fetch(
-      `/api/image/${id}?uid=${imageItem.uid}&fileName=${imageItem.fileName}`,
+      `/api/image/${id}?uid=${imageItem.uid}&fileName=${imageItem.fileName}&tag=${imageItem.tags.join("&tag=")}`,
       {
         method: "DELETE",
       },
@@ -54,6 +60,8 @@ const ManageImage = ({ id }: { id: string }) => {
         resetFollowingPopularityGrid();
         resetUserCreatedAtGrid();
         resetUserPopularityGrid();
+        resetSearchCreatedAtGrid();
+        resetSearchPopularityGrid();
         setAlerts((prev) => [
           ...prev,
           {
