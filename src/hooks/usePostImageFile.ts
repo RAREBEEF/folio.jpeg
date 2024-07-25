@@ -24,7 +24,7 @@ const calcShutterSpeed = (shutterSpeedValue: number) => {
 /**
  * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
  */
-const useSetImageFile = () => {
+const usePostImageFile = () => {
   const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [isInputUploading, setIsInputUploading] = useState<boolean>(false);
@@ -118,7 +118,7 @@ const useSetImageFile = () => {
   /**
    * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수
    * */
-  const setImageFileAsync = async ({
+  const postImageFileAsync = async ({
     uid,
     fileName,
     img,
@@ -150,7 +150,7 @@ const useSetImageFile = () => {
     setError(null);
   };
 
-  const setImageFile = async ({
+  const postImageFile = async ({
     uid,
     fileName,
     img,
@@ -164,7 +164,7 @@ const useSetImageFile = () => {
 
     try {
       return await fetchWithRetry({
-        asyncFn: setImageFileAsync,
+        asyncFn: postImageFileAsync,
         args: {
           uid,
           fileName,
@@ -182,7 +182,7 @@ const useSetImageFile = () => {
   return {
     isInputUploading,
     isLoading,
-    setImageFile,
+    postImageFile,
     onFileSelect,
     reset,
     error,
@@ -199,4 +199,4 @@ const useSetImageFile = () => {
   };
 };
 
-export default useSetImageFile;
+export default usePostImageFile;

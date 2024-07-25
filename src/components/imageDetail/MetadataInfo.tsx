@@ -1,15 +1,15 @@
-import { ImageItem } from "@/types";
+import { ImageData } from "@/types";
 
 const MetadataInfo = ({
   showInfo,
   infoPos,
   disableHoverInfo,
-  imageItem,
+  imageData,
 }: {
   showInfo: boolean;
   infoPos: [number, number];
   disableHoverInfo: boolean;
-  imageItem: ImageItem;
+  imageData: ImageData;
 }) => {
   return (
     <div
@@ -22,7 +22,7 @@ const MetadataInfo = ({
     >
       <div
         style={{
-          background: imageItem.themeColor,
+          background: imageData.themeColor,
         }}
         className="absolute left-0 top-0 h-full w-full rounded-xl opacity-10"
       />
@@ -30,24 +30,24 @@ const MetadataInfo = ({
         <div className="relative z-50 flex">
           <h3>카메라 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.model ||
-              imageItem?.customMetadata?.model ||
+            {imageData?.metadata?.model ||
+              imageData?.customMetadata?.model ||
               "--"}
           </span>
         </div>
         <div className="relative z-50 flex flex-wrap">
           <h3>렌즈 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.lensModel ||
-              imageItem?.customMetadata?.lensModel ||
+            {imageData?.metadata?.lensModel ||
+              imageData?.customMetadata?.lensModel ||
               "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>초점 거리: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.focalLength ||
-              imageItem?.customMetadata?.focalLength ||
+            {imageData?.metadata?.focalLength ||
+              imageData?.customMetadata?.focalLength ||
               "--"}
             mm
           </span>
@@ -55,8 +55,8 @@ const MetadataInfo = ({
         <div className="relative z-50 flex">
           <h3>셔터스피드: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.shutterSpeed ||
-              imageItem?.customMetadata?.shutterSpeed ||
+            {imageData?.metadata?.shutterSpeed ||
+              imageData?.customMetadata?.shutterSpeed ||
               "--"}
             s
           </span>
@@ -65,15 +65,15 @@ const MetadataInfo = ({
           <h3>조리개: </h3>
           <span className="pl-2 font-semibold">
             f
-            {imageItem?.metadata?.fNumber ||
-              imageItem?.customMetadata?.fNumber ||
+            {imageData?.metadata?.fNumber ||
+              imageData?.customMetadata?.fNumber ||
               "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>ISO: </h3>
           <span className="pl-2 font-semibold">
-            {imageItem?.metadata?.ISO || imageItem?.customMetadata?.ISO || "--"}
+            {imageData?.metadata?.ISO || imageData?.customMetadata?.ISO || "--"}
           </span>
         </div>
       </div>

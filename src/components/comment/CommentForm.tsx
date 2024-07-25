@@ -2,7 +2,7 @@ import useInput from "@/hooks/useInput";
 import {
   authStatusState,
   commentsState,
-  imageItemState,
+  imageDataState,
   loginModalState,
 } from "@/recoil/states";
 import { Comment, Comments, UserData } from "@/types";
@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import Button from "../Button";
 import Loading from "@/components//loading/Loading";
 import useSendFcm from "@/hooks/useSendFcm";
-import useSetComment from "@/hooks/useSetComment";
+import usePostComment from "@/hooks/usePostComment";
 
 const CommentForm = ({
   imageId,
@@ -27,9 +27,9 @@ const CommentForm = ({
   // const [isLoading, setIsLoading] = useState<boolean>(false);
   const setLoginModal = useSetRecoilState(loginModalState);
   const setComments = useSetRecoilState(commentsState(imageId as string));
-  const imageItem = useRecoilValue(imageItemState(imageId));
-  const { setComment, isLoading } = useSetComment({
-    imageItem,
+  const imageData = useRecoilValue(imageDataState(imageId));
+  const { postComment, isLoading } = usePostComment({
+    imageData,
     author,
     parentId,
   });
@@ -43,7 +43,7 @@ const CommentForm = ({
   // 댓글 등록
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content || !imageItem || isLoading) return;
+    if (!content || !imageData || isLoading) return;
 
     if (authStatus.status === "pending") {
       return;
@@ -82,7 +82,7 @@ const CommentForm = ({
       });
 
       // db에 댓글 등록
-      await setComment({ comment }).catch((error) => {
+      await postComment({ comment }).catch((error) => {
         // 에러 시 롤백
         setComments(prevComments);
       });
@@ -114,7 +114,7 @@ const CommentForm = ({
       });
 
       // db에 답글 등록
-      await setComment({ comment, tokens, parentComment }).catch((error) => {
+      await postComment({ comment, tokens, parentComment }).catch((error) => {
         // 에러 시 롤백
         setComments(prevComments);
       });

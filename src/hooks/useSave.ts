@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import useErrorAlert from "./useErrorAlert";
 import useFetchWithRetry from "./useFetchWithRetry";
-import { Folders, ImageDataPages, ImageItem } from "@/types";
+import { Folders, ImageDataPages, ImageData } from "@/types";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   alertsState,
@@ -18,8 +18,8 @@ import useImagePopularity from "./useImagePopularity";
 import _, { uniqueId } from "lodash";
 import useTagScore from "./useTagScore";
 
-const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
-  // const { adjustTagScore } = useTagScore({ imageItem });
+const useSave = ({ imageData }: { imageData: ImageData | null }) => {
+  // const { adjustTagScore } = useTagScore({ imageData });
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const setAlerts = useSetRecoilState(alertsState);
   const setLoginModal = useSetRecoilState(loginModalState);
@@ -36,7 +36,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
   const { adjustPopularity } = useImagePopularity({
-    imageId: imageItem?.id || "",
+    imageId: imageData?.id || "",
   });
   const [folders, setFolders] = useRecoilState(
     foldersState(authStatus.data?.uid || ""),
@@ -88,11 +88,11 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
         showInit: authStatus.status === "noExtraData",
       });
       return;
-    } else if (!folders || !authStatus.data || !imageItem) {
+    } else if (!folders || !authStatus.data || !imageData) {
       return;
     }
     // 이미 저장된 이미지인지 체크
-    const targetId = imageItem.id;
+    const targetId = imageData.id;
 
     for (const folder of folders) {
       const { images } = folder;
@@ -103,7 +103,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
       if (targetIndex !== -1) {
         setSaveModal({
           show: true,
-          image: imageItem,
+          image: imageData,
           imageSavedFolder: folder,
         });
         return;
@@ -124,7 +124,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
     let prevDefaultFolderGridImageIds: Array<string>;
 
     // 폴더 상태 업데이트
-    const newImages = [...defaultFolder.images, imageItem.id];
+    const newImages = [...defaultFolder.images, imageData.id];
     const newFolders = [...folders];
     newFolders.splice(defaultFolderIndex, 1, {
       ...defaultFolder,
@@ -137,16 +137,16 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
       const newImagePage = _.cloneDeep(prev);
 
       if (newImagePage.length <= 0) {
-        return [[imageItem]];
+        return [[imageData]];
       } else {
-        newImagePage[0].unshift(imageItem);
+        newImagePage[0].unshift(imageData);
         return newImagePage;
       }
     });
     setDefaultFolderGridImageIds((prev) => {
       prevDefaultFolderGridImageIds = prev; // 이전 상태
       const newIds = _.cloneDeep(prev);
-      newIds.unshift(imageItem.id);
+      newIds.unshift(imageData.id);
       return newIds;
     });
 
@@ -160,7 +160,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
         setDefaultFolderGridImageIds(prevDefaultFolderGridImageIds);
       })
       .then(async () => {
-        if (authStatus.data && imageItem.uid !== authStatus.data.uid) {
+        if (authStatus.data && imageData.uid !== authStatus.data.uid) {
           await Promise.all([
             adjustPopularity(2),
             // adjustTagScore({ action: "save" }),
@@ -182,10 +182,10 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
 
   const unsaveAsync = async () => {
     console.log("useSave");
-    if (!folders || !savedFolder || !imageItem || !authStatus.data) return;
+    if (!folders || !savedFolder || !imageData || !authStatus.data) return;
 
     const uid = authStatus.data.uid;
-    const imageId = imageItem.id;
+    const imageId = imageData.id;
     const folderId = savedFolder.id;
     const updatedAt = Date.now();
 
@@ -279,12 +279,12 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
       !savedFolder ||
       !authStatus.data ||
       savedFolder.id === selectedFolderId ||
-      !imageItem
+      !imageData
     )
       return;
 
     const uid = authStatus.data.uid;
-    const imageId = imageItem.id;
+    const imageId = imageData.id;
     const prevFolderId = savedFolder.id;
     const updatedAt = Date.now();
 
@@ -359,9 +359,9 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
       const newImagePage = _.cloneDeep(prev);
 
       if (newImagePage.length <= 0) {
-        return [[imageItem]];
+        return [[imageData]];
       } else {
-        newImagePage[0].push(imageItem);
+        newImagePage[0].push(imageData);
         return newImagePage;
       }
     });
@@ -369,7 +369,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
     setSelectedFolderGridImageIds((prev) => {
       selectedFolderGridImageIds = prev; // 이전 상태
       const newIds = _.cloneDeep(prev);
-      newIds.push(imageItem.id);
+      newIds.push(imageData.id);
       return newIds;
     });
 
@@ -464,12 +464,12 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
   // 저장 여부는 각 버튼의 ui를 관리하기 때문에
   // recoil과는 별도로 이미지 그리드 아이템마다 별도로 관리되는 로컬 상태로 구분
   useEffect(() => {
-    if (!folders || !authStatus.data || !imageItem) {
+    if (!folders || !authStatus.data || !imageData) {
       setIsSaved(false);
       return;
     }
 
-    const targetId = imageItem.id;
+    const targetId = imageData.id;
 
     for (const folder of folders) {
       const { images } = folder;
@@ -483,7 +483,7 @@ const useSave = ({ imageItem }: { imageItem: ImageItem | null }) => {
     }
 
     setIsSaved(false);
-  }, [authStatus.data, folders, imageItem]);
+  }, [authStatus.data, folders, imageData]);
 
   const onSelectedFolderChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedFolderId(e.target.value);

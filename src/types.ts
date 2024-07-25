@@ -63,10 +63,8 @@ export interface ImageDocData {
   metadata: ImageMetadata;
   customMetadata: ImageMetadata;
 }
-export interface ImageData extends ImageDocData {
-  id: string;
-}
-export type ImageItem = {
+
+export type ImageData = {
   id: string;
   fileName: string;
   originalName: string;
@@ -161,6 +159,7 @@ export interface UploadStatus {
   previewURL: string;
   status: "start" | "analyzing" | "uploadFile" | "uploadData" | "done" | "fail";
   failMessage: string;
+  analysisResult?: null | AnalysisResult;
 }
 export interface InAppNotification {
   title: string;

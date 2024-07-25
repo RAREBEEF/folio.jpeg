@@ -3,7 +3,7 @@ import useFetchWithRetry from "./useFetchWithRetry";
 import useErrorAlert from "./useErrorAlert";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
-import { Comment, Comments, ImageItem, UserData } from "@/types";
+import { Comment, Comments, ImageData, UserData } from "@/types";
 import useImagePopularity from "./useImagePopularity";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { alertsState, authStatusState, commentsState } from "@/recoil/states";
@@ -19,12 +19,12 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
   const { fetchWithRetry } = useFetchWithRetry();
 
   const deleteCommentAsync = async ({
-    imageItem,
+    imageData,
     comment,
     author,
     parentId = null,
   }: {
-    imageItem: ImageItem;
+    imageData: ImageData;
     comment: Comment;
     author: UserData;
     parentId: string | null;
@@ -34,7 +34,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
     let prevComments: Comments | null;
 
     if (!parentId) {
-      const docRef = doc(db, "images", imageItem.id, "comments", comment.id);
+      const docRef = doc(db, "images", imageData.id, "comments", comment.id);
 
       setComments((prev) => {
         prevComments = prev;
@@ -46,7 +46,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
       });
       await deleteDoc(docRef)
         .then(async () => {
-          if (comment.uid !== imageItem.uid) await adjustPopularity(-5);
+          if (comment.uid !== imageData.uid) await adjustPopularity(-5);
           setAlerts((prev) => [
             ...prev,
             {
@@ -72,7 +72,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
           ]);
         });
     } else {
-      const docRef = doc(db, "images", imageItem.id, "comments", parentId);
+      const docRef = doc(db, "images", imageData.id, "comments", parentId);
       let newReplies: Array<Comment> = [];
 
       setComments((prev) => {
@@ -93,7 +93,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
 
       await updateDoc(docRef, { replies: newReplies })
         .then(async () => {
-          if (comment.uid !== imageItem.uid) await adjustPopularity(-5);
+          if (comment.uid !== imageData.uid) await adjustPopularity(-5);
           setAlerts((prev) => [
             ...prev,
             {
@@ -123,12 +123,12 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
   };
 
   const deleteComment = async ({
-    imageItem,
+    imageData,
     comment,
     author,
     parentId = null,
   }: {
-    imageItem: ImageItem;
+    imageData: ImageData;
     comment: Comment;
     author: UserData | null;
     parentId?: string | null;
@@ -140,7 +140,7 @@ const useDeleteComment = ({ imageId }: { imageId: string }) => {
       await fetchWithRetry({
         asyncFn: deleteCommentAsync,
         args: {
-          imageItem,
+          imageData,
           comment,
           author,
           parentId,

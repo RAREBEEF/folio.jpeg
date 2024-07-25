@@ -1,15 +1,15 @@
 import { useState } from "react";
 import useFetchWithRetry from "./useFetchWithRetry";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { authStatusState, imageItemState } from "@/recoil/states";
+import { authStatusState, imageDataState } from "@/recoil/states";
 import { doc, increment, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import useErrorAlert from "./useErrorAlert";
-import { ImageItem } from "@/types";
+import { ImageData } from "@/types";
 
 const useImagePopularity = ({ imageId }: { imageId: string }) => {
   const showErrorAlert = useErrorAlert();
-  const [imageItem, setImageItem] = useRecoilState(imageItemState(imageId));
+  const [imageData, setImageData] = useRecoilState(imageDataState(imageId));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { fetchWithRetry } = useFetchWithRetry();
   const authStatus = useRecoilValue(authStatusState);
@@ -24,11 +24,11 @@ const useImagePopularity = ({ imageId }: { imageId: string }) => {
     if (isLoading || authStatus.status !== "signedIn") return;
     setIsLoading(true);
 
-    let prevImageItem: ImageItem | null = null;
+    let prevImageData: ImageData | null = null;
 
-    setImageItem((prev) => {
+    setImageData((prev) => {
       if (!prev) return prev;
-      prevImageItem = prev;
+      prevImageData = prev;
 
       return { ...prev, popularity: prev.popularity + amount };
     });
@@ -36,7 +36,7 @@ const useImagePopularity = ({ imageId }: { imageId: string }) => {
     try {
       await fetchWithRetry({ asyncFn: adjustPopularityAsync, args: amount });
     } catch (error) {
-      setImageItem(prevImageItem);
+      setImageData(prevImageData);
       showErrorAlert();
     } finally {
       setIsLoading(false);

@@ -1,7 +1,6 @@
 import { db, storage } from "@/fb";
 import { ImageDocData } from "@/types";
 import {
-  arrayUnion,
   doc,
   FieldValue,
   increment,
@@ -13,12 +12,12 @@ import useErrorAlert from "./useErrorAlert";
 import { deleteObject, ref } from "firebase/storage";
 import useFetchWithRetry from "./useFetchWithRetry";
 
-const useSetImageData = () => {
+const usePostImageData = () => {
   const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const setImageDataAsync = async ({
+  const postImageDataAsync = async ({
     id,
     data,
     update = false,
@@ -53,7 +52,7 @@ const useSetImageData = () => {
     return "success";
   };
 
-  const setImageData = async ({
+  const postImageData = async ({
     id,
     data,
     update = false,
@@ -66,7 +65,7 @@ const useSetImageData = () => {
 
     try {
       await fetchWithRetry({
-        asyncFn: setImageDataAsync,
+        asyncFn: postImageDataAsync,
         args: {
           id,
           data,
@@ -86,7 +85,7 @@ const useSetImageData = () => {
     }
   };
 
-  return { setImageData, isLoading };
+  return { postImageData, isLoading };
 };
 
-export default useSetImageData;
+export default usePostImageData;

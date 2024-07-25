@@ -1,6 +1,11 @@
 import { MouseEvent, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { alertsState, authStatusState, imageItemState } from "@/recoil/states";
+import {
+  alertsState,
+  authStatusState,
+  imageDataState,
+  searchHistoryState,
+} from "@/recoil/states";
 import { useRouter } from "next/navigation";
 import _, { uniqueId } from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
@@ -13,6 +18,7 @@ const ManageImage = ({ id }: { id: string }) => {
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
+  const searchHistory = useRecoilValue(searchHistoryState);
   const resetUserCreatedAtGrid = useResetGrid({
     gridType: "user-" + authStatus.data?.uid + "-" + "createdAt",
   });
@@ -33,11 +39,11 @@ const ManageImage = ({ id }: { id: string }) => {
   const resetSearchCreatedAtGrid = useResetGrid({
     gridType: "search-" + "createdAt",
   });
-  const [imageItem, setImageItem] = useRecoilState(imageItemState(id));
+  const [imageData, setImageData] = useRecoilState(imageDataState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!imageItem || authStatus.data?.uid !== imageItem.uid) return;
+    if (!imageData || authStatus.data?.uid !== imageData.uid) return;
 
     const ok = window.confirm("이미지를 삭제하시겠습니까?");
 
@@ -47,13 +53,13 @@ const ManageImage = ({ id }: { id: string }) => {
 
     // 이미지 doc의 하위 컬렉션인 comments도 함께 지우려면 admin-sdk를 이용하는게 좋아서 엔드포인트 구현
     await fetch(
-      `/api/image/${id}?uid=${imageItem.uid}&fileName=${imageItem.fileName}&tag=${imageItem.tags.join("&tag=")}`,
+      `/api/image/${id}?uid=${imageData.uid}&fileName=${imageData.fileName}&tag=${imageData.tags.join("&tag=")}`,
       {
         method: "DELETE",
       },
     )
       .then(() => {
-        setImageItem(null);
+        setImageData(null);
         resetHomeCreatedAtGrid();
         resetHomePopularityGrid();
         resetFollowingCreatedAtGrid();
@@ -92,11 +98,11 @@ const ManageImage = ({ id }: { id: string }) => {
   };
 
   return (
-    imageItem &&
+    imageData &&
     authStatus.data &&
-    imageItem.uid === authStatus.data.uid && (
+    imageData.uid === authStatus.data.uid && (
       <div className="flex gap-2 rounded-l bg-astronaut-50 p-2 pr-2 text-xs">
-        <Link href={`/edit/${imageItem.id}`}>
+        <Link href={`/edit/${imageData.id}`}>
           <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
         </Link>
         <button onClick={onDeleteClick} disabled={isLoading}>

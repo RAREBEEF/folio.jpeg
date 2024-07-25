@@ -6,9 +6,8 @@ import {
   Folder,
   Folders,
   Grid,
-  ImageData,
   ImageDataPages,
-  ImageItem,
+  ImageData,
   InAppNotification,
   UploadStatus,
   UserData,
@@ -62,9 +61,9 @@ export const gridImageIdsState = atomFamily({
     return [];
   },
 });
-export const imageItemState = atomFamily({
-  key: "imageItemState",
-  default: (id: string): ImageItem | null => {
+export const imageDataState = atomFamily({
+  key: "imageDataState",
+  default: (id: string): ImageData | null => {
     return null;
   },
 });
@@ -125,4 +124,9 @@ export const inAppNotificationState = atom<{
 export const deviceState = atom<"mobile" | "pc">({
   key: "deviceState",
   default: "pc",
+});
+
+export const searchHistoryState = atom<Array<string>>({
+  key: "searchHistory",
+  default: [],
 });

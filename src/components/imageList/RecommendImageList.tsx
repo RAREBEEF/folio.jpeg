@@ -7,9 +7,9 @@ import { gridState } from "@/recoil/states";
 import ImageInfiniteScroller from "./ImageInfiniteScroller";
 import { useParams } from "next/navigation";
 import { and, or, where } from "firebase/firestore";
-import { ImageItem } from "@/types";
+import { ImageData } from "@/types";
 
-const RecommendImageList = ({ imageItem }: { imageItem: ImageItem }) => {
+const RecommendImageList = ({ imageData }: { imageData: ImageData }) => {
   const { id } = useParams();
   const grid = useRecoilValue(gridState);
 
@@ -23,8 +23,8 @@ const RecommendImageList = ({ imageItem }: { imageItem: ImageItem }) => {
             // orderBy: ["createdAt", "desc"],
             limit: Math.min(grid.colCount * 2, 1),
             where: and(
-              where("tags", "array-contains-any", imageItem.imgTags),
-              where("id", "!=", imageItem.id),
+              where("tags", "array-contains-any", imageData.imgTags),
+              where("id", "!=", imageData.id),
             ),
           }}
         />

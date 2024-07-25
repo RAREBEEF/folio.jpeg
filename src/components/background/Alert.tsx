@@ -11,27 +11,6 @@ import ArrowSvg from "@/icons/chevron-left-solid.svg";
 import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
 import DeleteIcon from "@/icons/xmark-solid.svg";
 
-// const uploadStatus: Array<UploadStatus> = [
-//   {
-//     id: "abc",
-//     imageId: "de59c825-e02b-43db-9a33-95812024654b",
-//     previewURL:
-//       "https://firebasestorage.googleapis.com/v0/b/folio-jpeg.appspot.com/o/images%2FVcqkQHQdnSfvwYlVCSeRmfFcPlm2%2F007f7282-4e79-4238-9ef4-c748c0b1d5b4.jpeg?alt=media&token=26875662-0c5c-4bc8-9fe0-8f2a3ac72d68",
-//     createdAt: Date.now(),
-//     step: 3,
-//     status: "uploading",
-//   },
-//   {
-//     id: "def",
-//     imageId: "de59c825-e02b-43db-9a33-95812024654b",
-//     previewURL:
-//       "https://firebasestorage.googleapis.com/v0/b/folio-jpeg.appspot.com/o/images%2FVcqkQHQdnSfvwYlVCSeRmfFcPlm2%2F007f7282-4e79-4238-9ef4-c748c0b1d5b4.jpeg?alt=media&token=26875662-0c5c-4bc8-9fe0-8f2a3ac72d68",
-//     createdAt: Date.now(),
-//     step: 1,
-//     status: "uploading",
-//   },
-// ];
-
 const STEPS = {
   start: 0,
   analyzing: 1,

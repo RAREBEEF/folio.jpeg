@@ -3,16 +3,16 @@ import { MouseEvent, useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
 import Comment from "./Comment";
 
-import { ImageItem } from "@/types";
+import { ImageData } from "@/types";
 import _ from "lodash";
 import Loading from "@/components/loading/Loading";
 import useGetComments from "@/hooks/useGetComments";
 
-const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
+const CommentList = ({ imageData }: { imageData: ImageData }) => {
   const isInitialMount = useRef(true);
-  const [comments, setComments] = useRecoilState(commentsState(imageItem.id));
+  const [comments, setComments] = useRecoilState(commentsState(imageData.id));
   const { getComments, isLoading, lastPage } = useGetComments({
-    imageId: imageItem.id,
+    imageId: imageData.id,
   });
 
   // 최초 댓글
@@ -27,7 +27,7 @@ const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
         await getComments();
       })();
     }
-  }, [comments, getComments, imageItem.id, isLoading, lastPage, setComments]);
+  }, [comments, getComments, imageData.id, isLoading, lastPage, setComments]);
 
   const onLoadClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ const CommentList = ({ imageItem }: { imageItem: ImageItem }) => {
         ) : (
           Object.keys(comments).map((id, i) => {
             const comment = comments[id];
-            return <Comment imageItem={imageItem} comment={comment} key={id} />;
+            return <Comment imageData={imageData} comment={comment} key={id} />;
           })
         )}
       </ol>

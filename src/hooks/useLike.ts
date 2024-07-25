@@ -1,10 +1,10 @@
 import { db } from "@/fb";
 import {
   authStatusState,
-  imageItemState,
+  imageDataState,
   loginModalState,
 } from "@/recoil/states";
-import { ImageDocData, ImageItem } from "@/types";
+import { ImageDocData, ImageData } from "@/types";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -18,15 +18,15 @@ const useLike = ({ imageId }: { imageId: string }) => {
   const sendFcm = useSendFcm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const setLoginModal = useSetRecoilState(loginModalState);
-  const [imageItem, setImageItem] = useRecoilState(
-    imageItemState(imageId as string),
+  const [imageData, setImageData] = useRecoilState(
+    imageDataState(imageId as string),
   );
-  // const { adjustTagScore } = useTagScore({ imageItem });
+  // const { adjustTagScore } = useTagScore({ imageData });
   const authStatus = useRecoilValue(authStatusState);
   const [alreadyLiked, setAlreadyLiked] = useState<boolean>(false);
   const checkAlreadyLiked = useCallback(
-    (imageItem: ImageItem | ImageDocData, uid: string) => {
-      const alreadyLiked = imageItem.likes.includes(uid);
+    (imageData: ImageData | ImageDocData, uid: string) => {
+      const alreadyLiked = imageData.likes.includes(uid);
       setAlreadyLiked(alreadyLiked);
     },
     [],
@@ -34,10 +34,10 @@ const useLike = ({ imageId }: { imageId: string }) => {
   const { adjustPopularity } = useImagePopularity({ imageId });
 
   useEffect(() => {
-    if (authStatus.data && imageItem) {
-      checkAlreadyLiked(imageItem, authStatus.data.uid);
+    if (authStatus.data && imageData) {
+      checkAlreadyLiked(imageData, authStatus.data.uid);
     }
-  }, [checkAlreadyLiked, imageItem, authStatus]);
+  }, [checkAlreadyLiked, imageData, authStatus]);
 
   // 업데이트 전 상태 백업
   let prevLikes: Array<string>;
@@ -58,7 +58,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
     setIsLoading(true);
 
     const docRef = doc(db, "images", imageId);
-    setImageItem((prev) => {
+    setImageData((prev) => {
       if (prev === null) return null;
       prevLikes = prev.likes;
       return { ...prev, likes: [...prevLikes, authStatus.data!.uid] };
@@ -74,17 +74,17 @@ const useLike = ({ imageId }: { imageId: string }) => {
             title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
             body: null,
             profileImage: authStatus.data?.photoURL,
-            targetImage: imageItem?.URL,
+            targetImage: imageData?.URL,
             click_action: `/image/${imageId}`,
             fcmTokens: tokens ? tokens : null,
-            tokenPath: tokens ? null : `users/${imageItem?.uid}`,
-            uids: imageItem?.uid ? [imageItem.uid] : null,
+            tokenPath: tokens ? null : `users/${imageData?.uid}`,
+            uids: imageData?.uid ? [imageData.uid] : null,
           },
         });
       })
       .catch((error) => {
         // 에러 시 롤백
-        setImageItem((prev) => {
+        setImageData((prev) => {
           if (prev === null) return null;
           return { ...prev, likes: [...prevLikes] };
         });
@@ -113,7 +113,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
     setIsLoading(true);
 
     const docRef = doc(db, "images", imageId);
-    setImageItem((prev) => {
+    setImageData((prev) => {
       if (prev === null) return null;
       prevLikes = prev.likes;
       const newlikes = prevLikes.filter((uid) => uid !== authStatus.data!.uid);
@@ -125,7 +125,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
     })
       .catch((error) => {
         // 에러 시 롤백
-        setImageItem((prev) => {
+        setImageData((prev) => {
           if (prev === null) return null;
           return { ...prev, likes: [...prevLikes] };
         });

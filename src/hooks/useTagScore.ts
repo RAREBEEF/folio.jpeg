@@ -1,6 +1,6 @@
 import { db } from "@/fb";
 import { authStatusState } from "@/recoil/states";
-import { AuthStatus, ImageItem } from "@/types";
+import { AuthStatus, ImageData } from "@/types";
 import { doc, updateDoc } from "firebase/firestore";
 import _ from "lodash";
 import { useState } from "react";
@@ -8,10 +8,10 @@ import { useRecoilState } from "recoil";
 
 const amountDict = { view: 1, save: 1, like: 2, comment: 3 };
 
-const useTagScore = ({ imageItem }: { imageItem: ImageItem | null }) => {
+const useTagScore = ({ imageData }: { imageData: ImageData | null }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [updated, setUpdated] = useState<boolean>(false);
-  const currentSeenTags = imageItem?.tags;
+  const currentSeenTags = imageData?.tags;
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
 
   const adjustTagScore = async ({

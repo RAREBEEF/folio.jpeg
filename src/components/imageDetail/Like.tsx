@@ -1,5 +1,5 @@
 import useLike from "@/hooks/useLike";
-import { imageItemState } from "@/recoil/states";
+import { imageDataState } from "@/recoil/states";
 import { useParams } from "next/navigation";
 import { MouseEvent, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -15,13 +15,13 @@ const Like = ({ author }: { author: UserData | null }) => {
     () => JSON.stringify(imageIdParam).replaceAll('"', ""),
     [imageIdParam],
   );
-  const imageItem = useRecoilValue(imageItemState(imageId as string));
+  const imageData = useRecoilValue(imageDataState(imageId as string));
   const { like, dislike, alreadyLiked, isLoading } = useLike({ imageId });
 
   // 좋아용
   const onLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (imageId && imageItem && !isLoading)
+    if (imageId && imageData && !isLoading)
       !alreadyLiked
         ? like(author?.fcmToken ? [author.fcmToken] : null)
         : dislike();
@@ -37,14 +37,14 @@ const Like = ({ author }: { author: UserData | null }) => {
   };
 
   return (
-    imageItem && (
-      <div className="text-astronaut-700 flex items-center justify-end gap-4">
+    imageData && (
+      <div className="flex items-center justify-end gap-4 text-astronaut-700">
         <button
           onClick={onLikeListClick}
-          className="text-astronaut-300 flex items-center gap-1"
+          className="flex items-center gap-1 text-astronaut-300"
         >
           <FlashIcon className="aspect-square w-3 fill-[#FADF15]" />
-          {imageItem.likes.length.toLocaleString()}
+          {imageData.likes.length.toLocaleString()}
         </button>
         <button
           onClick={onLikeClick}
@@ -53,12 +53,12 @@ const Like = ({ author }: { author: UserData | null }) => {
           {alreadyLiked ? (
             <FlashIcon className="aspect-square w-4 fill-[#FADF15] transition-all" />
           ) : (
-            <FlashIcon className="fill-astronaut-500 aspect-square w-4 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
+            <FlashIcon className="aspect-square w-4 fill-astronaut-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
           )}
         </button>
         {showModal && (
           <Modal close={onCloseModal} title="좋아요">
-            <UserListModal users={imageItem.likes} />
+            <UserListModal users={imageData.likes} />
           </Modal>
         )}
       </div>

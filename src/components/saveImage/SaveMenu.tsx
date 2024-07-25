@@ -13,10 +13,10 @@ const SaveMenu = () => {
     () => saveModal.imageSavedFolder,
     [saveModal.imageSavedFolder],
   );
-  const imageItem = useMemo(() => saveModal.image, [saveModal.image]);
+  const imageData = useMemo(() => saveModal.image, [saveModal.image]);
   const { unsave, changeFolder, onSelectedFolderChange, selectedFolderId } =
     useSave({
-      imageItem,
+      imageData,
     });
 
   const authStatus = useRecoilValue(authStatusState);

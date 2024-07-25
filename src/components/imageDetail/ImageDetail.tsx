@@ -3,7 +3,7 @@
 import {
   commentsState,
   deviceState,
-  imageItemState,
+  imageDataState,
   lastVisibleState,
   userDataState,
   usersDataState,
@@ -49,14 +49,14 @@ const ImageDetail = () => {
   const isInitialMount = useRef(true);
   const { replace } = useRouter();
   const [displayId, setDisplayId] = useState<string>("");
-  const { getImageItem, isLoading } = useGetImage();
+  const { getImageData, isLoading } = useGetImage();
   const { back } = useRouter();
   const { id } = useParams();
   const imageId = useMemo(() => JSON.stringify(id).replaceAll('"', ""), [id]);
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
-  const [imageItem, setImageItem] = useRecoilState(imageItemState(imageId));
+  const [imageData, setImageData] = useRecoilState(imageDataState(imageId));
   const setComments = useSetRecoilState(commentsState(imageId));
   const setLastVisible = useSetRecoilState<QueryDocumentSnapshot<
     DocumentData,
@@ -67,14 +67,14 @@ const ImageDetail = () => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [zoomIn, setZoomIn] = useState<boolean>(false);
   // const { adjustTagScore } = useTagScore({
-  //   imageItem,
+  //   imageData,
   // });
   const { adjustPopularity } = useImagePopularity({
     imageId,
   });
   const [viewActionDone, setViewActionDone] = useState<boolean>(false);
 
-  // imageItem이 null이면 직접 불러오기
+  // imageData이 null이면 직접 불러오기
   useEffect(() => {
     if (process.env.NODE_ENV === "development" && isInitialMount.current) {
       isInitialMount.current = false;
@@ -89,21 +89,21 @@ const ImageDetail = () => {
         ]);
       })();
     }
-    if (imageId && !imageItem && !isLoading) {
+    if (imageId && !imageData && !isLoading) {
       (async () => {
-        const imageItem = await getImageItem({ imageId: imageId });
-        if (imageItem) {
-          setImageItem(imageItem);
+        const imageData = await getImageData({ imageId: imageId });
+        if (imageData) {
+          setImageData(imageData);
         } else {
           replace("/");
         }
       })();
     }
   }, [
-    imageItem,
+    imageData,
     imageId,
-    getImageItem,
-    setImageItem,
+    getImageData,
+    setImageData,
     isLoading,
     replace,
     viewActionDone,
@@ -113,13 +113,13 @@ const ImageDetail = () => {
 
   // 작성자 상태 업데이트
   useEffect(() => {
-    if (!author && imageItem) {
-      if (usersData[imageItem.uid]) {
-        const data = usersData[imageItem.uid];
+    if (!author && imageData) {
+      if (usersData[imageData.uid]) {
+        const data = usersData[imageData.uid];
         setDisplayId(data.displayId || "");
         setAuthor(data);
       } else {
-        const uid = imageItem.uid;
+        const uid = imageData.uid;
 
         (async () => {
           let userData: UserData;
@@ -146,7 +146,7 @@ const ImageDetail = () => {
         })();
       }
     }
-  }, [author, imageItem, usersData, setUsersData]);
+  }, [author, imageData, usersData, setUsersData]);
 
   // page user data 전역 상태 업데이트
   useEffect(() => {
@@ -158,7 +158,7 @@ const ImageDetail = () => {
   // 이미지 새로고침
   const refreshImage = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setImageItem(null);
+    setImageData(null);
     setLastVisible(null);
     setComments(null);
   };
@@ -254,7 +254,7 @@ const ImageDetail = () => {
 
   return (
     <div className="relative h-full bg-astronaut-50 px-10 xs:px-4">
-      {imageItem ? (
+      {imageData ? (
         <div>
           <nav className="sticky top-16 z-10 flex items-center justify-between py-4 xs:hidden">
             <button
@@ -268,12 +268,12 @@ const ImageDetail = () => {
           </nav>
 
           <div className="m-auto flex w-full max-w-[1440px] flex-col items-center rounded-lg p-10 shadow-lg xs:p-4">
-            {imageItem && (
+            {imageData && (
               <div className="relative flex w-full gap-8 sm:flex-col sm:gap-4">
                 <div className="z-10 shrink-0 basis-[50%] text-center">
                   <div
                     style={{
-                      aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
+                      aspectRatio: `${imageData.size.width}/${imageData.size.height}`,
                       maxHeight: "calc(100vh - 150px)",
                     }}
                     className="sticky top-28 m-auto w-auto max-w-[80vw] rounded-xl bg-gradient-to-br from-astronaut-100 to-astronaut-300"
@@ -281,7 +281,7 @@ const ImageDetail = () => {
                     {isImageBroken ? (
                       <BrokenSvg
                         style={{
-                          aspectRatio: `${imageItem.size.width}/${imageItem.size.height}`,
+                          aspectRatio: `${imageData.size.width}/${imageData.size.height}`,
                         }}
                         className={`rounded-xl fill-astronaut-500 p-[20%]`}
                       />
@@ -290,10 +290,10 @@ const ImageDetail = () => {
                         onClick={onZoomIn}
                         priority
                         placeholder="empty"
-                        style={{ background: imageItem.themeColor }}
+                        style={{ background: imageData.themeColor }}
                         className={`cursor-zoom-in rounded-xl`}
-                        src={imageItem.URL}
-                        alt={imageItem.title || imageItem.fileName}
+                        src={imageData.URL}
+                        alt={imageData.title || imageData.fileName}
                         layout="fill"
                         objectFit="contain"
                         onMouseMove={onImageMouseMove}
@@ -317,7 +317,7 @@ const ImageDetail = () => {
                     )}
                   </div>
                   <MetadataInfo
-                    imageItem={imageItem}
+                    imageData={imageData}
                     showInfo={showInfo}
                     disableHoverInfo={disableHoverInfo}
                     infoPos={infoPos}
@@ -331,21 +331,21 @@ const ImageDetail = () => {
                       <button onClick={refreshImage}>
                         <RefreshIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
                       </button>
-                      <ManageImage id={imageItem.id} />
+                      <ManageImage id={imageData.id} />
                     </div>
                   </div>
 
                   <div className="z-20 my-4 break-keep ">
-                    <h2 className="text-xl font-semibold">{imageItem.title}</h2>
+                    <h2 className="text-xl font-semibold">{imageData.title}</h2>
                     <div className="whitespace-pre-line text-astronaut-900">
-                      {imageItem.description}
+                      {imageData.description}
                     </div>
                   </div>
 
                   <div className="mt-8">
                     <h3 className="mb-2 text-lg font-semibold ">댓글</h3>
                     <div>
-                      <CommentList imageItem={imageItem} />
+                      <CommentList imageData={imageData} />
                     </div>
                   </div>
 
@@ -356,11 +356,11 @@ const ImageDetail = () => {
                     <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />
                       <div className="w-6 items-center">
-                        <SaveButton color="gray" imageItem={imageItem} />
+                        <SaveButton color="gray" imageData={imageData} />
                       </div>
                     </div>
                     <CommentForm
-                      imageId={imageItem.id}
+                      imageId={imageData.id}
                       parentId={null}
                       author={author}
                     />
@@ -371,7 +371,7 @@ const ImageDetail = () => {
           </div>
           <div className="mt-12">
             <h3 className="text-center text-lg font-semibold ">추천 이미지</h3>
-            <RecommendImageList imageItem={imageItem} />
+            <RecommendImageList imageData={imageData} />
           </div>
         </div>
       ) : (
@@ -379,7 +379,7 @@ const ImageDetail = () => {
           <Loading />
         </div>
       )}
-      {imageItem && zoomIn && (
+      {imageData && zoomIn && (
         <div
           onClick={onZoomOut}
           className="fixed left-0 top-0 z-50 h-screen w-screen cursor-zoom-out bg-astronaut-950"
@@ -387,10 +387,10 @@ const ImageDetail = () => {
           <Image
             priority
             placeholder="empty"
-            style={{ background: imageItem.themeColor }}
+            style={{ background: imageData.themeColor }}
             className={`rounded-xl`}
-            src={imageItem.URL}
-            alt={imageItem.title || imageItem.fileName}
+            src={imageData.URL}
+            alt={imageData.title || imageData.fileName}
             layout="fill"
             objectFit="contain"
             quality={100}

@@ -1,5 +1,5 @@
 import { db } from "@/fb";
-import { ImageDocData, ImageItem } from "@/types";
+import { ImageDocData, ImageData } from "@/types";
 import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
 import useErrorAlert from "./useErrorAlert";
@@ -15,35 +15,35 @@ const useGetImage = () => {
   /**
    * imageId로 db에서 이미지 데이터를 불러오는 비동기 함수
    * */
-  const getImageItemAsync = async ({
+  const getImageDataAsync = async ({
     imageId,
   }: {
     imageId: string;
-  }): Promise<ImageItem | null> => {
+  }): Promise<ImageData | null> => {
     console.log("useGetImage");
     const docRef = doc(db, "images", imageId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      const imageData = docSnap.data() as ImageDocData;
-      const imageItem = { ...imageData, grid: null, id: docSnap.id };
-      return imageItem;
+      const data = docSnap.data() as ImageDocData;
+      const imageData = { ...data, grid: null, id: docSnap.id };
+      return imageData;
     } else {
       return null;
     }
   };
 
-  const getImageItem = async ({
+  const getImageData = async ({
     imageId,
   }: {
     imageId: string;
-  }): Promise<ImageItem | null> => {
+  }): Promise<ImageData | null> => {
     if (isLoading) return null;
     setIsLoading(true);
 
     try {
       return await fetchWithRetry({
-        asyncFn: getImageItemAsync,
+        asyncFn: getImageDataAsync,
         args: { imageId },
       });
     } catch (error) {
@@ -54,7 +54,7 @@ const useGetImage = () => {
     }
   };
 
-  return { getImageItem, isLoading };
+  return { getImageData, isLoading };
 };
 
 export default useGetImage;

@@ -1,28 +1,25 @@
-import { db, storage } from "@/fb";
-import { Comment, ImageDocData, ImageItem, UserData } from "@/types";
+import { db } from "@/fb";
+import { Comment, ImageData, UserData } from "@/types";
 import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import useErrorAlert from "./useErrorAlert";
-import { deleteObject, ref } from "firebase/storage";
 import useFetchWithRetry from "./useFetchWithRetry";
 import useSendFcm from "./useSendFcm";
 import { useRecoilValue } from "recoil";
 import { authStatusState } from "@/recoil/states";
 import useImagePopularity from "./useImagePopularity";
-import useTagScore from "./useTagScore";
 
-const useSetComment = ({
-  imageItem,
+const usePostComment = ({
+  imageData,
   author,
   parentId = null,
 }: {
-  imageItem: ImageItem | null;
+  imageData: ImageData | null;
   author: UserData | null;
   parentId: string | null;
 }) => {
-  // const { adjustTagScore } = useTagScore({ imageItem });
   const { adjustPopularity } = useImagePopularity({
-    imageId: imageItem?.id || "",
+    imageId: imageData?.id || "",
   });
   const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
@@ -30,7 +27,7 @@ const useSetComment = ({
   const sendFcm = useSendFcm();
   const authStatus = useRecoilValue(authStatusState);
 
-  const setCommentAsync = async ({
+  const postCommentAsync = async ({
     comment,
     tokens = null,
     parentComment = null,
@@ -41,11 +38,11 @@ const useSetComment = ({
   }): Promise<"success" | "error"> => {
     console.log("useSetComment");
 
-    if (!imageItem) throw new Error("No image item");
+    if (!imageData) throw new Error("No image item");
 
     // 댓글
     if (!parentId) {
-      const docRef = doc(db, "images", imageItem.id, "comments", comment.id);
+      const docRef = doc(db, "images", imageData.id, "comments", comment.id);
       await setDoc(docRef, comment).then(async () => {
         // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
         await Promise.all([
@@ -55,10 +52,10 @@ const useSetComment = ({
               title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
               body: `${authStatus.data?.displayName}님: ${comment.content}`,
               profileImage: authStatus.data?.photoURL,
-              targetImage: imageItem?.URL,
-              click_action: `/image/${imageItem.id}`,
+              targetImage: imageData?.URL,
+              click_action: `/image/${imageData.id}`,
               fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
-              tokenPath: author?.fcmToken ? null : `users/${imageItem?.uid}`,
+              tokenPath: author?.fcmToken ? null : `users/${imageData?.uid}`,
               uids: author?.uid ? [author.uid] : null,
             },
           }),
@@ -66,7 +63,7 @@ const useSetComment = ({
       });
       // 답글
     } else {
-      const docRef = doc(db, "images", imageItem.id, "comments", parentId);
+      const docRef = doc(db, "images", imageData.id, "comments", parentId);
       await updateDoc(docRef, {
         replies: arrayUnion(comment),
         fcmTokens: arrayUnion(authStatus.data!.fcmToken || ""),
@@ -76,12 +73,12 @@ const useSetComment = ({
             title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
             body: `${authStatus.data?.displayName}님: ${comment.content}`,
             profileImage: authStatus.data?.photoURL,
-            targetImage: imageItem?.URL,
-            click_action: `/image/${imageItem.id}`,
+            targetImage: imageData?.URL,
+            click_action: `/image/${imageData.id}`,
             fcmTokens: tokens,
             tokenPath: tokens
               ? null
-              : `images/${imageItem.id}/comments/${parentId}`,
+              : `images/${imageData.id}/comments/${parentId}`,
             uids: parentComment
               ? parentComment.replies.map((reply) => reply.uid)
               : null,
@@ -93,7 +90,7 @@ const useSetComment = ({
     return "success";
   };
 
-  const setComment = async ({
+  const postComment = async ({
     comment,
     tokens = null,
     parentComment = null,
@@ -102,13 +99,13 @@ const useSetComment = ({
     tokens?: Array<string> | null;
     parentComment?: Comment | null;
   }): Promise<"success" | "error"> => {
-    if (isLoading || !imageItem) return "error";
+    if (isLoading || !imageData) return "error";
 
     setIsLoading(true);
 
     try {
       await fetchWithRetry({
-        asyncFn: setCommentAsync,
+        asyncFn: postCommentAsync,
         args: {
           comment,
           tokens,
@@ -120,14 +117,14 @@ const useSetComment = ({
       showErrorAlert();
       return "error";
     } finally {
-      if (authStatus.data && imageItem.uid !== authStatus.data.uid) {
+      if (authStatus.data && imageData.uid !== authStatus.data.uid) {
         await adjustPopularity(5);
       }
       setIsLoading(false);
     }
   };
 
-  return { setComment, isLoading };
+  return { postComment, isLoading };
 };
 
-export default useSetComment;
+export default usePostComment;

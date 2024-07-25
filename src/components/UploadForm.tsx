@@ -3,27 +3,28 @@
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
 import useInput from "@/hooks/useInput";
-import { AnalysisResult, ImageData, ImageItem, ImageMetadata } from "@/types";
-import useSetImageData from "@/hooks/useSetImageItem";
-import useSetImageFile from "@/hooks/useSetImageFile";
+import { AnalysisResult, ImageData, ImageMetadata } from "@/types";
+import usePostImageData from "@/hooks/usePostImageData";
+import usePostImageFile from "@/hooks/usePostImageFile";
 import { useParams, useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { alertsState, authStatusState, imageItemState } from "@/recoil/states";
+import { alertsState, authStatusState, imageDataState } from "@/recoil/states";
 import useGetImage from "@/hooks/useGetImage";
 import Loading from "@/components/loading/Loading";
-import _, { uniqueId } from "lodash";
+import _ from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
 import useAnalyzingImage from "@/hooks/useAnalyzingImage";
 import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
+import useUploadValidCheck from "@/hooks/useUploadValidCheck";
 
 const UploadForm = () => {
   const { updateUploadStatus } = useUpdateUploadStatus();
-  const { getImageItem, isLoading: isImageLoading } = useGetImage();
-  const { setImageData, isLoading: isImageDataUploading } = useSetImageData();
+  const { getImageData, isLoading: isImageLoading } = useGetImage();
+  const { postImageData, isLoading: isImageDataUploading } = usePostImageData();
   const { analyzingImage, isLoading: isAnalyzing } = useAnalyzingImage();
   const {
-    setImageFile,
+    postImageFile,
     onFileSelect,
     error,
     reset,
@@ -39,11 +40,7 @@ const UploadForm = () => {
       size,
       imgMetaData,
     },
-  } = useSetImageFile();
-  const [showResultModal, setShowResultModal] = useState<boolean>(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null,
-  );
+  } = usePostImageFile();
   const { replace, push } = useRouter();
   const { id: imageIdParam } = useParams();
   const currentImageId = useMemo(
@@ -52,11 +49,12 @@ const UploadForm = () => {
     [imageIdParam],
   );
   const isEdit = !!currentImageId;
+  const { uploadValidCheck } = useUploadValidCheck();
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [init, setInit] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
-  const [imageItem, setImageItem] = useRecoilState(
-    imageItemState(currentImageId),
+  const [imageData, setImageData] = useRecoilState(
+    imageDataState(currentImageId),
   );
   const resetUserCreatedAtGrid = useResetGrid({
     gridType: "user-" + authStatus.data?.uid + "-" + "createdAt",
@@ -98,33 +96,33 @@ const UploadForm = () => {
     value: title,
     setValue: setTitle,
     onChange: onTitleChange,
-  } = useInput(imageItem?.title || "");
+  } = useInput(imageData?.title || "");
   const {
     value: desc,
     setValue: setDesc,
     onChange: onDescChange,
-  } = useInput(imageItem?.description || "");
+  } = useInput(imageData?.description || "");
   const {
     value: customCameraModel,
     setValue: setCustomCameraModel,
     onChange: onCustomCameraModelChange,
   } = useInput(
-    imageItem?.metadata.model || imageItem?.customMetadata.model || "",
+    imageData?.metadata.model || imageData?.customMetadata.model || "",
   );
   const {
     value: customLensModel,
     setValue: setCustomLensModel,
     onChange: onCustomLensModelChange,
   } = useInput(
-    imageItem?.metadata.lensModel || imageItem?.customMetadata.lensModel || "",
+    imageData?.metadata.lensModel || imageData?.customMetadata.lensModel || "",
   );
   const {
     value: customShutterSpeed,
     setValue: setCustomShutterSpeed,
     onChange: onCustomShutterSpeedChange,
   } = useInput(
-    imageItem?.metadata.shutterSpeed ||
-      imageItem?.customMetadata.shutterSpeed ||
+    imageData?.metadata.shutterSpeed ||
+      imageData?.customMetadata.shutterSpeed ||
       "",
   );
   const {
@@ -132,8 +130,8 @@ const UploadForm = () => {
     setValue: setCustomFNumber,
     onChange: onCustomFNumberChange,
   } = useInput(
-    imageItem?.metadata.fNumber?.toString() ||
-      imageItem?.customMetadata.fNumber?.toString() ||
+    imageData?.metadata.fNumber?.toString() ||
+      imageData?.customMetadata.fNumber?.toString() ||
       "",
   );
   const {
@@ -141,8 +139,8 @@ const UploadForm = () => {
     setValue: setCustomISO,
     onChange: onCustomISOChange,
   } = useInput(
-    imageItem?.metadata.ISO?.toString() ||
-      imageItem?.customMetadata.ISO?.toString() ||
+    imageData?.metadata.ISO?.toString() ||
+      imageData?.customMetadata.ISO?.toString() ||
       "",
   );
   const {
@@ -150,8 +148,8 @@ const UploadForm = () => {
     setValue: setCustomFocalLength,
     onChange: onCustomFocalLengthChange,
   } = useInput(
-    imageItem?.metadata.focalLength?.toString() ||
-      imageItem?.customMetadata.focalLength?.toString() ||
+    imageData?.metadata.focalLength?.toString() ||
+      imageData?.customMetadata.focalLength?.toString() ||
       "",
   );
 
@@ -163,24 +161,24 @@ const UploadForm = () => {
       (authStatus.status !== "pending" && authStatus.status !== "signedIn") ||
       (isEdit &&
         authStatus.data &&
-        imageItem &&
-        authStatus.data.uid !== imageItem.uid)
+        imageData &&
+        authStatus.data.uid !== imageData.uid)
     ) {
       replace("/");
     } else if (authStatus.status === "signedIn") {
       // 수정모드 구분
       if (isEdit) {
         // 수정할 이미지 데이터가 아직 없으면 불러오기
-        if (!imageItem) {
+        if (!imageData) {
           (async () => {
             console.log("불러오기");
-            const data = await getImageItem({
+            const data = await getImageData({
               imageId: currentImageId,
             });
             if (!data) {
               replace("/");
             } else {
-              setImageItem(data);
+              setImageData(data);
               setTitle(data.title || "");
               setDesc(data.description || "");
               setCustomCameraModel(data.metadata.model || "");
@@ -203,15 +201,15 @@ const UploadForm = () => {
   }, [
     authStatus.data,
     authStatus.status,
-    getImageItem,
-    imageItem,
+    getImageData,
+    imageData,
     init,
     isEdit,
     isImageLoading,
     currentImageId,
     replace,
     setDesc,
-    setImageItem,
+    setImageData,
     setTitle,
     setCustomCameraModel,
     setCustomLensModel,
@@ -223,9 +221,9 @@ const UploadForm = () => {
 
   useEffect(() => {
     setLoadedMetadata({
-      ...(isEdit && imageItem ? imageItem.metadata : imgMetaData),
+      ...(isEdit && imageData ? imageData.metadata : imgMetaData),
     });
-  }, [isEdit, imgMetaData, imageItem]);
+  }, [isEdit, imgMetaData, imageData]);
 
   const handleBeforeUnload = (event: any) => {
     event.preventDefault();
@@ -244,126 +242,36 @@ const UploadForm = () => {
     e.preventDefault();
 
     // // // // // // // // //
-    // 예외처리
+    // 유효성 체크
     // // // // // // // // //
-    if (isEdit && isEditing) {
+    if (
+      !uploadValidCheck({
+        isEdit,
+        isEditing,
+        error,
+        file,
+        imageData,
+        title,
+        desc,
+        customCameraModel,
+        customLensModel,
+        customShutterSpeed,
+        customISO,
+        customFNumber,
+        customFocalLength,
+        id,
+        size,
+        byte,
+        fileName,
+        originalName,
+      })
+    )
       return;
-    } else if (error !== null) {
-      switch (error) {
-        case "fileType":
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              text: "유효하지 않은 파일 형식입니다.",
-              createdAt: Date.now(),
-              type: "warning",
-              show: true,
-            },
-          ]);
-          return;
-        default:
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              createdAt: Date.now(),
-              type: "warning",
-              show: true,
-              text: "이미지 업로드 중 문제가 발생하였습니다.",
-            },
-          ]);
-          return;
-      }
-    } else if (authStatus.status !== "signedIn" || !authStatus.data) {
-      setAlerts((prev) => [
-        ...prev,
-        {
-          id: uniqueId(),
-          createdAt: Date.now(),
-          type: "warning",
-          show: true,
-          text: "로그인 후 다시 시도해 주세요.",
-        },
-      ]);
-      return;
-    } else if (!isEdit && !file) {
-      setAlerts((prev) => [
-        ...prev,
-        {
-          id: uniqueId(),
-          createdAt: Date.now(),
-          type: "warning",
-          show: true,
-          text: "이미지를 첨부해 주세요.",
-        },
-      ]);
-      return;
-    } else if (isEdit) {
-      if (!imageItem) {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            createdAt: Date.now(),
-            type: "warning",
-            show: true,
-            text: "수정할 이미지가 존재하지 않습니다.",
-          },
-        ]);
-        return;
-      } else if (authStatus.data?.uid !== imageItem.uid) {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            createdAt: Date.now(),
-            type: "warning",
-            show: true,
-            text: "이미지를 수정할 권한이 없습니다.",
-          },
-        ]);
-        return;
-      } else if (
-        title.trim() === imageItem.title &&
-        desc.trim() === imageItem.description &&
-        customCameraModel === imageItem.customMetadata.model &&
-        customLensModel === imageItem.customMetadata.lensModel &&
-        customShutterSpeed === imageItem.customMetadata.shutterSpeed &&
-        customISO === imageItem.customMetadata.ISO?.toString() &&
-        customFNumber === imageItem.customMetadata.fNumber?.toString() &&
-        customFocalLength === imageItem.customMetadata.focalLength?.toString()
-      ) {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            createdAt: Date.now(),
-            type: "warning",
-            show: true,
-            text: "변경 사항이 존재하지 않습니다.",
-          },
-        ]);
-        return;
-      }
-    } else {
-      if (!id || !size || !byte || !fileName || !originalName) {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            createdAt: Date.now(),
-            type: "warning",
-            show: true,
-            text: "이미지 데이터를 불러오는 중 문제가 발생하였습니다.",
-          },
-        ]);
-        return;
-      }
-    }
 
-    // 업로드 과정 시작
-    const imageId = isEdit ? imageItem!.id : (id as string);
+    // // // // // // // // //
+    // 업로드 시작
+    // // // // // // // // //
+    const imageId = isEdit ? imageData!.id : (id as string);
     updateUploadStatus({
       id: imageId,
       status: "start",
@@ -376,24 +284,23 @@ const UploadForm = () => {
     // 분석 결과
     let analysisResult: AnalysisResult | null;
     // 업데이트 전 상태 백업
-    let prevImageItem: ImageItem | null = null;
+    let prevImageData: ImageData | null = null;
 
     // // // // // // // // //
     // 이미지 분석
     // // // // // // // // //
-
     updateUploadStatus({
       id: imageId,
       status: "analyzing",
     });
 
     // 수정인 경우 기존 결과 유지
-    if (isEdit && imageItem) {
+    if (isEdit && imageData) {
       analysisResult = {
-        imgTags: imageItem.imgTags,
-        contentTags: imageItem.contentTags,
-        themeColor: imageItem.themeColor,
-        feedback: imageItem.feedback,
+        imgTags: imageData.imgTags,
+        contentTags: imageData.contentTags,
+        themeColor: imageData.themeColor,
+        feedback: imageData.feedback,
       };
     } else {
       analysisResult = await analyzingImage({
@@ -406,8 +313,6 @@ const UploadForm = () => {
         abortUpload(imageId, "이미지 분석에 실패하였습니다.");
         return;
       }
-
-      setAnalysisResult(analysisResult);
     }
 
     // 부적절한 이미지 필터
@@ -425,9 +330,9 @@ const UploadForm = () => {
     });
 
     const downloadURL = isEdit
-      ? (imageItem!.URL as string)
-      : await setImageFile({
-          uid: authStatus.data.uid,
+      ? (imageData!.URL as string)
+      : await postImageFile({
+          uid: authStatus.data!.uid,
           fileName: fileName as string,
           img: file as File,
         });
@@ -448,14 +353,14 @@ const UploadForm = () => {
 
     const data: ImageData = {
       id: imageId,
-      createdAt: isEdit && imageItem ? imageItem.createdAt : Date.now(),
-      uid: authStatus.data.uid,
-      fileName: isEdit && imageItem ? imageItem.fileName : fileName,
-      originalName: isEdit && imageItem ? imageItem.originalName : originalName,
+      createdAt: isEdit && imageData ? imageData.createdAt : Date.now(),
+      uid: authStatus.data!.uid,
+      fileName: isEdit && imageData ? imageData.fileName : fileName,
+      originalName: isEdit && imageData ? imageData.originalName : originalName,
       title: title.trim(),
       description: desc.trim(),
-      byte: isEdit && imageItem ? imageItem.byte : byte,
-      size: isEdit && imageItem ? imageItem.size : size,
+      byte: isEdit && imageData ? imageData.byte : byte,
+      size: isEdit && imageData ? imageData.size : size,
       URL: downloadURL,
       themeColor: analysisResult.themeColor,
       imgTags: analysisResult.imgTags,
@@ -464,7 +369,7 @@ const UploadForm = () => {
         new Set(analysisResult.imgTags.concat(analysisResult.contentTags)),
       ),
       feedback: analysisResult.feedback,
-      likes: isEdit && imageItem ? imageItem.likes : [],
+      likes: isEdit && imageData ? imageData.likes : [],
       popularity: 0,
       metadata: loadedMetadata,
       customMetadata: {
@@ -482,8 +387,8 @@ const UploadForm = () => {
     // 수정 모드는 앱에 이미지 상태가 존재하기 때문에 상태 업데이트
     if (isEdit) {
       // 이미지 아이템 상태 업데이트
-      setImageItem((prev) => {
-        prevImageItem = prev;
+      setImageData((prev) => {
+        prevImageData = prev;
 
         if (!prev) {
           return prev;
@@ -496,7 +401,7 @@ const UploadForm = () => {
       });
     }
 
-    const response = await setImageData({
+    const response = await postImageData({
       id: imageId,
       data: data,
       update: isEdit,
@@ -506,6 +411,7 @@ const UploadForm = () => {
       updateUploadStatus({
         id: imageId,
         status: "done",
+        analysisResult,
       });
 
       if (isEdit) {
@@ -523,7 +429,7 @@ const UploadForm = () => {
         resetSearchPopularityGrid();
       }
     } else {
-      if (isEdit) setImageItem(prevImageItem);
+      if (isEdit) setImageData(prevImageData);
       abortUpload(imageId, "게시물 업로드 과정에서 문제가 발생하였습니다.");
     }
   };
@@ -562,19 +468,19 @@ const UploadForm = () => {
           <label
             className={`sticky top-[150px] h-auto max-w-[500px] grow self-start overflow-hidden rounded-xl bg-gradient-to-br from-astronaut-100 to-astronaut-300 sm:relative sm:top-auto sm:w-full sm:grow-0 sm:self-center ${isEdit ? " cursor-default" : "cursor-pointer"}`}
           >
-            {(previewURL || (isEdit && imageItem && imageItem.URL)) &&
+            {(previewURL || (isEdit && imageData && imageData.URL)) &&
             !isInputUploading ? (
               <div
                 style={{
                   maxHeight: "calc(100vh - 156px)",
-                  aspectRatio: `${isEdit ? imageItem?.size.width : size?.width || 0}/${isEdit ? imageItem?.size.height : size?.height || 0}`,
+                  aspectRatio: `${isEdit ? imageData?.size.width : size?.width || 0}/${isEdit ? imageData?.size.height : size?.height || 0}`,
                 }}
                 className={`group relative m-auto rounded-xl p-4 `}
               >
                 <NextImage
                   layout="fill"
                   src={
-                    (isEdit && imageItem ? imageItem.URL : previewURL) as string
+                    (isEdit && imageData ? imageData.URL : previewURL) as string
                   }
                   alt={fileName || ""}
                 />

@@ -6,25 +6,38 @@ import { useRecoilValue } from "recoil";
 import { gridState } from "@/recoil/states";
 import ImageInfiniteScroller from "./ImageInfiniteScroller";
 import { useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { where } from "firebase/firestore";
 import OrderByFilter from "./OrderByFilter";
 import { useRouter } from "next/navigation";
+import useResetGrid from "@/hooks/useResetGrid";
 
 const SearchResultImageList = () => {
   const { replace } = useRouter();
   const grid = useRecoilValue(gridState);
   const params = useSearchParams();
-  const queries = params.getAll("query");
+  const queries = useMemo(() => params.getAll("query"), [params]);
   const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
     (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
   );
+  const resetSearchCreatedAtGrid = useResetGrid({
+    gridType: "search-" + "createdAt",
+  });
+  const resetSearchPopularityGrid = useResetGrid({
+    gridType: "search-" + "popularity",
+  });
 
   useEffect(() => {
     if (queries.length <= 0) {
       replace("/");
     }
   }, [queries.length, replace]);
+
+  useEffect(() => {
+    resetSearchCreatedAtGrid();
+    resetSearchPopularityGrid();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queries]);
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOrderBy(e.target.value as "popularity" | "createdAt");
@@ -35,6 +48,11 @@ const SearchResultImageList = () => {
 
   return (
     <div className="relative h-full bg-astronaut-50">
+      <div className="flex min-h-20 items-center border-b border-astronaut-950 p-4 pl-10">
+        <h2 className="text-2xl font-semibold text-astronaut-700">
+          &quot;{queries.join(" ")}&quot; 검색 결과
+        </h2>
+      </div>
       {grid && (
         <div
           style={{

@@ -8,12 +8,15 @@ import InAppNotificationListener from "./InAppNotificationListener";
 import SaveImageListener from "./SaveImageListener";
 import Alert from "./Alert";
 import AuthModal from "../modal/AuthModal";
-import { useRecoilState } from "recoil";
-import { deviceState } from "@/recoil/states";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { deviceState, searchHistoryState } from "@/recoil/states";
 import Router from "next/router";
 import { usePathname } from "next/navigation";
+import useTypeGuards from "@/hooks/useTypeGuards";
 
 const Init = () => {
+  const { isArrayOfStrings } = useTypeGuards();
+  const setSearchHistory = useSetRecoilState(searchHistoryState);
   const pathname = usePathname();
   const [device, setDevice] = useRecoilState(deviceState);
 
@@ -24,6 +27,16 @@ const Init = () => {
     );
     setDevice(isMobile ? "mobile" : "pc");
   }, [setDevice]);
+
+  useEffect(() => {
+    const storedSearchHistory = localStorage.getItem("searchHistory");
+    if (storedSearchHistory) {
+      const parsedSearchHistory = JSON.parse(storedSearchHistory);
+      if (isArrayOfStrings(parsedSearchHistory)) {
+        setSearchHistory(parsedSearchHistory);
+      }
+    }
+  }, [setSearchHistory, isArrayOfStrings]);
 
   useEffect(() => {
     const routeChangeHandler = () => {

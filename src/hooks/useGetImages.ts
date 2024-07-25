@@ -20,12 +20,14 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import _ from "lodash";
 import { Filter } from "@/types";
 import useErrorAlert from "./useErrorAlert";
-import useSettleImageItemState from "@/hooks/useSettleImageItemState";
+import useSettleImageDataState from "@/hooks/useSettleImageDataState";
 import useFetchWithRetry from "./useFetchWithRetry";
+import useTypeGuards from "./useTypeGuards";
 
 const useGetImages = ({ gridType }: { gridType: string }) => {
+  const { isImageDocData } = useTypeGuards();
   const { fetchWithRetry } = useFetchWithRetry();
-  const { settleImageItemState } = useSettleImageItemState();
+  const { settleImageDataState } = useSettleImageDataState();
   const showErrorAlert = useErrorAlert();
   const setImageDataPages = useSetRecoilState(imageDataPagesState(gridType));
   const [gridImageIds, setGridImageIds] = useRecoilState(
@@ -95,11 +97,15 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
       // id 목록에서 이미지 중복 체크 후 목록 업데이트
       documentSnapshots.forEach((doc) => {
         const id = doc.id;
-        const data = { ...(doc.data() as ImageDocData), id: doc.id };
-        settleImageItemState({ image: data });
-        if (!gridImageIds.includes(id)) {
-          setGridImageIds((prev) => [...prev, id]);
-          imgs.push(data);
+        const docData = doc.data();
+
+        if (isImageDocData(docData)) {
+          const data = { ...docData, id: doc.id };
+          settleImageDataState({ image: data });
+          if (!gridImageIds.includes(id)) {
+            setGridImageIds((prev) => [...prev, id]);
+            imgs.push(data);
+          }
         }
       });
 

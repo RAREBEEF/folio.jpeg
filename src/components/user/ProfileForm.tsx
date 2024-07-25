@@ -15,7 +15,7 @@ import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import _, { uniqueId } from "lodash";
-import useSetImageFile from "@/hooks/useSetImageFile";
+import usePostImageFile from "@/hooks/usePostImageFile";
 import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { AuthStatus, UserData } from "@/types";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
@@ -40,10 +40,10 @@ const ProfileForm = () => {
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
   const {
     reset,
-    setImageFile,
+    postImageFile,
     onFileSelect,
     data: { file, previewURL, id: imageId },
-  } = useSetImageFile();
+  } = usePostImageFile();
   const { value: displayName, onChange: onDisplayNameChange } = useInput(
     authStatus.data?.displayName || "",
   );
@@ -179,7 +179,7 @@ const ProfileForm = () => {
       // 새 프로필 이미지 업로드 및 이미지 URL 불러오기
       if (file && imageId) {
         photoURL =
-          (await setImageFile({
+          (await postImageFile({
             uid: user.uid,
             fileName: imageId,
             img: file,

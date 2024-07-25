@@ -1,4 +1,4 @@
-import { Comment as CommentType, ImageItem, UserData } from "@/types";
+import { Comment as CommentType, ImageData, UserData } from "@/types";
 import CommentForm from "@/components/comment/CommentForm";
 import {
   ChangeEvent,
@@ -23,16 +23,16 @@ import useImagePopularity from "@/hooks/useImagePopularity";
 import useDeleteComment from "@/hooks/useDeleteComment";
 
 const Comment = ({
-  imageItem,
+  imageData,
   comment,
   parentId = null,
 }: {
-  imageItem: ImageItem;
+  imageData: ImageData;
   comment: CommentType;
   parentId?: string | null;
 }) => {
-  const { deleteComment } = useDeleteComment({ imageId: imageItem.id });
-  const { adjustPopularity } = useImagePopularity({ imageId: imageItem.id });
+  const { deleteComment } = useDeleteComment({ imageId: imageData.id });
+  const { adjustPopularity } = useImagePopularity({ imageId: imageData.id });
   const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
   const [summaryText, setSummaryText] = useState<string>(
@@ -44,7 +44,7 @@ const Comment = ({
   const [displayId, setDisplayId] = useState<string>("");
   const [userData, setUserData] = useRecoilState(userDataState(displayId));
   const authStatus = useRecoilValue(authStatusState);
-  const setComments = useSetRecoilState(commentsState(imageItem.id));
+  const setComments = useSetRecoilState(commentsState(imageData.id));
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
 
@@ -62,12 +62,12 @@ const Comment = ({
 
     // 댓글인 경우 (답글x)
     if (!parentId) {
-      await deleteComment({ imageItem, comment, author });
+      await deleteComment({ imageData, comment, author });
 
       // 답글인 경우
     } else {
       await deleteComment({
-        imageItem,
+        imageData,
         comment,
         author,
         parentId,
@@ -183,7 +183,7 @@ const Comment = ({
                     {comment.replies.map((reply, j) => {
                       return (
                         <Comment
-                          imageItem={imageItem}
+                          imageData={imageData}
                           comment={reply}
                           key={j}
                           parentId={comment.id}
@@ -198,7 +198,7 @@ const Comment = ({
             <div className="mt-4">
               <CommentForm
                 author={author}
-                imageId={imageItem.id}
+                imageId={imageData.id}
                 parentId={comment.id}
               />
             </div>
