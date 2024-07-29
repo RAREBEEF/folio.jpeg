@@ -113,19 +113,18 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
       return newUsersData;
     });
     setAuthStatus((prev) => {
-      prevAuthStatus = prev;
       if (!prev) return prev;
-      const newAuthStatus = _.cloneDeep(prev);
+      prevAuthStatus = prev;
 
-      return {
-        ...newAuthStatus,
-        data: newAuthStatus.data
-          ? {
-              ...newAuthStatus.data,
-              following: [targetUid, ...(newAuthStatus.data?.following || [])],
-            }
-          : null,
-      };
+      return prev.status === "signedIn"
+        ? {
+            status: prev.status,
+            data: {
+              ...prev.data,
+              following: [targetUid, ...(prev.data?.following || [])],
+            },
+          }
+        : prev;
     });
 
     // db 업데이트하기
@@ -231,19 +230,18 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
     setAuthStatus((prev) => {
       prevAuthStatus = prev;
       if (!prev) return prev;
-      const newAuthStatus = _.cloneDeep(prev);
 
-      return {
-        ...newAuthStatus,
-        data: newAuthStatus.data
-          ? {
-              ...newAuthStatus.data,
-              following: newAuthStatus.data?.following?.filter(
+      return prev.status === "signedIn"
+        ? {
+            status: prev.status,
+            data: {
+              ...prev.data,
+              following: prev.data?.following?.filter(
                 (uid) => uid !== targetUid,
               ),
-            }
-          : null,
-      };
+            },
+          }
+        : prev;
     });
 
     // db 업데이트하기

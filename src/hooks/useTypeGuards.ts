@@ -1,4 +1,10 @@
-import { Feedback, ImageDocData, ImageMetadata } from "@/types";
+import {
+  ExtraUserData,
+  Feedback,
+  ImageDocData,
+  ImageMetadata,
+  UserData,
+} from "@/types";
 
 const useTypeGuards = () => {
   const isArrayOfStrings = (target: any): target is Array<string> => {
@@ -71,13 +77,26 @@ const useTypeGuards = () => {
       | "symbol"
       | "undefined"
       | null
+      | Array<
+          | "bigint"
+          | "boolean"
+          | "function"
+          | "number"
+          | "object"
+          | "string"
+          | "symbol"
+          | "undefined"
+          | null
+        >
       | Function,
   ): boolean => {
     return (
       key in object &&
       (typeof type === "function"
         ? type(object[key])
-        : typeof object[key] === type)
+        : Array.isArray(type)
+          ? type.includes(typeof object[key])
+          : typeof object[key] === type)
     );
   };
 
@@ -107,7 +126,27 @@ const useTypeGuards = () => {
     );
   };
 
-  return { isArrayOfStrings, isImageDocData, isFeedback, isImageMetaData };
+  const isExtraUserData = (target: any): target is ExtraUserData => {
+    return (
+      typeof target === "object" &&
+      objectContainValidItem(target, "displayId", [
+        "string",
+        "undefined",
+        null,
+      ]) &&
+      objectContainValidItem(target, "following", isArrayOfStrings) &&
+      objectContainValidItem(target, "follower", isArrayOfStrings) &&
+      objectContainValidItem(target, "fcmToken", ["string", null])
+    );
+  };
+
+  return {
+    isArrayOfStrings,
+    isImageDocData,
+    isFeedback,
+    isImageMetaData,
+    isExtraUserData,
+  };
 };
 
 export default useTypeGuards;

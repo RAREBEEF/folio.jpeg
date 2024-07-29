@@ -62,7 +62,7 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
 
   return (
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
-      <ul className="flex h-full flex-col gap-4 p-4 px-6">
+      <ul className="flex h-full flex-col gap-4 overflow-scroll p-4 px-6">
         {!isLoading && userList.length <= 0 ? (
           <div className="flex h-[80%] items-center justify-center text-center text-astronaut-700">
             목록이 비어있습니다.

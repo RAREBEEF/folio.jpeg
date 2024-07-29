@@ -15,29 +15,25 @@ export interface UserData extends User {
   following?: Array<string>;
   follower?: Array<string>;
   fcmToken?: string | null;
-  tagScore?: { [key in string]: number };
 }
+export type UserDataWithoutExtraData = Exclude<
+  UserData,
+  "displayId" | "following" | "follower" | "fcmToken"
+>;
 export interface ExtraUserData {
   displayId: string;
   photoURL: string;
   following: Array<string>;
   follower: Array<string>;
   fcmToken: string | null;
-  tagScore: { [key in string]: number };
 }
 
-type AuthStatusUserData = {
-  pending: null;
-  noExtraData: UserData;
-  signedIn: UserData;
-  signedOut: null;
-  error: null;
-}[AuthStatus["status"]];
-
-export interface AuthStatus {
-  status: "pending" | "noExtraData" | "signedIn" | "signedOut" | "error";
-  data: AuthStatusUserData;
-}
+export type AuthStatus =
+  | { status: "pending"; data: null | UserDataWithoutExtraData }
+  | { status: "noExtraData"; data: UserDataWithoutExtraData }
+  | { status: "signedIn"; data: UserData }
+  | { status: "signedOut"; data: null }
+  | { status: "error"; data: null };
 
 // 이미지 관련
 export interface ImageDocData {
@@ -64,30 +60,10 @@ export interface ImageDocData {
   customMetadata: ImageMetadata;
 }
 
-export type ImageData = {
+export interface ImageData extends ImageDocData {
   id: string;
-  fileName: string;
-  originalName: string;
-  title?: string;
-  description?: string;
-  createdAt: number;
-  uid: string;
-  likes: Array<string>;
-  imgTags: Array<string>;
-  contentTags: Array<string>;
-  tags: Array<string>;
-  feedback: Feedback;
-  byte: number;
-  URL: string;
-  themeColor: string;
-  size: {
-    width: number;
-    height: number;
-  };
-  popularity: number;
-  metadata: ImageMetadata;
-  customMetadata: ImageMetadata;
-};
+}
+
 export type ImageDataPages = Array<Array<ImageData>>;
 
 // 그리드
@@ -157,7 +133,7 @@ export interface UploadStatus {
   id: string;
   createdAt: number;
   previewURL: string;
-  status: "start" | "analyzing" | "uploadFile" | "uploadData" | "done" | "fail";
+  status: UploadStatuses;
   failMessage: string;
   imageData?: null | ImageData;
 }

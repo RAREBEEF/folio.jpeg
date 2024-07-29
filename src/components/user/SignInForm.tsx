@@ -52,7 +52,7 @@ const SignInForm = () => {
         const user = result.user;
         setAuthStatus({
           status: "pending",
-          data: _.cloneDeep(user) as UserData,
+          data: _.cloneDeep(user),
         });
       })
       .catch((error) => {
@@ -74,7 +74,7 @@ const SignInForm = () => {
         const user = result.user;
         setAuthStatus({
           status: "pending",
-          data: _.cloneDeep(user) as UserData,
+          data: _.cloneDeep(user),
         });
       })
       .catch((error) => {
@@ -95,7 +95,7 @@ const SignInForm = () => {
         const user = result.user;
         setAuthStatus({
           status: "pending",
-          data: _.cloneDeep(user) as UserData,
+          data: _.cloneDeep(user),
         });
       })
       .catch((error) => {

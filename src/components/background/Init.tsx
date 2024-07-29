@@ -54,7 +54,7 @@ const Init = () => {
     <Fragment>
       <Auth />
       <PushRequest />
-      <ExtraUserDataListener />
+      {/* <ExtraUserDataListener /> */}
       <InAppNotificationListener />
       <SaveImageListener />
       <Alert />

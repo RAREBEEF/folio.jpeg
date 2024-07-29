@@ -36,7 +36,6 @@ import InfoSvg from "@/icons/circle-info-solid.svg";
 import XSvg from "@/icons/xmark-solid.svg";
 import _ from "lodash";
 import MetadataInfo from "./MetadataInfo";
-import useTagScore from "@/hooks/useTagScore";
 import useImagePopularity from "@/hooks/useImagePopularity";
 
 const ImageDetail = () => {
@@ -66,9 +65,7 @@ const ImageDetail = () => {
   const [infoPos, setInfoPos] = useState<[number, number]>([0, 0]);
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [zoomIn, setZoomIn] = useState<boolean>(false);
-  // const { adjustTagScore } = useTagScore({
-  //   imageData,
-  // });
+
   const { adjustPopularity } = useImagePopularity({
     imageId,
   });
@@ -83,10 +80,7 @@ const ImageDetail = () => {
     if (!viewActionDone) {
       setViewActionDone(true);
       (async () => {
-        await Promise.all([
-          // adjustTagScore({ action: "view" }),
-          adjustPopularity(1),
-        ]);
+        await adjustPopularity(1);
       })();
     }
     if (imageId && !imageData && !isLoading) {
@@ -107,7 +101,6 @@ const ImageDetail = () => {
     isLoading,
     replace,
     viewActionDone,
-    // adjustTagScore,
     adjustPopularity,
   ]);
 

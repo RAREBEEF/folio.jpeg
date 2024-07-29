@@ -11,7 +11,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import useSendFcm from "./useSendFcm";
 import useErrorAlert from "./useErrorAlert";
 import useImagePopularity from "./useImagePopularity";
-import useTagScore from "./useTagScore";
 
 const useLike = ({ imageId }: { imageId: string }) => {
   const showErrorAlert = useErrorAlert();
@@ -21,7 +20,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
   const [imageData, setImageData] = useRecoilState(
     imageDataState(imageId as string),
   );
-  // const { adjustTagScore } = useTagScore({ imageData });
+
   const authStatus = useRecoilValue(authStatusState);
   const [alreadyLiked, setAlreadyLiked] = useState<boolean>(false);
   const checkAlreadyLiked = useCallback(
@@ -91,10 +90,7 @@ const useLike = ({ imageId }: { imageId: string }) => {
         showErrorAlert();
       })
       .finally(async () => {
-        await Promise.all([
-          adjustPopularity(2),
-          // adjustTagScore({ action: "like" }),
-        ]);
+        await adjustPopularity(2);
         setIsLoading(false);
       });
   };

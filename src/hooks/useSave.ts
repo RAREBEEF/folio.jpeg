@@ -16,10 +16,8 @@ import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import useImagePopularity from "./useImagePopularity";
 import _, { uniqueId } from "lodash";
-import useTagScore from "./useTagScore";
 
 const useSave = ({ imageData }: { imageData: ImageData | null }) => {
-  // const { adjustTagScore } = useTagScore({ imageData });
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const setAlerts = useSetRecoilState(alertsState);
   const setLoginModal = useSetRecoilState(loginModalState);
@@ -161,10 +159,7 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
       })
       .then(async () => {
         if (authStatus.data && imageData.uid !== authStatus.data.uid) {
-          await Promise.all([
-            adjustPopularity(2),
-            // adjustTagScore({ action: "save" }),
-          ]);
+          await adjustPopularity(2);
         }
         // 저장 완료 알림 띄우기
         setAlerts((prev) => [

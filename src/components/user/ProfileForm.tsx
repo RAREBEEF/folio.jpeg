@@ -210,9 +210,8 @@ const ProfileForm = () => {
       // 유저 데이터 상태 업데이트
       setAuthStatus((prev) => {
         prevAuthStatus = prev;
-        const newAuthStatus = prev;
         return {
-          ...newAuthStatus,
+          ...prev,
           status: "signedIn",
           data: {
             ...(prev.data as UserData),
@@ -255,7 +254,6 @@ const ProfileForm = () => {
               follower: [],
               following: [],
               fcmToken: "",
-              tagScore: {},
             }),
         updateProfile(user, {
           displayName,

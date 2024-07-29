@@ -234,7 +234,7 @@ export default function RootLayout({
           sizes="128x128"
         />
         <meta name="application-name" content="folio.JPEG" />
-        <meta name="msapplication-TileColor" content="#f6f6f6" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
         <meta
           name="msapplication-TileImage"
           content="/images/mstile-144x144.png"

@@ -138,17 +138,17 @@ const LayoutNav = () => {
   return (
     <div
       id="nav"
-      className={`fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:bg-astronaut-800 xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
+      className={`fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:bg-white xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-white text-astronaut-500 shadow-lg transition-all xs:h-16 xs:border-t xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
+        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-white text-astronaut-500 shadow-[10px_0_15px_-3px_rgb(0_0_0_/_0.1),4px_-0_6px_-4px_rgb(0_0_0_/_0.1)] transition-all xs:h-16 xs:shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
         <button
           onClick={(e) => {
             e.preventDefault();
             setNav((prev) => ({ show: !prev.show }));
           }}
-          className={`absolute right-[10px] top-[5px] h-[30px] w-[30px] transition-all xs:hidden ${
+          className={`absolute right-[10px] top-[10px] h-[30px] w-[30px] transition-all xs:hidden ${
             nav.show ? "scale-x-[-100%]" : "scale-x-100"
           }`}
         >

@@ -55,7 +55,9 @@ const PushRequest = () => {
 
   const requestAndGetToken = async () => {
     Notification.requestPermission().then(async (permission) => {
-      if (permission !== "granted") {
+      if (authStatus.status !== "signedIn") {
+        return;
+      } else if (permission !== "granted") {
         // 푸시 거부됐을 때 처리할 내용
         localStorage.setItem("pushRequest", "not now");
       } else {
@@ -76,15 +78,19 @@ const PushRequest = () => {
               }).then(async () => {
                 // db 저장 완료 후 localStorage와 상태에 저장
                 localStorage.setItem("pushRequest", "granted");
+
                 setAuthStatus((prev) => {
-                  return {
-                    ...prev,
-                    data: {
-                      ...(prev.data as UserData),
-                      fcmToken: currentToken,
-                    },
-                  };
+                  return prev.status === "signedIn"
+                    ? {
+                        status: prev.status,
+                        data: {
+                          ...prev.data,
+                          fcmToken: currentToken,
+                        },
+                      }
+                    : prev;
                 });
+
                 setAlerts((prev) => [
                   ...prev,
                   {
@@ -135,7 +141,7 @@ const PushRequest = () => {
     setShowPushRequestModal(false);
     await requestAndGetToken();
   };
-  const ondeniClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const onDenyClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     localStorage.setItem("pushRequest", "denied");
     setShowPushRequestModal(false);
@@ -169,7 +175,7 @@ const PushRequest = () => {
               </div>
               {secondRequest && (
                 <button
-                  onClick={ondeniClick}
+                  onClick={onDenyClick}
                   className="pt-4 text-astronaut-700 underline"
                 >
                   <div>다시 보지 않기</div>

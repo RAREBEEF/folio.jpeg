@@ -37,8 +37,8 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/images/favicon-128.png",
-      "sizes": "128",
+      "src": "/images/favicon-128x128.png",
+      "sizes": "128x128",
       "type": "image/png",
       "rel": "icon",
       "purpose": "any maskable"

@@ -24,7 +24,6 @@ const useGetExistTags = () => {
   };
 
   const getExistTags = async () => {
-    console.log("useGetExistTags");
     if (isLoading) return;
     setIsLoading(true);
 

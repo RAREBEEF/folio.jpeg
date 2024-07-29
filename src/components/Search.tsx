@@ -2,9 +2,9 @@ import useInput from "@/hooks/useInput";
 import SearchSvg from "@/icons/magnifying-glass-solid.svg";
 import Link from "next/link";
 import {
+  FocusEvent,
   FormEvent,
   MouseEvent,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -105,9 +105,10 @@ const Search = () => {
     push("/search?query=" + value.split(" ").join("&query="));
   };
 
-  const onFocusInput = () => {
+  const onFocusInput = (e: FocusEvent<HTMLInputElement>) => {
     setNav({ show: false });
     setShowDropdown(true);
+    e.currentTarget.setSelectionRange(0, value.length);
   };
   const onBlurInput = () => {
     setShowDropdown(false);
@@ -134,34 +135,39 @@ const Search = () => {
   return (
     <div className="relative mr-4 grow">
       {showDropdown &&
-        Object.keys(suggestions).length + searchHistory.length > 0 && (
+        (!value || (value && Object.keys(suggestions).length !== 0)) && (
           <div
             onMouseDown={(e) => {
               e.preventDefault();
             }}
-            className="absolute top-7 flex h-fit max-h-[300px] w-full flex-col overflow-scroll rounded-b-lg bg-astronaut-50 text-astronaut-950 shadow-lg"
+            className="absolute top-10 flex h-fit max-h-[300px] w-full flex-col overflow-scroll rounded-b-lg border border-t-0 bg-white text-astronaut-950 shadow-lg"
           >
             {value ? (
               // 입력값과 일치하는 추천 검색어
               Object.keys(suggestions).map((tag, i) => (
-                <div key={tag} className="hover:bg-astronaut-100">
+                <div key={tag} className="hover:bg-astronaut-50">
                   <Link
                     onMouseUp={(e) => {
                       e.preventDefault();
-                      console.log(inputRef.current);
                       inputRef.current?.blur();
-                      push("/search?query=" + value.split(" ").join("&query="));
+                      push("/search?query=" + tag.split(" ").join("&query="));
                     }}
-                    href={"/search?query=" + value.split(" ").join("&query=")}
+                    href={"/search?query=" + tag.split(" ").join("&query=")}
                     className="block w-full p-2"
                   >
                     {tag}
                   </Link>
                 </div>
               ))
+            ) : searchHistory.length <= 0 ? (
+              <div>
+                <p className="p-4 text-center text-xs text-astronaut-950">
+                  검색 기록이 없습니다.
+                </p>
+              </div>
             ) : (
               <div>
-                <div className="flex justify-between whitespace-nowrap p-2 text-xs text-astronaut-800">
+                <div className="flex justify-between whitespace-nowrap p-2 text-xs text-astronaut-950">
                   <div>검색기록</div>
                   <button
                     onClick={onDeleteAllHistory}
@@ -173,7 +179,7 @@ const Search = () => {
                 {searchHistory.map((queries, i) => (
                   <div
                     key={queries}
-                    className="flex pr-2 hover:bg-astronaut-100"
+                    className="flex pr-2 hover:bg-astronaut-50"
                   >
                     <Link
                       onMouseUp={(e) => {
@@ -215,7 +221,12 @@ const Search = () => {
           minLength={1}
           maxLength={30}
           type="search"
-          className={`h-7 w-full pl-6 pr-2 text-base outline-none ${showDropdown ? "bg-astronaut-50 text-astronaut-950" : "bg-astronaut-50 text-astronaut-50"} ${showDropdown && Object.keys(suggestions).length + searchHistory.length > 0 ? "rounded-t-lg border-b " : "rounded-lg"}`}
+          className={`w-full pl-6 pr-2 text-base outline-none transition-all ${showDropdown ? "h-10 border bg-white text-astronaut-950" : "h-7 bg-astronaut-50 text-astronaut-400"} ${
+            showDropdown &&
+            (!value || (value && Object.keys(suggestions).length !== 0))
+              ? "rounded-t-lg"
+              : "rounded-lg"
+          }`}
         />
         <SearchSvg
           className={`pointer-events-none absolute bottom-0 left-2 top-0 m-auto h-3 w-3 ${showDropdown ? "fill-astronaut-700" : "fill-astronaut-500"}`}

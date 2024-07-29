@@ -17,13 +17,16 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   setDoc,
 } from "firebase/firestore";
-import { AuthStatus, Folder, Folders, UserData } from "@/types";
+import { AuthStatus, ExtraUserData, Folder, Folders, UserData } from "@/types";
+import useTypeGuards from "@/hooks/useTypeGuards";
 
 const Auth = () => {
+  const { isExtraUserData } = useTypeGuards();
   // 로그인 모달창 state
   const setLoginModal = useSetRecoilState(loginModalState);
   // pending 여부
@@ -109,8 +112,9 @@ const Auth = () => {
             setAuthStatus((prev) => {
               return {
                 ...(prev as AuthStatus),
-                status: "noExtraData",
-                data: prev.data,
+                ...(prev.data
+                  ? { status: "noExtraData", data: prev.data }
+                  : { status: "signedOut", data: null }),
               };
             });
             // db에 데이터가 있으면 불러온 데이터로 auth 상태 업데이트
