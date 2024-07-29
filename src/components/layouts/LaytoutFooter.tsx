@@ -10,7 +10,7 @@ const LayoutFooter = () => {
   return (
     <div
       id="footer"
-      className={`ml-[50px] bg-astronaut-800 px-10 py-4 text-astronaut-50 transition-all xs:ml-0 ${uploadStatus.length > 0 && "xs:pb-36"}`}
+      className={`ml-[50px] border-t bg-white px-10 py-4 text-astronaut-950 transition-all xs:ml-0 ${uploadStatus.length > 0 && "xs:pb-36"}`}
     >
       <nav className="mx-auto mb-6 max-w-[1300px]">
         <ul className="flex gap-x-24 *:flex *:flex-col *:gap-2">
@@ -46,7 +46,7 @@ const LayoutFooter = () => {
         </ul>
       </nav>
       <footer className="text-balance break-keep text-center text-xs">
-        © 2023. RAREBEEF All Rights Reserved.
+        © 2024. RAREBEEF All Rights Reserved.
       </footer>
     </div>
   );

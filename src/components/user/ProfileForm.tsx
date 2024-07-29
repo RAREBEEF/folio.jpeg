@@ -103,7 +103,7 @@ const ProfileForm = () => {
       displayId.includes(" ") ||
       displayId.includes("/") ||
       displayId.includes("-") ||
-      ["edit", "image", "upload"].includes(displayId)
+      ["edit", "image", "upload", "search"].includes(displayId)
     ) {
       setAlerts((prev) => [
         ...prev,

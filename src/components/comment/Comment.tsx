@@ -118,7 +118,7 @@ const Comment = ({
 
   return (
     <li
-      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-astronaut-50"}`}
+      className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-white"}`}
     >
       <div className="flex items-start gap-2">
         <Link

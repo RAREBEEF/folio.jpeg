@@ -100,7 +100,7 @@ const UserDetail = () => {
   };
 
   return (
-    <div className="h-full bg-astronaut-50">
+    <div className="h-full bg-white">
       {!isLoading && userData ? (
         <div className="flex flex-col gap-4 pb-12">
           <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">

@@ -238,7 +238,7 @@ const FolderDetail = ({}: {}) => {
   };
 
   return (
-    <div className="relative h-full bg-astronaut-50">
+    <div className="relative h-full bg-white">
       {currentFolder && (
         <div className="flex h-full flex-col">
           <div className="flex min-h-20 items-center border-b border-astronaut-950 p-4 pl-10">

@@ -1,5 +1,5 @@
 import { uploadStatusState } from "@/recoil/states";
-import { UploadStatuses, AnalysisResult } from "@/types";
+import { UploadStatuses, ImageData } from "@/types";
 import _ from "lodash";
 import { useSetRecoilState } from "recoil";
 
@@ -11,13 +11,13 @@ const useUpdateUploadStatus = () => {
     status,
     previewURL = "",
     failMessage = "",
-    analysisResult = null,
+    imageData = null,
   }: {
     id: string;
     status: UploadStatuses;
     previewURL?: string;
     failMessage?: string;
-    analysisResult?: AnalysisResult | null;
+    imageData?: ImageData | null | undefined;
   }) => {
     setUploadStatus((prev) => {
       const newUploadStatus = _.cloneDeep(prev);
@@ -36,7 +36,7 @@ const useUpdateUploadStatus = () => {
           ...prev[targetIndex],
           status,
           failMessage,
-          analysisResult,
+          imageData,
         });
       }
 

@@ -6,7 +6,7 @@ import { auth } from "@/fb";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { authStatusState, loginModalState } from "@/recoil/states";
 import _ from "lodash";
-import logo from "@/images/logo-no-bg.png";
+import logo from "@/images/logo-theme-no-bg.png";
 import Image from "next/image";
 import Search from "../Search";
 
@@ -30,7 +30,7 @@ const LayoutHeader = () => {
     <Suspense>
       <header
         id="header"
-        className="fixed top-0 z-40 flex h-16 w-full min-w-[300px] items-end bg-astronaut-800 pb-[7px] text-astronaut-50"
+        className="fixed top-0 z-[41] flex h-16 w-full min-w-[300px] items-end bg-white pb-[7px] text-astronaut-50 shadow-lg"
       >
         <div className="flex w-full items-center justify-between">
           <h1 className="font-bold xs:pl-2">
@@ -49,7 +49,7 @@ const LayoutHeader = () => {
           authStatus.status === "noExtraData" ? (
             <button
               onClick={onLogoutClick}
-              className="mr-6 rounded-lg bg-astronaut-50 px-2 py-1 text-sm font-semibold"
+              className="mr-6 rounded-lg bg-white px-2 py-1 text-sm font-semibold"
             >
               <div className="whitespace-nowrap text-astronaut-600 hover:text-astronaut-800">
                 로그아웃
@@ -58,7 +58,7 @@ const LayoutHeader = () => {
           ) : (
             <button
               onClick={onLoginClick}
-              className="mr-6 rounded-lg bg-astronaut-50 px-2 py-1 text-sm font-semibold"
+              className="mr-6 rounded-lg bg-white px-2 py-1 text-sm font-semibold"
             >
               <div className="whitespace-nowrap text-astronaut-600 hover:text-astronaut-800">
                 로그인

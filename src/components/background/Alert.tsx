@@ -5,11 +5,13 @@ import { useRecoilState } from "recoil";
 import CircleCheckIcon from "@/icons/circle-check-solid.svg";
 import CircleExclamationIcon from "@/icons/circle-exclamation-solid.svg";
 import _ from "lodash";
-import { UploadStatus } from "@/types";
+import { AnalysisResult, UploadStatus } from "@/types";
 import Image from "next/image";
 import ArrowSvg from "@/icons/chevron-left-solid.svg";
 import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
 import DeleteIcon from "@/icons/xmark-solid.svg";
+import Modal from "../modal/Modal";
+import AnalysisResultModal from "../modal/AnalysisResultModal";
 
 const STEPS = {
   start: 0,
@@ -26,6 +28,16 @@ const Alert = () => {
   const [isListOpen, setIsListOpen] = useState<boolean>(true);
   const [alerts, setAlerts] = useRecoilState(alertsState);
   const [needToSetCleanUp, setNeedToSetCleanUp] = useState<boolean>(false);
+  const [analysisResult, setAnalysisResult] = useState<
+    AnalysisResult | null | undefined
+  >(null);
+  const [resultPreviewURL, setResultPreviewURL] = useState<string>("");
+  const [resultPreviewSize, setResultPreviewSize] = useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
+  const [showAnalysisResultModal, setShowAnalysisResultModal] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (alerts.filter((alert) => !alert.cleanUp).length > 0) {
@@ -64,7 +76,7 @@ const Alert = () => {
     }
   };
 
-  const cleanUpDoneUpload = (e: MouseEvent<HTMLButtonElement>) => {
+  const uploadCleanUpDone = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     setUploadStatus((prev) => {
@@ -72,22 +84,41 @@ const Alert = () => {
     });
   };
 
-  const cleanUpSelf = (e: MouseEvent<HTMLButtonElement>, id: string) => {
+  const uploadCleanUpSelf = (e: MouseEvent<HTMLButtonElement>, id: string) => {
+    e.preventDefault();
     setUploadStatus((prev) => {
       return prev.filter((upload) => upload.id !== id);
     });
   };
 
+  const onShowAnalysisResultModal = (
+    e: MouseEvent<HTMLButtonElement>,
+    analysisResult: AnalysisResult | null | undefined,
+    previewURL: string,
+    previewSize: { width: number; height: number },
+  ) => {
+    e.preventDefault();
+    setAnalysisResult(analysisResult);
+    setResultPreviewURL(previewURL);
+    setResultPreviewSize(previewSize);
+    setShowAnalysisResultModal(true);
+  };
+
+  const onCloseAnalysisModal = () => {
+    setShowAnalysisResultModal(false);
+  };
+
   return (
     <div className="pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex w-screen flex-col items-center justify-end gap-4 overflow-visible xs:bottom-[80px]">
       <div className="flex w-full items-end xs:flex-col xs:items-center">
+        {/* 알림 */}
         <div className="flex grow flex-col items-center xs:mb-4">
           {alerts
             .filter((alert) => alert.fixed)
             .map((alert) => (
               <div
                 key={alert.createdAt}
-                className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-100 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
+                className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-50 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
               >
                 {alert.type === "success" ? (
                   <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
@@ -105,7 +136,7 @@ const Alert = () => {
             .map((alert) => (
               <div
                 key={alert.createdAt}
-                className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-100 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
+                className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-50  px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
               >
                 {alert.type === "success" ? (
                   <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
@@ -118,10 +149,10 @@ const Alert = () => {
               </div>
             ))}
         </div>
-
+        {/* 업로드 목록 */}
         {uploadStatus.length > 0 && (
           <div
-            className={`pointer-events-auto mr-5 flex w-fit min-w-[300px] max-w-[50vw] shrink-0 animate-alert select-none flex-col items-center gap-2 overflow-hidden break-keep rounded-xl bg-astronaut-100 px-4 py-4 text-lg font-semibold text-astronaut-800 shadow-lg transition-all xs:mr-0`}
+            className={`pointer-events-auto mr-5 flex w-fit min-w-[300px] max-w-[50vw] shrink-0 animate-alert select-none flex-col items-center gap-2 overflow-hidden break-keep rounded-xl bg-astronaut-50 px-4 py-4 text-lg font-semibold text-astronaut-800 shadow-lg transition-all xs:mr-0`}
           >
             <div className="self-start px-4">
               <div className="flex items-center gap-1">
@@ -152,7 +183,7 @@ const Alert = () => {
               </summary>
               <div className="mt-2 flex max-h-[50vh] flex-col gap-2 overflow-scroll px-5">
                 <button
-                  onClick={cleanUpDoneUpload}
+                  onClick={uploadCleanUpDone}
                   className="self-end text-xs text-astronaut-500"
                 >
                   완료된 항목 지우기
@@ -164,7 +195,7 @@ const Alert = () => {
                   >
                     {["done", "fail"].includes(upload.status) && (
                       <button
-                        onClick={(e) => cleanUpSelf(e, upload.id)}
+                        onClick={(e) => uploadCleanUpSelf(e, upload.id)}
                         className="absolute right-0 top-1 h-3 w-3 fill-astronaut-500 hover:fill-astronaut-600 active:fill-astronaut-700"
                       >
                         <DeleteIcon />
@@ -201,17 +232,42 @@ const Alert = () => {
                           ></div>
                         </div>
                       </div>
-                      <div className="mt-1 grow text-xs leading-tight">
-                        {STEPS[upload.status] === 0 &&
-                          "업로드가 시작되었습니다."}
-                        {STEPS[upload.status] === 1 && "이미지 분석 중입니다."}
-                        {STEPS[upload.status] === 2 &&
-                          "이미지 업로드 중입니다."}
-                        {STEPS[upload.status] === 3 &&
-                          "게시물 업로드 중입니다."}
-                        {upload.status === "done" && "업로드가 완료되었습니다."}
-                        {upload.status === "fail" &&
-                          (upload.failMessage || "업로드에 실패하였습니다.")}
+                      <div className="mt-1 flex grow justify-between text-xs leading-tight">
+                        <div>
+                          {STEPS[upload.status] === 0 &&
+                            "업로드가 시작되었습니다."}
+                          {STEPS[upload.status] === 1 &&
+                            "이미지 분석 중입니다."}
+                          {STEPS[upload.status] === 2 &&
+                            "이미지 업로드 중입니다."}
+                          {STEPS[upload.status] === 3 &&
+                            "게시물 업로드 중입니다."}
+                          {upload.status === "done" &&
+                            "업로드가 완료되었습니다."}
+                          {upload.status === "fail" &&
+                            (upload.failMessage || "업로드에 실패하였습니다.")}
+                        </div>
+                        {upload.status === "done" && (
+                          <button
+                            onClick={(e) => {
+                              upload.imageData &&
+                                onShowAnalysisResultModal(
+                                  e,
+                                  {
+                                    feedback: upload.imageData?.feedback,
+                                    themeColor: upload.imageData?.themeColor,
+                                    imgTags: upload.imageData?.imgTags,
+                                    contentTags: upload.imageData?.contentTags,
+                                  },
+                                  upload.previewURL,
+                                  upload.imageData.size,
+                                );
+                            }}
+                            className="text-astronaut-500 underline"
+                          >
+                            분석 결과
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -219,6 +275,18 @@ const Alert = () => {
               </div>
             </details>
           </div>
+        )}
+      </div>
+
+      <div className="pointer-events-auto">
+        {showAnalysisResultModal && analysisResult && (
+          <Modal close={onCloseAnalysisModal} title="분석 결과">
+            <AnalysisResultModal
+              imgURL={resultPreviewURL}
+              imgSize={resultPreviewSize}
+              result={analysisResult}
+            />
+          </Modal>
         )}
       </div>
     </div>

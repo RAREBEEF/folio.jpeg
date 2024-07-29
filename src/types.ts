@@ -159,7 +159,7 @@ export interface UploadStatus {
   previewURL: string;
   status: "start" | "analyzing" | "uploadFile" | "uploadData" | "done" | "fail";
   failMessage: string;
-  analysisResult?: null | AnalysisResult;
+  imageData?: null | ImageData;
 }
 export interface InAppNotification {
   title: string;

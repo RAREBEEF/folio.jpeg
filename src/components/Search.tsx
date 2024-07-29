@@ -215,10 +215,10 @@ const Search = () => {
           minLength={1}
           maxLength={30}
           type="search"
-          className={`h-7 w-full pl-6 pr-2 text-base outline-none ${showDropdown ? "bg-astronaut-50 text-astronaut-950" : "bg-astronaut-500 text-astronaut-50"} ${showDropdown && Object.keys(suggestions).length + searchHistory.length > 0 ? "rounded-t-lg border-b " : "rounded-lg"}`}
+          className={`h-7 w-full pl-6 pr-2 text-base outline-none ${showDropdown ? "bg-astronaut-50 text-astronaut-950" : "bg-astronaut-50 text-astronaut-50"} ${showDropdown && Object.keys(suggestions).length + searchHistory.length > 0 ? "rounded-t-lg border-b " : "rounded-lg"}`}
         />
         <SearchSvg
-          className={`pointer-events-none absolute bottom-0 left-2 top-0 m-auto h-3 w-3 ${showDropdown ? "fill-astronaut-700" : "fill-astronaut-50"}`}
+          className={`pointer-events-none absolute bottom-0 left-2 top-0 m-auto h-3 w-3 ${showDropdown ? "fill-astronaut-700" : "fill-astronaut-500"}`}
         />
       </form>
     </div>

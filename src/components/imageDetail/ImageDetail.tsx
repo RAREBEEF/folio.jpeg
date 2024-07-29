@@ -253,12 +253,12 @@ const ImageDetail = () => {
   }, []);
 
   return (
-    <div className="relative h-full bg-astronaut-50 px-10 xs:px-4">
+    <div className="relative h-full bg-white px-10 xs:px-4">
       {imageData ? (
         <div>
           <nav className="sticky top-16 z-10 flex items-center justify-between py-4 xs:hidden">
             <button
-              className="flex aspect-square h-fit items-center gap-2 rounded-full bg-astronaut-50 px-2 py-1 font-semibold text-astronaut-700"
+              className="flex aspect-square h-fit items-center gap-2 rounded-full bg-white px-2 py-1 font-semibold text-astronaut-700"
               onClick={() => {
                 back();
               }}
@@ -351,7 +351,7 @@ const ImageDetail = () => {
 
                   <div
                     id="image-detail__sticky-comment-form"
-                    className="sticky bottom-0 z-10 mt-4 border-t bg-astronaut-50 px-4 pb-8 pt-4"
+                    className="sticky bottom-0 z-10 mt-4 border-t bg-white px-4 pb-8 pt-4"
                   >
                     <div className="mb-4 flex justify-end gap-4">
                       <Like author={author} />

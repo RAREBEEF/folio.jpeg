@@ -11,7 +11,7 @@ import logo from "@/images/logo.png";
 
 const inter = Inter({ subsets: ["latin"] });
 export const viewport: Viewport = {
-  themeColor: "#1f1f1f",
+  themeColor: "#ffffff",
   colorScheme: "light",
   minimumScale: 1,
   initialScale: 1,
@@ -306,11 +306,7 @@ export default function RootLayout({
           rel="apple-touch-startup-image"
         />
       </head>
-      <body
-        className={
-          inter.className + " bg-astronaut-800 flex min-h-lvh flex-col"
-        }
-      >
+      <body className={inter.className + " flex min-h-lvh flex-col bg-white"}>
         <RecoilProvider>
           <Fragment>
             <LayoutHeader />

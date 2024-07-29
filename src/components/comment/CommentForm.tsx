@@ -126,7 +126,7 @@ const CommentForm = ({
   return (
     <form className="gap flex text-sm" onSubmit={onSubmit}>
       <input
-        className="min-w-2 grow rounded-l-lg bg-white p-2 outline-none"
+        className="min-w-2 grow rounded-l-lg bg-astronaut-50 p-2 outline-none"
         value={content}
         placeholder={
           authStatus.status === "signedIn" ||

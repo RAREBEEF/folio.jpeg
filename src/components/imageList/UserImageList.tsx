@@ -25,7 +25,7 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
   };
 
   return (
-    <div className="relative h-full bg-astronaut-50">
+    <div className="relative h-full bg-white">
       {grid && (
         <div
           style={{

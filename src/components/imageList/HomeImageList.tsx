@@ -45,7 +45,7 @@ const HomeImageList = () => {
   };
 
   return (
-    <div className="relative h-full bg-astronaut-50">
+    <div className="relative h-full bg-white">
       <nav className="flex items-end justify-center gap-12 pt-12 text-xl font-semibold  xs:pt-8">
         <Link
           href={`?where=all&orderBy=${orderBy}`}

@@ -47,7 +47,7 @@ const SearchResultImageList = () => {
   };
 
   return (
-    <div className="relative h-full bg-astronaut-50">
+    <div className="relative h-full bg-white">
       <div className="flex min-h-20 items-center border-b border-astronaut-950 p-4 pl-10">
         <h2 className="text-2xl font-semibold text-astronaut-700">
           &quot;{queries.join(" ")}&quot; 검색 결과

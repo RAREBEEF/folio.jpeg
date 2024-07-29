@@ -98,7 +98,7 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
   };
 
   return (
-    <div className="m-auto mb-8 w-[80%] break-keep rounded bg-astronaut-100 p-4">
+    <div className="m-auto mb-8 w-[80%] break-keep rounded bg-astronaut-50 p-4">
       <h3 className="mb-2 flex items-center gap-2 font-semibold leading-tight">
         <Image src={geminiLogo} alt="Gemini AI logo" width="30" height="30" />
         Google Gemini AI 이미지 분석
@@ -191,7 +191,7 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
       {isAnalyzing && (
         <div className="fixed left-0 top-0 z-50 h-screen w-screen">
           <div className="h-full w-full bg-astronaut-800 opacity-30" />
-          <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg bg-astronaut-50">
+          <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-[50%] min-w-[300px] rounded-lg bg-white">
             <UploadLoading />
             <div className="text-balance break-keep px-8 pb-8 text-center leading-tight text-astronaut-700">
               최근 피드백을 종합하고 있습니다.

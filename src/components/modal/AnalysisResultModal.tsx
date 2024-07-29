@@ -11,15 +11,20 @@ const AnalysisResultModal = ({
   imgSize: { width: number; height: number } | null;
 }) => {
   return result === "inappreciate" ? null : (
-    <div className="flex flex-col gap-8 break-keep px-8 pb-8">
+    <div className="flex flex-col gap-8 break-keep px-8 pb-12">
       {imgURL && (
         <div
           style={{
             aspectRatio: `${imgSize?.width || 0}/${imgSize?.height || 0}`,
           }}
-          className={`group relative rounded-xl p-4`}
+          className={`group relative p-4`}
         >
-          <Image layout="fill" src={imgURL} alt={"target image"} />
+          <Image
+            className="rounded-xl"
+            layout="fill"
+            src={imgURL}
+            alt={"target image"}
+          />
         </div>
       )}
       <div>

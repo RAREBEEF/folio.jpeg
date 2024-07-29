@@ -411,7 +411,7 @@ const UploadForm = () => {
       updateUploadStatus({
         id: imageId,
         status: "done",
-        analysisResult,
+        imageData: data,
       });
 
       if (isEdit) {
@@ -462,7 +462,7 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="h-full w-full bg-astronaut-50 px-12 py-24">
+    <div className="h-full w-full bg-white px-12 py-24">
       {init ? (
         <div className="flex h-full items-center justify-center gap-12 gap-x-24 sm:flex-col md:gap-x-12">
           <label
@@ -567,7 +567,7 @@ const UploadForm = () => {
                     onChange={onCustomCameraModelChange}
                     disabled={!!loadedMetadata.model}
                     type="text"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none ${!!loadedMetadata.model && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none ${!!loadedMetadata.model && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 카메라 모델명을 적어주세요."
                     maxLength={50}
                   />
@@ -586,7 +586,7 @@ const UploadForm = () => {
                     onChange={onCustomLensModelChange}
                     disabled={!!loadedMetadata.lensModel}
                     type="text"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none ${!!loadedMetadata.lensModel && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none ${!!loadedMetadata.lensModel && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 렌즈 모델명을 적어주세요."
                     maxLength={50}
                   />
@@ -605,7 +605,7 @@ const UploadForm = () => {
                     onChange={onCustomShutterSpeedChange}
                     disabled={!!loadedMetadata.shutterSpeed}
                     type="string"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none ${!!loadedMetadata.shutterSpeed && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none ${!!loadedMetadata.shutterSpeed && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 셔터스피드 값을 적어주세요."
                     maxLength={20}
                   />
@@ -625,7 +625,7 @@ const UploadForm = () => {
                     disabled={!!loadedMetadata.fNumber}
                     onWheel={onNumberInputWheel}
                     type="number"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.fNumber && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.fNumber && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 조리개 값을 적어주세요."
                     maxLength={10}
                   />
@@ -645,7 +645,7 @@ const UploadForm = () => {
                     disabled={!!loadedMetadata.ISO}
                     onWheel={onNumberInputWheel}
                     type="number"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.ISO && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.ISO && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 ISO 값을 적어주세요."
                     maxLength={10}
                   />
@@ -665,7 +665,7 @@ const UploadForm = () => {
                     disabled={!!loadedMetadata.focalLength}
                     onWheel={onNumberInputWheel}
                     type="number"
-                    className={`rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.focalLength && "border-none"}`}
+                    className={`rounded-lg border border-astronaut-200 py-1 pl-2 outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none ${!!loadedMetadata.focalLength && "border-none bg-astronaut-50"}`}
                     placeholder="촬영에 사용된 초점 거리를 적어주세요."
                     maxLength={10}
                   />

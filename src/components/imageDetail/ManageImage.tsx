@@ -1,11 +1,6 @@
 import { MouseEvent, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import {
-  alertsState,
-  authStatusState,
-  imageDataState,
-  searchHistoryState,
-} from "@/recoil/states";
+import { alertsState, authStatusState, imageDataState } from "@/recoil/states";
 import { useRouter } from "next/navigation";
 import _, { uniqueId } from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
@@ -18,7 +13,6 @@ const ManageImage = ({ id }: { id: string }) => {
   const { back } = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const authStatus = useRecoilValue(authStatusState);
-  const searchHistory = useRecoilValue(searchHistoryState);
   const resetUserCreatedAtGrid = useResetGrid({
     gridType: "user-" + authStatus.data?.uid + "-" + "createdAt",
   });
@@ -101,7 +95,7 @@ const ManageImage = ({ id }: { id: string }) => {
     imageData &&
     authStatus.data &&
     imageData.uid === authStatus.data.uid && (
-      <div className="flex gap-2 rounded-l bg-astronaut-50 p-2 pr-2 text-xs">
+      <div className="flex gap-2 rounded-l bg-white p-2 pr-2 text-xs">
         <Link href={`/edit/${imageData.id}`}>
           <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
         </Link>
