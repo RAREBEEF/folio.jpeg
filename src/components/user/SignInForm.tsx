@@ -221,11 +221,11 @@ const SignInForm = () => {
   return (
     <div className="m-auto flex h-full w-fit flex-col pb-12">
       {(createAccount || pwReset) && (
-        <h3 className="pt-6 text-center text-lg font-semibold text-astronaut-700">
+        <h3 className="text-center text-lg font-semibold text-astronaut-700">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}
         </h3>
       )}
-      <div className="mt-10 flex grow flex-col justify-between gap-12">
+      <div className="flex grow flex-col justify-between gap-12">
         <form className="flex w-72 flex-col gap-y-4" onSubmit={onSubmit}>
           <label className="flex flex-col">
             <h4 className="pb-1 pl-2 text-xs text-astronaut-700">이메일</h4>

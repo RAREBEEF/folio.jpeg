@@ -21,10 +21,10 @@ const SearchResultImageList = () => {
     (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
   );
   const resetSearchCreatedAtGrid = useResetGrid({
-    gridType: "search-" + "createdAt",
+    gridType: "search-" + queries.join(" ") + "-createdAt",
   });
   const resetSearchPopularityGrid = useResetGrid({
-    gridType: "search-" + "popularity",
+    gridType: "search-" + queries.join(" ") + "-popularity",
   });
 
   useEffect(() => {
@@ -33,11 +33,11 @@ const SearchResultImageList = () => {
     }
   }, [queries.length, replace]);
 
-  useEffect(() => {
-    resetSearchCreatedAtGrid();
-    resetSearchPopularityGrid();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queries]);
+  // useEffect(() => {
+  //   resetSearchCreatedAtGrid();
+  //   resetSearchPopularityGrid();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [queries]);
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setOrderBy(e.target.value as "popularity" | "createdAt");
@@ -48,7 +48,7 @@ const SearchResultImageList = () => {
 
   return (
     <div className="relative h-full bg-white">
-      <div className="flex min-h-20 items-center border-b border-astronaut-950 p-4 pl-10">
+      <div className="flex min-h-20 items-center border-b border-astronaut-200 p-4 pl-10">
         <h2 className="text-2xl font-semibold text-astronaut-700">
           &quot;{queries.join(" ")}&quot; 검색 결과
         </h2>
@@ -64,10 +64,11 @@ const SearchResultImageList = () => {
           <OrderByFilter onChange={onOrderByChange} value={orderBy} />
         </div>
       )}
-      <ImageGrid type={"search-" + orderBy} />
+      <ImageGrid type={"search-" + queries.join(" ") + "-" + orderBy} />
       {grid && (
         <ImageInfiniteScroller
-          type={"search-" + orderBy}
+          key={queries.join(" ")}
+          type={"search-" + queries.join(" ") + "-" + orderBy}
           filter={{
             where: where("tags", "array-contains-any", queries),
             orderBy: [orderBy, "desc"],

@@ -158,7 +158,7 @@ const AddFolder = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 px-10 pb-12 pt-4">
+    <div className="flex flex-col gap-8 px-10 pb-12">
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input

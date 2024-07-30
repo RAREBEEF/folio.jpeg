@@ -313,7 +313,7 @@ const ProfileForm = () => {
   }, [file]);
 
   return (
-    <div className="m-auto flex h-full w-fit flex-col px-4 pb-12 pt-6">
+    <div className="m-auto flex h-full w-fit flex-col px-4 pb-12">
       <div className="flex grow flex-col justify-between gap-12">
         <form
           className="flex w-[50vw] min-w-52 max-w-72 flex-col gap-y-4"

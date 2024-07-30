@@ -17,7 +17,7 @@ const AnalysisResultModal = ({
           style={{
             aspectRatio: `${imgSize?.width || 0}/${imgSize?.height || 0}`,
           }}
-          className={`group relative p-4`}
+          className={`group relative sticky p-4`}
         >
           <Image
             className="rounded-xl"

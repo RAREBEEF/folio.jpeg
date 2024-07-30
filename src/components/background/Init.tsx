@@ -8,13 +8,18 @@ import InAppNotificationListener from "./InAppNotificationListener";
 import SaveImageListener from "./SaveImageListener";
 import Alert from "./Alert";
 import AuthModal from "../modal/AuthModal";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { deviceState, searchHistoryState } from "@/recoil/states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  authStatusState,
+  deviceState,
+  searchHistoryState,
+} from "@/recoil/states";
 import Router from "next/router";
 import { usePathname } from "next/navigation";
 import useTypeGuards from "@/hooks/useTypeGuards";
 
 const Init = () => {
+  const authStatus = useRecoilValue(authStatusState);
   const { isArrayOfStrings } = useTypeGuards();
   const setSearchHistory = useSetRecoilState(searchHistoryState);
   const pathname = usePathname();
@@ -29,14 +34,21 @@ const Init = () => {
   }, [setDevice]);
 
   useEffect(() => {
-    const storedSearchHistory = localStorage.getItem("searchHistory");
+    const storedSearchHistory = localStorage.getItem(
+      "sh-" + authStatus.data?.uid || "",
+    );
     if (storedSearchHistory) {
       const parsedSearchHistory = JSON.parse(storedSearchHistory);
       if (isArrayOfStrings(parsedSearchHistory)) {
         setSearchHistory(parsedSearchHistory);
       }
     }
-  }, [setSearchHistory, isArrayOfStrings]);
+  }, [
+    setSearchHistory,
+    isArrayOfStrings,
+    authStatus.status,
+    authStatus.data?.uid,
+  ]);
 
   useEffect(() => {
     const routeChangeHandler = () => {
@@ -54,7 +66,7 @@ const Init = () => {
     <Fragment>
       <Auth />
       <PushRequest />
-      {/* <ExtraUserDataListener /> */}
+      <ExtraUserDataListener />
       <InAppNotificationListener />
       <SaveImageListener />
       <Alert />

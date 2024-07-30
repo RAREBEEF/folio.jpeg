@@ -15,10 +15,11 @@ import _ from "lodash";
 import { deleteField, doc, FieldValue, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { navState, searchHistoryState } from "@/recoil/states";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { authStatusState, navState, searchHistoryState } from "@/recoil/states";
 
 const Search = () => {
+  const authStatus = useRecoilValue(authStatusState);
   const setNav = useSetRecoilState(navState);
   const [searchHistory, setSearchHistory] = useRecoilState(searchHistoryState);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +31,9 @@ const Search = () => {
   const [existTagList, setExistTagList] = useState<
     { [key in string]: number } | null
   >(null);
-  const { value, onChange } = useInput(params.getAll("query").join(" "));
+  const { value, setValue, onChange } = useInput(
+    params.getAll("query").join(" "),
+  );
   const [suggestions, setSuggestions] = useState<{ [key in string]: number }>(
     {},
   );
@@ -98,7 +101,10 @@ const Search = () => {
     setShowDropdown(false);
     setSearchHistory((prev) => {
       const newHistory = Array.from(new Set([value, ...prev]));
-      localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+      localStorage.setItem(
+        "sh-" + authStatus.data?.uid || "",
+        JSON.stringify(newHistory),
+      );
       return newHistory;
     });
     inputRef.current?.blur();
@@ -121,14 +127,17 @@ const Search = () => {
     e.preventDefault();
     setSearchHistory((prev) => {
       const newHistory = prev.filter((query) => query !== target);
-      localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+      localStorage.setItem(
+        "sh-" + authStatus.data?.uid || "",
+        JSON.stringify(newHistory),
+      );
       return newHistory;
     });
   };
 
   const onDeleteAllHistory = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    localStorage.removeItem("searchHistory");
+    localStorage.removeItem("sh-" + authStatus.data?.uid || "");
     setSearchHistory([]);
   };
 
@@ -149,7 +158,17 @@ const Search = () => {
                   <Link
                     onMouseUp={(e) => {
                       e.preventDefault();
-                      inputRef.current?.blur();
+                      setValue(tag);
+                      setSearchHistory((prev) => {
+                        const newHistory = Array.from(new Set([tag, ...prev]));
+                        localStorage.setItem(
+                          "sh-" + authStatus.data?.uid || "",
+                          JSON.stringify(newHistory),
+                        );
+                        inputRef.current?.blur();
+
+                        return newHistory;
+                      });
                       push("/search?query=" + tag.split(" ").join("&query="));
                     }}
                     href={"/search?query=" + tag.split(" ").join("&query=")}
@@ -184,8 +203,8 @@ const Search = () => {
                     <Link
                       onMouseUp={(e) => {
                         e.preventDefault();
-                        console.log(inputRef.current);
                         inputRef.current?.blur();
+                        setValue(queries);
                         push(
                           "/search?query=" + queries.split(" ").join("&query="),
                         );

@@ -7,7 +7,10 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   authStatusState,
   foldersState,
+  inAppNotificationState,
   loginModalState,
+  searchHistoryState,
+  uploadStatusState,
   userDataState,
   usersDataState,
 } from "@/recoil/states";
@@ -26,7 +29,6 @@ import { AuthStatus, ExtraUserData, Folder, Folders, UserData } from "@/types";
 import useTypeGuards from "@/hooks/useTypeGuards";
 
 const Auth = () => {
-  const { isExtraUserData } = useTypeGuards();
   // 로그인 모달창 state
   const setLoginModal = useSetRecoilState(loginModalState);
   // pending 여부
@@ -37,6 +39,9 @@ const Auth = () => {
   const [myFolders, setMyFolders] = useRecoilState(
     foldersState(authStatus.data?.uid || ""),
   );
+  const setInAppNotification = useSetRecoilState(inAppNotificationState);
+  const setUploadStatusState = useSetRecoilState(uploadStatusState);
+  const setSearchHistoryState = useSetRecoilState(searchHistoryState);
   const [userData, setUserData] = useRecoilState(
     userDataState(authStatus.data?.displayId || ""),
   );
@@ -50,12 +55,22 @@ const Auth = () => {
       if (data) {
         setAuthStatus({ data, status: "pending" });
         setMyFolders(null);
+        // 로그아웃됨
       } else {
         setAuthStatus({ data: null, status: "signedOut" });
+        setInAppNotification({ lastCheck: 0, list: [] });
+        setUploadStatusState([]);
+        setSearchHistoryState([]);
         setMyFolders(null);
       }
     });
-  }, [setAuthStatus, setMyFolders]);
+  }, [
+    setAuthStatus,
+    setInAppNotification,
+    setMyFolders,
+    setSearchHistoryState,
+    setUploadStatusState,
+  ]);
 
   // extraUserData 체크하고 불러오기
   useEffect(() => {

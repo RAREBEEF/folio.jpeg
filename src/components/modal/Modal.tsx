@@ -40,17 +40,17 @@ const Modal = ({
       className={`pointer-events-all fixed bottom-0 left-0 right-0 top-0 z-50 m-auto flex min-w-[300px] items-center justify-center opacity-100`}
     >
       <div className="relative h-fit max-h-[80vh] w-[400px] overflow-scroll rounded-xl bg-white xs:min-w-[250px] xs:max-w-[80vw]">
-        <button
-          className="group absolute right-4 top-4 h-5 w-5"
-          onClick={closeModal}
-        >
-          <XSvg className="fill-astronaut-400 group-hover:fill-astronaut-500" />
-        </button>
-        {/* max-h-[90vh] w-[400px] min-w-[250px] overflow-scroll xs:aspect-auto xs:w-auto xs:overflow-scroll */}
-        <div className="h-fit">
-          <h2 className="mb-4 ml-8 mt-8 text-2xl font-bold ">{title}</h2>
-          {children}
+        <div className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-astronaut-200 bg-white p-6">
+          <h2 className="text-2xl font-bold">{title}</h2>
+          <button
+            className="justify-items group flex h-5 w-5 items-center"
+            onClick={closeModal}
+          >
+            <XSvg className="fill-astronaut-400 group-hover:fill-astronaut-500" />
+          </button>
         </div>
+
+        <div className="z-40 mt-12">{children}</div>
       </div>
     </div>
   );

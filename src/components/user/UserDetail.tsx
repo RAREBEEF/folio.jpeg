@@ -9,7 +9,7 @@ import {
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Loading from "@/components/loading/Loading";
 import { useParams, useSearchParams } from "next/navigation";
-import { MouseEvent, useEffect, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo } from "react";
 import ProfileImage from "@/components/user/ProfileImage";
 import Link from "next/link";
 import SavedTab from "@/components/saveImage/SavedTab";

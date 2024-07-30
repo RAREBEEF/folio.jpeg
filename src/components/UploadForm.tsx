@@ -70,12 +70,12 @@ const UploadForm = () => {
   const resetFollowingPopularityGrid = useResetGrid({
     gridType: "following-popularity",
   });
-  const resetSearchPopularityGrid = useResetGrid({
-    gridType: "search-" + "popularity",
-  });
-  const resetSearchCreatedAtGrid = useResetGrid({
-    gridType: "search-" + "createdAt",
-  });
+  // const resetSearchPopularityGrid = useResetGrid({
+  //   gridType: "search-" + "popularity",
+  // });
+  // const resetSearchCreatedAtGrid = useResetGrid({
+  //   gridType: "search-" + "createdAt",
+  // });
   const setAlerts = useSetRecoilState(alertsState);
   const [imgURL, setImgURL] = useState<string | null>(null);
   const [imgSize, setImgSize] = useState<{
@@ -425,8 +425,8 @@ const UploadForm = () => {
         resetHomePopularityGrid();
         resetFollowingCreatedAtGrid();
         resetFollowingPopularityGrid();
-        resetSearchCreatedAtGrid();
-        resetSearchPopularityGrid();
+        // resetSearchCreatedAtGrid();
+        // resetSearchPopularityGrid();
       }
     } else {
       if (isEdit) setImageData(prevImageData);

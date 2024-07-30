@@ -27,12 +27,12 @@ const ManageImage = ({ id }: { id: string }) => {
   const resetFollowingPopularityGrid = useResetGrid({
     gridType: "following-popularity",
   });
-  const resetSearchPopularityGrid = useResetGrid({
-    gridType: "search-" + "popularity",
-  });
-  const resetSearchCreatedAtGrid = useResetGrid({
-    gridType: "search-" + "createdAt",
-  });
+  // const resetSearchPopularityGrid = useResetGrid({
+  //   gridType: "search-" + "popularity",
+  // });
+  // const resetSearchCreatedAtGrid = useResetGrid({
+  //   gridType: "search-" + "createdAt",
+  // });
   const [imageData, setImageData] = useRecoilState(imageDataState(id));
 
   const onDeleteClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -60,8 +60,8 @@ const ManageImage = ({ id }: { id: string }) => {
         resetFollowingPopularityGrid();
         resetUserCreatedAtGrid();
         resetUserPopularityGrid();
-        resetSearchCreatedAtGrid();
-        resetSearchPopularityGrid();
+        // resetSearchCreatedAtGrid();
+        // resetSearchPopularityGrid();
         setAlerts((prev) => [
           ...prev,
           {
