@@ -41,7 +41,7 @@ const Modal = ({
     >
       <div className="relative h-fit max-h-[80vh] w-[400px] overflow-scroll rounded-xl bg-white xs:min-w-[250px] xs:max-w-[80vw]">
         <div className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-astronaut-200 bg-white p-6">
-          <h2 className="text-2xl font-bold">{title}</h2>
+          <h2 className="text-xl font-semibold">{title}</h2>
           <button
             className="justify-items group flex h-5 w-5 items-center"
             onClick={closeModal}

@@ -239,7 +239,7 @@ const LayoutNav = () => {
                 />
               )}
               <div
-                className={`absolute select-none text-center ${nav.show ? "left-full" : "right-0"} top-0 aspect-square w-4 rounded-full bg-white text-xs tracking-tighter`}
+                className={`absolute select-none text-center ${nav.show ? "left-full bg-astronaut-500 text-white" : "right-0 bg-white"} top-0 aspect-square w-4 rounded-full bg-white text-xs tracking-tighter`}
               >
                 {Math.min(notificationCount, 99)}
               </div>

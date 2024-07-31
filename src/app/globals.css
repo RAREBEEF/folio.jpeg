@@ -22,7 +22,7 @@ body {
 }
 
 #body-wrapper {
-  min-height: calc(100lvh - 64px);
+  min-height: calc(100lvh - calc(64px + env(safe-area-inset-top)));
   margin-left: calc(50px + env(safe-area-inset-left));
 }
 
