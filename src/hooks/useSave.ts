@@ -50,7 +50,7 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
         "user-saved-" + (authStatus.data?.uid || "") + "-" + "_DEFAULT",
       ),
     );
-  const [prevFolderImagePage, setPrevFolderImagePage] = useRecoilState(
+  const [currentFolderImagePage, setCurrentFolderImagePage] = useRecoilState(
     imageDataPagesState(
       "user-saved-" +
         (authStatus.data?.uid || "") +
@@ -58,14 +58,15 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
         (savedFolder?.id || ""),
     ),
   );
-  const [prevFolderGridImageIds, setPrevFolderGridImageIds] = useRecoilState(
-    gridImageIdsState(
-      "user-saved-" +
-        (authStatus.data?.uid || "") +
-        "-" +
-        (savedFolder?.id || ""),
-    ),
-  );
+  const [currentFolderGridImageIds, setCurrentFolderGridImageIds] =
+    useRecoilState(
+      gridImageIdsState(
+        "user-saved-" +
+          (authStatus.data?.uid || "") +
+          "-" +
+          (savedFolder?.id || ""),
+      ),
+    );
   const [selectedFolderImagePage, setSelectedFolderImagePage] = useRecoilState(
     imageDataPagesState(
       "user-saved-" + (authStatus.data?.uid || "") + "-" + selectedFolderId,
@@ -117,9 +118,10 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     const defaultFolder = folders[defaultFolderIndex];
 
     // 이전 상태 백업
-    let prevFolders = [...folders];
-    let prevDefaultFolderImagePage: ImageDataPages;
-    let prevDefaultFolderGridImageIds: Array<string>;
+    let prevFolders = folders;
+    let prevDefaultFolderImagePage: ImageDataPages = defaultFolderImagePage;
+    let prevDefaultFolderGridImageIds: Array<string> =
+      defaultFolderGridImageIds;
 
     // 폴더 상태 업데이트
     const newImages = [...defaultFolder.images, imageData.id];
@@ -131,7 +133,6 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     });
     setFolders(newFolders);
     setDefaultFolderImagePage((prev) => {
-      prevDefaultFolderImagePage = prev; // 이전 상태
       const newImagePage = _.cloneDeep(prev);
 
       if (newImagePage.length <= 0) {
@@ -142,37 +143,37 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
       }
     });
     setDefaultFolderGridImageIds((prev) => {
-      prevDefaultFolderGridImageIds = prev; // 이전 상태
       const newIds = _.cloneDeep(prev);
       newIds.unshift(imageData.id);
       return newIds;
     });
 
     // db 업데이트
-    const docRef = doc(db, "users", uid, "folders", "_DEFAULT");
-    await updateDoc(docRef, { images: newImages, updatedAt })
-      .catch((error) => {
-        // 에러 시 백업 상태로 롤백
-        setFolders(prevFolders);
-        setDefaultFolderImagePage(prevDefaultFolderImagePage);
-        setDefaultFolderGridImageIds(prevDefaultFolderGridImageIds);
-      })
-      .then(async () => {
-        if (authStatus.data && imageData.uid !== authStatus.data.uid) {
-          await adjustPopularity(2);
-        }
-        // 저장 완료 알림 띄우기
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "저장되었습니다.",
-          },
-        ]);
-      });
+    try {
+      const docRef = doc(db, "users", uid, "folders", "_DEFAULT");
+
+      await updateDoc(docRef, { images: newImages, updatedAt });
+
+      if (authStatus.data && imageData.uid !== authStatus.data.uid) {
+        await adjustPopularity(2);
+      }
+      // 저장 완료 알림 띄우기
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "success",
+          createdAt: Date.now(),
+          text: "저장되었습니다.",
+        },
+      ]);
+    } catch (error) {
+      // 에러 시 백업 상태로 롤백
+      setFolders(prevFolders);
+      setDefaultFolderImagePage(prevDefaultFolderImagePage);
+      setDefaultFolderGridImageIds(prevDefaultFolderGridImageIds);
+    }
   };
 
   const unsaveAsync = async () => {
@@ -185,15 +186,15 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     const updatedAt = Date.now();
 
     // 이전 상태 백업
-    let prevFolders: Folders;
-    let prevFolderImagePage: ImageDataPages;
-    let prevFolderGridImageIds: Array<string>;
+    let prevFolders: Folders = folders;
+    let prevCurrentFolderImagePage: ImageDataPages = currentFolderImagePage;
+    let prevCurrentFolderGridImageIds: Array<string> =
+      currentFolderGridImageIds;
 
     // 폴더 상태 업데이트
     setFolders((prev) => {
       if (!prev) return [];
 
-      prevFolders = prev;
       const newFolders = _.cloneDeep(prev);
 
       const targetFolderIndex = newFolders.findIndex(
@@ -209,9 +210,7 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
 
       return newFolders;
     });
-    setPrevFolderImagePage((prev) => {
-      prevFolderImagePage = prev;
-
+    setCurrentFolderImagePage((prev) => {
       const newCustomFolderImagePage = _.cloneDeep(prev);
 
       for (let page = 0; page <= newCustomFolderImagePage.length; page++) {
@@ -227,44 +226,41 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
 
       return newCustomFolderImagePage;
     });
-    setPrevFolderGridImageIds((prev) => {
-      prevFolderGridImageIds = prev;
+    setCurrentFolderGridImageIds((prev) => {
       const newCustomFolderGridImageIds = _.cloneDeep(prev);
       return newCustomFolderGridImageIds.filter((id) => id !== imageId);
     });
-
-    const docRef = doc(db, "users", uid, "folders", folderId);
-    await updateDoc(docRef, { images: arrayRemove(imageId), updatedAt })
-      .then(async () => {
-        await adjustPopularity(-2);
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "저장 목록에서 삭제되었습니다.",
-          },
-        ]);
-        setSaveModal({ show: false, image: null, imageSavedFolder: null });
-      })
-      .catch((error) => {
-        // 에러 시 백업 상태로 롤백
-        setFolders(prevFolders);
-        setPrevFolderImagePage(prevFolderImagePage);
-        setPrevFolderGridImageIds(prevFolderGridImageIds);
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "목록 업데이트 중 문제가 발생했습니다.",
-          },
-        ]);
-      });
+    try {
+      const docRef = doc(db, "users", uid, "folders", folderId);
+      await updateDoc(docRef, { images: arrayRemove(imageId), updatedAt });
+      await adjustPopularity(-2);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "success",
+          createdAt: Date.now(),
+          text: "저장 목록에서 삭제되었습니다.",
+        },
+      ]);
+      setSaveModal({ show: false, image: null, imageSavedFolder: null });
+    } catch (error) {
+      // 에러 시 백업 상태로 롤백
+      setFolders(prevFolders);
+      setCurrentFolderImagePage(prevCurrentFolderImagePage);
+      setCurrentFolderGridImageIds(prevCurrentFolderGridImageIds);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "목록 업데이트 중 문제가 발생했습니다.",
+        },
+      ]);
+    }
   };
 
   const changeFolderAsync = async () => {
@@ -284,18 +280,19 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     const updatedAt = Date.now();
 
     // 이전 상태 백업
-    let prevFolders: Folders;
-    let prevFolderImagePage: ImageDataPages;
-    let prevFolderGridImageIds: Array<string>;
-    let selectedFolderImagePage: ImageDataPages;
-    let selectedFolderGridImageIds: Array<string>;
+    let prevFolders: Folders = folders;
+    let prevCurrentFolderImagePage: ImageDataPages = currentFolderImagePage;
+    let prevCurrentFolderGridImageIds: Array<string> =
+      currentFolderGridImageIds;
+    let prevSelectedFolderImagePage: ImageDataPages = selectedFolderImagePage;
+    let prevSelectedFolderGridImageIds: Array<string> =
+      selectedFolderGridImageIds;
 
     // 폴더 상태 업데이트
     // 이전 폴더에서 이미지 삭제 후 선택한 폴더에 이미지 추가
     setFolders((prev) => {
       if (!prev) return [];
 
-      prevFolders = prev;
       const newFolders = _.cloneDeep(prev);
 
       const prevFolderIndex = newFolders.findIndex(
@@ -320,9 +317,7 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     });
     // 이전 폴더의 상태 업데이트
     // 이전 폴더의 이미지 목록에서 삭제
-    setPrevFolderImagePage((prev) => {
-      prevFolderImagePage = prev;
-
+    setCurrentFolderImagePage((prev) => {
       const newFolderImagePage = _.cloneDeep(prev);
 
       for (let page = 0; page <= newFolderImagePage.length; page++) {
@@ -342,15 +337,13 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
       return newFolderImagePage;
     });
     // 이전 폴더의 이미지 id 목록에서 id 삭제
-    setPrevFolderGridImageIds((prev) => {
-      prevFolderGridImageIds = prev;
+    setCurrentFolderGridImageIds((prev) => {
       const newFolderGridImageIds = _.cloneDeep(prev);
       return newFolderGridImageIds.filter((id) => id !== imageId);
     });
 
     // 새로 선택한 폴더의 이미지 목록에 추가
     setSelectedFolderImagePage((prev) => {
-      selectedFolderImagePage = prev; // 이전 상태
       const newImagePage = _.cloneDeep(prev);
 
       if (newImagePage.length <= 0) {
@@ -362,59 +355,61 @@ const useSave = ({ imageData }: { imageData: ImageData | null }) => {
     });
     // 새로 선택한 폴더의 이미지 id 목록에 추가
     setSelectedFolderGridImageIds((prev) => {
-      selectedFolderGridImageIds = prev; // 이전 상태
       const newIds = _.cloneDeep(prev);
       newIds.push(imageData.id);
       return newIds;
     });
 
-    // db 업데이트
-    const prevFolderDocRef = doc(db, "users", uid, "folders", prevFolderId);
-    const selectedFolderDocRef = doc(
-      db,
-      "users",
-      uid,
-      "folders",
-      selectedFolderId,
-    );
-    await Promise.all([
-      updateDoc(prevFolderDocRef, { images: arrayRemove(imageId), updatedAt }),
-      updateDoc(selectedFolderDocRef, {
-        images: arrayUnion(imageId),
-        updatedAt,
-      }),
-    ])
-      .then(() => {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            show: true,
-            type: "success",
-            createdAt: Date.now(),
-            text: "폴더가 변경되었습니다.",
-          },
-        ]);
-        setSaveModal({ show: false, image: null, imageSavedFolder: null });
-      })
-      .catch((error) => {
-        // 에러 시 백업 상태로 롤백
-        setFolders(prevFolders);
-        setPrevFolderImagePage(prevFolderImagePage);
-        setPrevFolderGridImageIds(prevFolderGridImageIds);
-        setSelectedFolderImagePage(selectedFolderImagePage);
-        setSelectedFolderGridImageIds(selectedFolderGridImageIds);
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            show: true,
-            type: "warning",
-            createdAt: Date.now(),
-            text: "폴더 변경 중 문제가 발생했습니다.",
-          },
-        ]);
-      });
+    try {
+      // db 업데이트
+      const prevFolderDocRef = doc(db, "users", uid, "folders", prevFolderId);
+      const selectedFolderDocRef = doc(
+        db,
+        "users",
+        uid,
+        "folders",
+        selectedFolderId,
+      );
+      await Promise.all([
+        updateDoc(prevFolderDocRef, {
+          images: arrayRemove(imageId),
+          updatedAt,
+        }),
+        updateDoc(selectedFolderDocRef, {
+          images: arrayUnion(imageId),
+          updatedAt,
+        }),
+      ]);
+
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "success",
+          createdAt: Date.now(),
+          text: "폴더가 변경되었습니다.",
+        },
+      ]);
+      setSaveModal({ show: false, image: null, imageSavedFolder: null });
+    } catch (error) {
+      // 에러 시 백업 상태로 롤백
+      setFolders(prevFolders);
+      setCurrentFolderImagePage(prevCurrentFolderImagePage);
+      setCurrentFolderGridImageIds(prevCurrentFolderGridImageIds);
+      setSelectedFolderImagePage(prevSelectedFolderImagePage);
+      setSelectedFolderGridImageIds(prevSelectedFolderGridImageIds);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "폴더 변경 중 문제가 발생했습니다.",
+        },
+      ]);
+    }
   };
 
   const save = async () => {

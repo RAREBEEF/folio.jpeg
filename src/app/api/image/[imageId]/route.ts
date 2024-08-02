@@ -17,7 +17,7 @@ export async function DELETE(
     .map((value) => decodeURIComponent(value));
 
   if (!imageId || !uid || !fileName) {
-    return NextResponse.json({ data: "Missing image ID", status: 400 });
+    return NextResponse.json({ data: "Missing target data", status: 400 });
   }
 
   try {

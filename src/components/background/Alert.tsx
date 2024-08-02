@@ -40,7 +40,8 @@ const Alert = () => {
     useState<boolean>(false);
 
   useEffect(() => {
-    if (alerts.filter((alert) => !alert.cleanUp).length > 0) {
+    const newAlertArrival = alerts.filter((alert) => !alert.cleanUp).length > 0;
+    if (newAlertArrival) {
       setNeedToSetCleanUp(true);
     } else {
       setNeedToSetCleanUp(false);

@@ -43,9 +43,12 @@ const CommentForm = ({
   // 댓글 등록
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content || !imageData || isLoading) return;
-
-    if (authStatus.status === "pending") {
+    if (
+      !content ||
+      !imageData ||
+      isLoading ||
+      authStatus.status === "pending"
+    ) {
       return;
       // 로그인 상태가 아닌 경우 로그인창
     } else if (authStatus.status !== "signedIn" || !authStatus.data) {

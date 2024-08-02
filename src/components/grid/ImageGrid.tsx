@@ -154,14 +154,26 @@ const ImageGrid = ({ type }: { type: string }) => {
 
     if (storedScroll && storedPrevPath) {
       const scroll = JSON.parse(storedScroll);
-      const { scrollY, restoreWhenFrom } = scroll as {
-        scrollY: number;
-        restoreWhenFrom: string;
+
+      const isValidScrollData = (
+        target: any,
+      ): target is { scrollY: number; restoreWhenFrom: string } => {
+        return (
+          typeof target === "object" &&
+          "scrollY" in target &&
+          typeof target.scrollY === "number" &&
+          "restoreWhenFrom" in target &&
+          typeof target.restoreWhenFrom === "string"
+        );
       };
 
-      if (restoreWhenFrom === storedPrevPath || pathname === "/") {
-        window.scrollTo({ top: scrollY });
-        sessionStorage.removeItem(pathname);
+      if (isValidScrollData(scroll)) {
+        const { scrollY, restoreWhenFrom } = scroll;
+
+        if (restoreWhenFrom === storedPrevPath || pathname === "/") {
+          window.scrollTo({ top: scrollY });
+          sessionStorage.removeItem(pathname);
+        }
       }
     }
   }, [pathname, gridInit, grid]);

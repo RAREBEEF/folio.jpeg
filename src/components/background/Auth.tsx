@@ -25,8 +25,7 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
-import { AuthStatus, ExtraUserData, Folder, Folders, UserData } from "@/types";
-import useTypeGuards from "@/hooks/useTypeGuards";
+import { AuthStatus, Folder, Folders, UserData } from "@/types";
 
 const Auth = () => {
   // 로그인 모달창 state
@@ -78,7 +77,7 @@ const Auth = () => {
     if (authStatus.status === "pending") {
       //  extraData가 없고 현재 불러오는 중도 아니면
       if (authStatus.data && !authStatus.data.displayId && !extraDataPending) {
-        // 현재 불러오는 중으로 상태로 변경
+        // 불러오는 중으로 상태로 변경
         setExtraDataPending(true);
 
         const uid = authStatus.data.uid;

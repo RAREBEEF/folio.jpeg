@@ -50,7 +50,7 @@ const Modal = ({
           </button>
         </div>
 
-        <div className="z-40 mt-12">{children}</div>
+        <div className="z-40">{children}</div>
       </div>
     </div>
   );

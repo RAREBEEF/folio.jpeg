@@ -8,8 +8,10 @@ import { UserData } from "@/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { uniqueId } from "lodash";
+import useFetchWithRetry from "@/hooks/useFetchWithRetry";
 
 const PushRequest = () => {
+  const { fetchWithRetry } = useFetchWithRetry();
   const setAlerts = useSetRecoilState(alertsState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
   const [showPushRequestModal, setShowPushRequestModal] =
@@ -17,7 +19,7 @@ const PushRequest = () => {
   const [secondRequest, setSecondRequest] = useState<boolean>(false);
 
   useEffect(() => {
-    if (authStatus.status !== "signedIn" || authStatus.data?.fcmToken) return;
+    if (authStatus.status !== "signedIn") return;
 
     const requestHistory = localStorage.getItem("pushRequest");
     switch (requestHistory) {
@@ -56,6 +58,7 @@ const PushRequest = () => {
   const requestAndGetToken = async () => {
     Notification.requestPermission().then(async (permission) => {
       if (authStatus.status !== "signedIn") {
+        // 토큰을 저장하기 위해서는 로그인이 필요함
         return;
       } else if (permission !== "granted") {
         // 푸시 거부됐을 때 처리할 내용
@@ -63,62 +66,71 @@ const PushRequest = () => {
       } else {
         // 푸시 승인됐을 때 처리할 내용
         const messaging = getMessaging();
+
         try {
-          await getToken(messaging, {
-            vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
-          }).then(async (currentToken) => {
-            if (!currentToken) {
-              localStorage.setItem("pushRequest", "not now");
-            } else {
-              if (!authStatus.data) return;
-              // 먼저 상태 업데이트
-              const docRef = doc(db, "users", authStatus.data.uid);
-              await updateDoc(docRef, {
-                fcmToken: currentToken,
-              }).then(async () => {
-                // db 저장 완료 후 localStorage와 상태에 저장
-                localStorage.setItem("pushRequest", "granted");
-
-                setAuthStatus((prev) => {
-                  return prev.status === "signedIn"
-                    ? {
-                        status: prev.status,
-                        data: {
-                          ...prev.data,
-                          fcmToken: currentToken,
-                        },
-                      }
-                    : prev;
-                });
-
-                setAlerts((prev) => [
-                  ...prev,
-                  {
-                    id: uniqueId(),
-                    createdAt: Date.now(),
-                    text: "푸시 허용이 완료되었습니다.",
-                    show: true,
-                    type: "success",
-                  },
-                ]);
-
-                const data = {
-                  title: "푸시를 허용이 완료되었습니다.",
-                  body: "이제 여기에 푸시 알림이 출력됩니다.",
-                  image: "/vercel.svg",
-                  click_action: "",
-                  fcmTokens: [currentToken],
-                };
-                await fetch("/api/fcm", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(data),
-                });
-              });
-            }
+          // 토큰 받아오기
+          const currentToken = await fetchWithRetry({
+            asyncFn: getToken,
+            multipleArgs: [
+              messaging,
+              {
+                vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
+              },
+            ],
           });
+
+          // 토큰을 받아오는데 실패했다면
+          if (!currentToken) {
+            // 다음에 다시 묻도록
+            localStorage.setItem("pushRequest", "not now");
+          } else {
+            // 먼저 상태 업데이트
+            const docRef = doc(db, "users", authStatus.data.uid);
+            await updateDoc(docRef, {
+              fcmToken: currentToken,
+            });
+
+            // db 저장 완료 후 localStorage와 상태에 저장
+            localStorage.setItem("pushRequest", "granted");
+            setAuthStatus((prev) => {
+              return prev.status === "signedIn"
+                ? {
+                    status: prev.status,
+                    data: {
+                      ...prev.data,
+                      fcmToken: currentToken,
+                    },
+                  }
+                : prev;
+            });
+            setAlerts((prev) => [
+              ...prev,
+              {
+                id: uniqueId(),
+                createdAt: Date.now(),
+                text: "푸시 허용이 완료되었습니다.",
+                show: true,
+                type: "success",
+              },
+            ]);
+
+            const data = {
+              title: "푸시를 허용이 완료되었습니다.",
+              body: "이제 여기에 푸시 알림이 출력됩니다.",
+              click_action: "",
+              fcmTokens: [currentToken],
+            };
+
+            // 푸시 발송 요청
+            await fetch("/api/fcm", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+          }
+          // 에러가 발생하면 다음에 다시 요청하도록
         } catch (error) {
           localStorage.setItem("pushRequest", "not now");
           setAlerts((prev) => [

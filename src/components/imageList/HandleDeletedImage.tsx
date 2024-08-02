@@ -14,15 +14,19 @@ const HandleDeletedImage = ({
 }) => {
   useEffect(() => {
     if (!folder) return;
-    const notFonundImgIds = folder.images.filter(
+    const notFoundImgIds = folder.images.filter(
       (id) => !loadedImgIds.includes(id),
     );
-    if (notFonundImgIds.length <= 0) return;
+    if (notFoundImgIds.length <= 0) return;
     (async () => {
-      const docRef = doc(db, "users", folder.uid, "folders", folder.id);
-      await updateDoc(docRef, {
-        images: arrayRemove(...notFonundImgIds),
-      }).catch((error) => {});
+      try {
+        const docRef = doc(db, "users", folder.uid, "folders", folder.id);
+        await updateDoc(docRef, {
+          images: arrayRemove(...notFoundImgIds),
+        });
+      } catch (error) {
+        console.log(error);
+      }
     })();
   }, [loadedImgIds, folder]);
 

@@ -11,6 +11,7 @@ import { where } from "firebase/firestore";
 import OrderByFilter from "./OrderByFilter";
 import { useRouter } from "next/navigation";
 import useResetGrid from "@/hooks/useResetGrid";
+import Share from "../Share";
 
 const SearchResultImageList = () => {
   const { replace } = useRouter();
@@ -48,10 +49,11 @@ const SearchResultImageList = () => {
 
   return (
     <div className="relative h-full bg-white">
-      <div className="flex min-h-20 items-center border-b border-astronaut-200 p-4 pl-10">
+      <div className="flex min-h-20 items-center justify-between border-b border-astronaut-200 p-4 pl-10">
         <h2 className="text-2xl font-semibold text-astronaut-700">
           &quot;{queries.join(" ")}&quot; 검색 결과
         </h2>
+        <Share tooltipDirection="bottom" />
       </div>
       {grid && (
         <div

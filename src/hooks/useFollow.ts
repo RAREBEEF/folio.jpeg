@@ -24,10 +24,10 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
   const [targetDisplayId, setTargetDisplayId] = useState<string>(
     usersData[targetUid]?.displayId || "",
   );
-  const [targetuserData, setTargetuserData] = useRecoilState(
+  const [targetUserData, setTargetUserData] = useRecoilState(
     userDataState(targetDisplayId),
   );
-  const setMyuserData = useSetRecoilState(
+  const [myUserData, setMyUserData] = useRecoilState(
     userDataState(authStatus.data?.displayId || ""),
   );
 
@@ -74,26 +74,23 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
 
     const myUid = authStatus.data.uid;
 
-    let prevTargetuserData: UserData | null;
-    let prevMyuserData: UserData | null;
-    let prevUsersData: { [key in string]: UserData };
-    let prevAuthStatus: AuthStatus;
+    let prevTargetUserData: UserData | null = targetUserData;
+    let prevMyUserData: UserData | null = myUserData;
+    let prevUsersData: { [key in string]: UserData } = usersData;
+    let prevAuthStatus: AuthStatus = authStatus;
 
     // 유저 관련 상태 모두 업데이트하기
-    setTargetuserData((prev) => {
-      prevTargetuserData = prev;
+    setTargetUserData((prev) => {
       if (!prev) return prev;
 
       return { ...prev, follower: [myUid, ...(prev.follower || [])] };
     });
-    setMyuserData((prev) => {
-      prevMyuserData = prev;
+    setMyUserData((prev) => {
       if (!prev) return prev;
 
       return { ...prev, following: [targetUid, ...(prev.following || [])] };
     });
     setUsersData((prev) => {
-      prevUsersData = prev;
       if (!prev || (!prev[targetUid] && !prev[myUid])) return prev;
 
       const newUsersData = _.cloneDeep(prev);
@@ -114,7 +111,6 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
     });
     setAuthStatus((prev) => {
       if (!prev) return prev;
-      prevAuthStatus = prev;
 
       return prev.status === "signedIn"
         ? {
@@ -130,45 +126,44 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
     // db 업데이트하기
     const targetDocRef = doc(db, "users", targetUid);
     const myDocRef = doc(db, "users", myUid);
-    await Promise.all([
-      updateDoc(myDocRef, {
-        following: arrayUnion(targetUid),
-      }),
-      updateDoc(targetDocRef, {
-        follower: arrayUnion(myUid),
-      }),
-    ])
-      .then(async () => {
-        // 팔로우 대상에게 푸시 전송
-        await sendFcm({
-          data: {
-            title: `${authStatus.data?.displayName}님이 회원님을 팔로우하기 시작했습니다.`,
-            body: null,
-            profileImage: authStatus.data?.photoURL,
-            targetImage: null,
-            click_action: authStatus.data?.displayId
-              ? `/${authStatus.data?.displayId}`
-              : "/",
-            fcmTokens: targetuserData?.fcmToken
-              ? [targetuserData?.fcmToken]
-              : null,
-            tokenPath: targetuserData?.fcmToken ? null : `users/${targetUid}`,
-            uids: [targetUid],
-          },
-        });
-      })
-      .catch((error) => {
-        // 에러 시 롤백
-        setAlreadyFollowing(false);
-        setTargetuserData(prevTargetuserData);
-        setMyuserData(prevMyuserData);
-        setUsersData(prevUsersData);
-        setAuthStatus(prevAuthStatus);
-        showErrorAlert();
-      })
-      .finally(() => {
-        setIsLoading(false);
+
+    try {
+      await Promise.all([
+        updateDoc(myDocRef, {
+          following: arrayUnion(targetUid),
+        }),
+        updateDoc(targetDocRef, {
+          follower: arrayUnion(myUid),
+        }),
+      ]);
+      // 팔로우 대상에게 푸시 전송
+      await sendFcm({
+        data: {
+          title: `${authStatus.data?.displayName}님이 회원님을 팔로우하기 시작했습니다.`,
+          body: null,
+          profileImage: authStatus.data?.photoURL,
+          targetImage: null,
+          click_action: authStatus.data?.displayId
+            ? `/${authStatus.data?.displayId}`
+            : "/",
+          fcmTokens: targetUserData?.fcmToken
+            ? [targetUserData?.fcmToken]
+            : null,
+          tokenPath: targetUserData?.fcmToken ? null : `users/${targetUid}`,
+          uids: [targetUid],
+        },
       });
+    } catch (error) {
+      // 에러 시 롤백
+      setAlreadyFollowing(false);
+      setTargetUserData(prevTargetUserData);
+      setMyUserData(prevMyUserData);
+      setUsersData(prevUsersData);
+      setAuthStatus(prevAuthStatus);
+      showErrorAlert();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const unfollow = async () => {
@@ -185,14 +180,13 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
     setIsLoading(true);
     setAlreadyFollowing(false);
 
-    let prevTargetuserData: UserData | null;
-    let prevMyuserData: UserData | null;
-    let prevUsersData: { [key in string]: UserData };
-    let prevAuthStatus: AuthStatus;
+    let prevTargetUserData: UserData | null = targetUserData;
+    let prevMyUserData: UserData | null = myUserData;
+    let prevUsersData: { [key in string]: UserData } = usersData;
+    let prevAuthStatus: AuthStatus = authStatus;
 
     // 유저 관련 상태 모두 업데이트하기
-    setTargetuserData((prev) => {
-      prevTargetuserData = prev;
+    setTargetUserData((prev) => {
       if (!prev) return prev;
 
       return {
@@ -200,8 +194,7 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
         follower: prev.follower?.filter((uid) => uid !== myUid),
       };
     });
-    setMyuserData((prev) => {
-      prevMyuserData = prev;
+    setMyUserData((prev) => {
       if (!prev) return prev;
 
       return {
@@ -210,7 +203,6 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
       };
     });
     setUsersData((prev) => {
-      prevUsersData = prev;
       if (!prev || (!prev[targetUid] && !prev[myUid])) return prev;
 
       const newUsersData = _.cloneDeep(prev);
@@ -228,7 +220,6 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
       return newUsersData;
     });
     setAuthStatus((prev) => {
-      prevAuthStatus = prev;
       if (!prev) return prev;
 
       return prev.status === "signedIn"
@@ -248,29 +239,27 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
     const targetDocRef = doc(db, "users", targetUid);
     const myDocRef = doc(db, "users", myUid);
 
-    await Promise.all([
-      updateDoc(myDocRef, {
-        following: arrayRemove(targetUid),
-      }),
-      updateDoc(targetDocRef, {
-        follower: arrayRemove(myUid),
-      }),
-    ])
-      .then(() => {
-        setAlreadyFollowing(false);
-      })
-      .catch((error) => {
-        // 에러 시 롤백
-        setAlreadyFollowing(true);
-        setTargetuserData(prevTargetuserData);
-        setMyuserData(prevMyuserData);
-        setUsersData(prevUsersData);
-        setAuthStatus(prevAuthStatus);
-        showErrorAlert();
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    try {
+      await Promise.all([
+        updateDoc(myDocRef, {
+          following: arrayRemove(targetUid),
+        }),
+        updateDoc(targetDocRef, {
+          follower: arrayRemove(myUid),
+        }),
+      ]);
+      setAlreadyFollowing(false);
+    } catch (error) {
+      // 에러 시 롤백
+      setAlreadyFollowing(true);
+      setTargetUserData(prevTargetUserData);
+      setMyUserData(prevMyUserData);
+      setUsersData(prevUsersData);
+      setAuthStatus(prevAuthStatus);
+      showErrorAlert();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return { follow, unfollow, alreadyFollowing, isLoading };

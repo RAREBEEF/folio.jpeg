@@ -3,8 +3,14 @@
 import _, { uniqueId } from "lodash";
 import { Folder, Folders, UserData } from "@/types";
 import SavedImageList from "../imageList/SavedImageList";
-import Button from "../Button";
-import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  MouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/fb";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -19,6 +25,10 @@ import Modal from "@/components/modal/Modal";
 import EditFolderModal from "@/components/modal/EditFolderModal";
 import useGetFolders from "@/hooks/useGetFolders";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
+import Share from "../Share";
+import TrashIcon from "@/icons/trash-solid.svg";
+import PenIcon from "@/icons/pen-solid.svg";
+import IconWithTooltip from "../IconWithTooltip";
 
 const FolderDetail = ({}: {}) => {
   const isInitialMount = useRef(true);
@@ -104,24 +114,19 @@ const FolderDetail = ({}: {}) => {
     if (!folders && authorUid) {
       // db에서 해당 유저의 폴더 목록 데이터 불러오기
       (async () => {
-        await getFolders({ uid: authorUid })
-          .then((folders) => {
-            // 폴더 목록 데이터가 존재하지 않거나 불러온 폴더의 uid와 현재 갖고 있는 uid가 일치하지 않으면
-            if (
-              !folders ||
-              folders.length <= 0 ||
-              folders[0].uid !== authorUid
-            ) {
-              // 홈으로 이동
-              replace("/");
-            } else {
-              //  데이터가 정상이면 폴더 목록 상태 업데이트
-              setFolders(folders);
-            }
-          })
-          .catch((error) => {
+        try {
+          const folders = await getFolders({ uid: authorUid });
+          // 폴더 목록 데이터가 존재하지 않거나 불러온 폴더의 uid와 현재 갖고 있는 uid가 일치하지 않으면
+          if (!folders || folders.length <= 0 || folders[0].uid !== authorUid) {
+            // 홈으로 이동
             replace("/");
-          });
+          } else {
+            //  데이터가 정상이면 폴더 목록 상태 업데이트
+            setFolders(folders);
+          }
+        } catch (error) {
+          replace("/");
+        }
       })();
     }
   }, [authorUid, folders, getFolders, isFolderLoading, replace, setFolders]);
@@ -170,54 +175,52 @@ const FolderDetail = ({}: {}) => {
 
     if (!ok) return;
 
-    // 기존 상태 백업
-    let prevFolders: Folders | null;
-
-    setFolders((prev) => {
-      prevFolders = prev;
-
-      if (!prev) return prev;
-
-      const newFolders = _.cloneDeep(prev);
-
-      const targetIndex = newFolders.findIndex(
-        (folder) => folder.id === currentFolder.id,
-      );
-
-      newFolders.splice(targetIndex, 1);
-
-      return newFolders;
-    });
-
     const docRef = doc(db, "users", authorUid, "folders", currentFolder.id);
-    await deleteDoc(docRef)
-      .then(() => {
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            text: "폴더를 삭제하였습니다.",
-            createdAt: Date.now(),
-            type: "success",
-            show: true,
-          },
-        ]);
-        replace(`/${displayId}`);
-      })
-      .catch((error) => {
-        // 오류 시 백업 상태로 롤백
-        setFolders(prevFolders);
-        setAlerts((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            text: "폴더 삭제 중 문제가 발생하였습니다..",
-            createdAt: Date.now(),
-            type: "warning",
-            show: true,
-          },
-        ]);
+
+    // 기존 상태 백업
+    let prevFolders: Folders | null = folders;
+
+    try {
+      setFolders((prev) => {
+        if (!prev) return prev;
+
+        const newFolders = _.cloneDeep(prev);
+
+        const targetIndex = newFolders.findIndex(
+          (folder) => folder.id === currentFolder.id,
+        );
+
+        newFolders.splice(targetIndex, 1);
+
+        return newFolders;
       });
+
+      await deleteDoc(docRef);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          text: "폴더를 삭제하였습니다.",
+          createdAt: Date.now(),
+          type: "success",
+          show: true,
+        },
+      ]);
+      replace(`/${displayId}`);
+    } catch (error) {
+      // 오류 시 백업 상태로 롤백
+      setFolders(prevFolders);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          text: "폴더 삭제 중 문제가 발생하였습니다..",
+          createdAt: Date.now(),
+          type: "warning",
+          show: true,
+        },
+      ]);
+    }
   };
 
   const onFolderEditClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -245,16 +248,24 @@ const FolderDetail = ({}: {}) => {
             <h2 className="text-2xl font-semibold text-astronaut-700">
               {currentFolder.name}
             </h2>
-            {authStatus.data?.uid === currentFolder.uid && (
-              <div className="flex shrink-0 grow justify-end gap-2">
-                <Button onClick={onFolderEditClick}>
-                  <div className="text-xs">폴더 수정</div>
-                </Button>
-                <Button onClick={onDeleteFolderClick}>
-                  <div className="text-xs">폴더 삭제</div>
-                </Button>
-              </div>
-            )}
+
+            <div className="flex shrink-0 grow justify-end gap-2">
+              <Share tooltipDirection="bottom" />
+              {authStatus.data?.uid === currentFolder.uid && (
+                <Fragment>
+                  <button onClick={onFolderEditClick}>
+                    <IconWithTooltip text="수정" tooltipDirection="bottom">
+                      <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                    </IconWithTooltip>
+                  </button>
+                  <button onClick={onDeleteFolderClick}>
+                    <IconWithTooltip text="삭제" tooltipDirection="bottom">
+                      <TrashIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                    </IconWithTooltip>
+                  </button>
+                </Fragment>
+              )}
+            </div>
           </div>
           <SavedImageList
             type={"user-saved-" + authorUid + "-" + currentFolder.id}

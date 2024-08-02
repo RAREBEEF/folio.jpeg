@@ -29,7 +29,6 @@ import { db } from "@/fb";
 import { ExtraUserData, UserData } from "@/types";
 import ProfileCard from "@/components/user/ProfileCard";
 import ManageImage from "./ManageImage";
-import RefreshIcon from "@/icons/rotate-right-solid.svg";
 import BrokenSvg from "@/icons/link-slash-solid.svg";
 import SaveButton from "../saveImage/SaveButton";
 import InfoSvg from "@/icons/circle-info-solid.svg";
@@ -40,7 +39,7 @@ import useImagePopularity from "@/hooks/useImagePopularity";
 
 const ImageDetail = () => {
   const device = useRecoilValue(deviceState);
-  const [smallViewport, setSmallViewprot] = useState<boolean>(false);
+  const [smallViewport, setSmallViewport] = useState<boolean>(false);
   const disableHoverInfo = useMemo(
     () => device === "mobile" || smallViewport,
     [device, smallViewport],
@@ -56,11 +55,6 @@ const ImageDetail = () => {
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [author, setAuthor] = useState<UserData | null>(null);
   const [imageData, setImageData] = useRecoilState(imageDataState(imageId));
-  const setComments = useSetRecoilState(commentsState(imageId));
-  const setLastVisible = useSetRecoilState<QueryDocumentSnapshot<
-    DocumentData,
-    DocumentData
-  > | null>(lastVisibleState("comments-" + imageId));
   const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
   const [infoPos, setInfoPos] = useState<[number, number]>([0, 0]);
   const [showInfo, setShowInfo] = useState<boolean>(false);
@@ -83,7 +77,8 @@ const ImageDetail = () => {
         await adjustPopularity(1);
       })();
     }
-    if (imageId && !imageData && !isLoading) {
+    const needToGetImageData = imageId && !imageData && !isLoading;
+    if (needToGetImageData) {
       (async () => {
         const imageData = await getImageData({ imageId: imageId });
         if (imageData) {
@@ -106,11 +101,14 @@ const ImageDetail = () => {
 
   // 작성자 상태 업데이트
   useEffect(() => {
+    // 작성자 데이터를 아직 안불러왔으면
     if (!author && imageData) {
+      // usersData에서 찾아보기
       if (usersData[imageData.uid]) {
         const data = usersData[imageData.uid];
         setDisplayId(data.displayId || "");
         setAuthor(data);
+        // db에서 찾아오기
       } else {
         const uid = imageData.uid;
 
@@ -147,14 +145,6 @@ const ImageDetail = () => {
       setUserData(author);
     }
   }, [author, displayId, setUserData]);
-
-  // 이미지 새로고침
-  const refreshImage = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setImageData(null);
-    setLastVisible(null);
-    setComments(null);
-  };
 
   const onImageMouseMove = (e: MouseEvent<HTMLImageElement>) => {
     e.preventDefault();
@@ -232,10 +222,10 @@ const ImageDetail = () => {
   useEffect(() => {
     const windowResizeHandler = _.debounce(() => {
       if (window.innerWidth <= 550) {
-        setSmallViewprot(true);
+        setSmallViewport(true);
         setShowInfo(false);
       } else {
-        setSmallViewprot(false);
+        setSmallViewport(false);
       }
     }, 100);
     window.addEventListener("resize", windowResizeHandler);
@@ -321,10 +311,7 @@ const ImageDetail = () => {
                   <div className="flex justify-between">
                     {<ProfileCard profileData={author} />}
                     <div className="flex">
-                      <button onClick={refreshImage}>
-                        <RefreshIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
-                      </button>
-                      <ManageImage id={imageData.id} />
+                      <ManageImage imageId={imageData.id} />
                     </div>
                   </div>
 

@@ -45,9 +45,8 @@ const usePostImageData = () => {
       promises.push(setDoc(imageDocRef, data));
     }
 
-    await Promise.all(promises).then(() => {
-      setIsLoading(false);
-    });
+    await Promise.all(promises);
+    setIsLoading(false);
 
     return "success";
   };

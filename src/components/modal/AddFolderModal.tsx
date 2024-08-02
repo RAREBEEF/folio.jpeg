@@ -37,11 +37,17 @@ const AddFolder = ({
   const onAddFolder = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
+    const hasPermission =
+      authStatus.status === "signedIn" && authStatus.data.uid === userData.uid;
+    const invalidName = name.includes("-") || name.includes("/");
+    const duplicatedName =
+      folders?.filter((folder) => folder.name === name).length !== 0;
+
     // 현재 로딩중일 경우 리턴
     if (isLoading) {
       return;
       // 인증 상태가 유효하지 않으면
-    } else if (!authStatus.data || authStatus.data.uid !== userData.uid) {
+    } else if (!hasPermission) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -67,7 +73,7 @@ const AddFolder = ({
       ]);
       return;
       // 사용 불가능한 문자 필터링
-    } else if (name.includes("-" || name.includes("/"))) {
+    } else if (invalidName) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -80,7 +86,7 @@ const AddFolder = ({
       ]);
       return;
       // 폴더명은 중복될 수 없다.
-    } else if (folders?.filter((folder) => folder.name === name).length !== 0) {
+    } else if (duplicatedName) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -115,40 +121,37 @@ const AddFolder = ({
       const docRef = doc(db, "users", uid, "folders", folderId);
 
       // 이전 상태 백업
-      let prevFolders: Folders | null;
+      let prevFolders: Folders | null = folders;
 
-      // 상태 업데이트
-      setFolders((prev) => {
-        prevFolders = prev;
-        if (!prev) {
-          return [newFolder];
-        } else {
-          return [newFolder, ...prev];
-        }
-      });
-
-      // db에 폴더 데이터 추가
-      await setDoc(docRef, newFolder)
-        .then(() => {
-          closeModal();
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "success",
-              createdAt: Date.now(),
-              text: "폴더가 생성되었습니다.",
-            },
-          ]);
-        })
-        .catch((error) => {
-          // 에러 시 백업 상태로 롤백
-          setFolders(prevFolders);
-        })
-        .finally(() => {
-          setIsLoading(false);
+      try {
+        // 상태 업데이트
+        setFolders((prev) => {
+          if (!prev) {
+            return [newFolder];
+          } else {
+            return [newFolder, ...prev];
+          }
         });
+
+        // db에 폴더 데이터 추가
+        await setDoc(docRef, newFolder);
+        closeModal();
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "폴더가 생성되었습니다.",
+          },
+        ]);
+      } catch (error) {
+        // 에러 시 백업 상태로 롤백
+        setFolders(prevFolders);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   };
 
@@ -158,7 +161,7 @@ const AddFolder = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 px-10 pb-12">
+    <div className="flex flex-col gap-8 px-10 pb-12 pt-8">
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input

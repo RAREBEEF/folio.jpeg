@@ -1,6 +1,6 @@
 const GeminiInfoModal = () => {
   return (
-    <ul className="flex flex-col gap-4 break-keep p-8 pb-16 pt-0">
+    <ul className="flex flex-col gap-4 break-keep p-8 pb-12 pt-8">
       <li>
         <h3 className="text-lg font-semibold">Gemini AI란?</h3>
         <div className="pl-1">

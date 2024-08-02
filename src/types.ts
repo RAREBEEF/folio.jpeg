@@ -15,6 +15,7 @@ export interface UserData extends User {
   following?: Array<string>;
   follower?: Array<string>;
   fcmToken?: string | null;
+  bgPhotoURL?: string;
 }
 export type UserDataWithoutExtraData = Exclude<
   UserData,
@@ -23,6 +24,7 @@ export type UserDataWithoutExtraData = Exclude<
 export interface ExtraUserData {
   displayId: string;
   photoURL: string;
+  bgPhotoURL: string;
   following: Array<string>;
   follower: Array<string>;
   fcmToken: string | null;

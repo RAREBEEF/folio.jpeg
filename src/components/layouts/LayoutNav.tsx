@@ -1,7 +1,6 @@
 "use client";
 
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import Angles from "@/icons/angles-solid.svg";
 import Link from "next/link";
 import {
   authStatusState,
@@ -18,6 +17,7 @@ import NotificationSvg from "@/icons/bell-solid.svg";
 import Modal from "@/components/modal/Modal";
 import NotificationsModal from "@/components/modal/NotificationsModal";
 import { usePathname } from "next/navigation";
+import IconWithTooltip from "../IconWithTooltip";
 
 const LayoutNav = () => {
   const pathname = usePathname();
@@ -141,9 +141,9 @@ const LayoutNav = () => {
       className={`fixed bottom-0 top-16 z-40 flex h-full xs:top-auto xs:h-16 xs:w-screen xs:bg-white xs:pt-0 ${nav.show ? "w-full xs:w-screen" : "w-[50px] xs:w-screen"}`}
     >
       <nav
-        className={`relative flex h-full shrink-0 flex-col overflow-hidden overflow-y-scroll bg-white text-astronaut-500 shadow-[10px_0_15px_-3px_rgb(0_0_0_/_0.1),4px_-0_6px_-4px_rgb(0_0_0_/_0.1)] transition-all xs:h-16 xs:shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
+        className={`relative flex h-full shrink-0 flex-col overflow-x-visible bg-white text-astronaut-500 shadow-[10px_0_15px_-3px_rgb(0_0_0_/_0.1),4px_-0_6px_-4px_rgb(0_0_0_/_0.1)] transition-all xs:h-16 xs:shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
-        <button
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
             setNav((prev) => ({ show: !prev.show }));
@@ -153,13 +153,13 @@ const LayoutNav = () => {
           }`}
         >
           <Angles className="fill-astronaut-500" />
-        </button>
+        </button> */}
 
         <ul
-          className={`absolute mt-16 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
+          className={`absolute mt-4 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-white "}`} xs:inline xs:aspect-auto`}
+            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-white "}`} xs:inline xs:aspect-auto`}
           >
             <Link
               href="/"
@@ -172,14 +172,16 @@ const LayoutNav = () => {
                   Home
                 </div>
               ) : (
-                <HomeSvg
-                  className={`aspect-square w-[30px] ${curPath === "home" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
-                />
+                <IconWithTooltip text="홈" tooltipDirection="right">
+                  <HomeSvg
+                    className={`aspect-square w-[30px] ${curPath === "home" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                  />
+                </IconWithTooltip>
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -193,14 +195,16 @@ const LayoutNav = () => {
                   Upload
                 </div>
               ) : (
-                <ImageSvg
-                  className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
-                />
+                <IconWithTooltip text="업로드" tooltipDirection="right">
+                  <ImageSvg
+                    className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                  />
+                </IconWithTooltip>
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -214,14 +218,16 @@ const LayoutNav = () => {
                   Profile
                 </div>
               ) : (
-                <ProfileSvg
-                  className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
-                />
+                <IconWithTooltip text="프로필" tooltipDirection="right">
+                  <ProfileSvg
+                    className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                  />
+                </IconWithTooltip>
               )}
             </Link>
           </li>
           <li
-            className={`w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <button
               onClick={onNotificationClick}
@@ -234,9 +240,11 @@ const LayoutNav = () => {
                   Notifications
                 </div>
               ) : (
-                <NotificationSvg
-                  className={`aspect-square w-[30px] ${curPath === "notification" ? "fill-astronaut-500" : "fill-astronaut-300 group-hover:fill-astronaut-400 "}`}
-                />
+                <IconWithTooltip text="알림" tooltipDirection="right">
+                  <NotificationSvg
+                    className={`aspect-square w-[30px] ${curPath === "notification" ? "fill-astronaut-500" : "fill-astronaut-300 group-hover:fill-astronaut-400 "}`}
+                  />
+                </IconWithTooltip>
               )}
               <div
                 className={`absolute select-none text-center ${nav.show ? "left-full bg-astronaut-500 text-white" : "right-0 bg-white"} top-0 aspect-square w-4 rounded-full bg-white text-xs tracking-tighter`}

@@ -31,8 +31,7 @@ export async function generateMetadata(
     });
   }
 
-  // 폴더에서 이미지 네 장 꺼내기
-  const imgURLs: Array<string> = [];
+  const imgURLs: Array<string> = [logo.src];
 
   const db = admin.firestore();
   const imagesCollectionRef = db.collection(`images`);
@@ -42,7 +41,6 @@ export async function generateMetadata(
     .get();
 
   if (imagesDocSnap.empty) {
-    imgURLs.push(logo.src);
   } else {
     imagesDocSnap.forEach((doc) => {
       imgURLs.unshift((doc.data() as ImageData).URL);

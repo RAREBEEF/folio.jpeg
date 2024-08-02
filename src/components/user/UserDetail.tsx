@@ -14,15 +14,18 @@ import ProfileImage from "@/components/user/ProfileImage";
 import Link from "next/link";
 import SavedTab from "@/components/saveImage/SavedTab";
 import UserImageList from "../imageList/UserImageList";
-import Button from "../Button";
 import { useRouter } from "next/navigation";
 import FollowBtn from "./FollowBtn";
 import Follow from "./Follow";
-import useGetUserBydisplayId from "@/hooks/useGetUserByDisplayId";
+import useGetUserByDisplayId from "@/hooks/useGetUserByDisplayId";
 import AiFeedback from "./AiFeedback";
+import Share from "../Share";
+import PenIcon from "@/icons/pen-solid.svg";
+import Image from "next/image";
+import IconWithTooltip from "../IconWithTooltip";
 
 const UserDetail = () => {
-  const { getUserByDisplayId, isLoading } = useGetUserBydisplayId();
+  const { getUserByDisplayId, isLoading } = useGetUserByDisplayId();
   const { replace } = useRouter();
   const setLoginModal = useSetRecoilState(loginModalState);
   const params = useSearchParams();
@@ -103,24 +106,37 @@ const UserDetail = () => {
     <div className="h-full bg-white">
       {!isLoading && userData ? (
         <div className="flex flex-col gap-4 pb-12">
-          <div className="relative flex flex-col items-center gap-5 pb-4 pt-12">
-            {authStatus.data?.uid === userData.uid && (
-              <div className="absolute right-2 top-2 text-xs">
-                <Button onClick={onProfileEditClick}>
-                  <div>프로필 수정</div>
-                </Button>
+          <div className="relative flex flex-col items-center gap-5 pb-4">
+            <div className="relative w-full">
+              {userData.bgPhotoURL && (
+                <Image
+                  src={userData.bgPhotoURL}
+                  layout="fill"
+                  objectFit="cover"
+                  alt="background image"
+                />
+              )}
+              <div className="relative m-auto w-[50%] max-w-72 pb-6 pt-12">
+                <ProfileImage URL={userData.photoURL} />
               </div>
-            )}
-            <div className="w-[50%] max-w-72">
-              <ProfileImage URL={userData.photoURL} />
             </div>
-            <h3 className="flex flex-col items-center">
+            <h3 className="relative flex w-full flex-col items-center">
               <span className="text-2xl font-bold ">
                 {userData.displayName}
               </span>
               <span className="text-base text-astronaut-500">
                 @{userData.displayId}
               </span>
+              <div className="absolute right-5 top-0 flex gap-2 text-xs">
+                <Share />
+                {authStatus.data?.uid === userData.uid && (
+                  <button onClick={onProfileEditClick}>
+                    <IconWithTooltip text="수정" tooltipDirection="top">
+                      <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                    </IconWithTooltip>
+                  </button>
+                )}
+              </div>
             </h3>
           </div>
 

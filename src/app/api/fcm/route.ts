@@ -96,12 +96,13 @@ export async function POST(req: Request) {
 
       // 전달받은 string 경로를 /로 끊어서 배열로 저장
       const pathSplit = tokenPath.split("/");
+      const pathLength = pathSplit.length;
 
       // 경로 배열이 2인 경우의 docRef(이미지와 유저 데이터 등에 해당)
-      if (pathSplit.length === 2) {
+      if (pathLength === 2) {
         docRef = admin.firestore().collection(pathSplit[0]).doc(pathSplit[1]);
         // 경로 배열이 4인 경우의 docRef(이미지의 댓글 데이터 등에 해당)
-      } else if (pathSplit.length === 4) {
+      } else if (pathLength === 4) {
         docRef = admin
           .firestore()
           .collection(pathSplit[0])
@@ -157,21 +158,16 @@ export async function POST(req: Request) {
     const res = await Promise.all([
       admin.messaging().sendEachForMulticast(notificationData),
       ...sendInappNotifications,
-    ]).catch((error) => {
-      return NextResponse.json({
-        data: "failed to send fcm.",
-        error,
-        status: 500,
-      });
-    });
+    ]);
 
     return NextResponse.json({
       data: { notificationData, res },
       status: 200,
     });
-  } catch (err) {
+  } catch (error) {
     return NextResponse.json({
       data: "failed to send fcm.",
+      error,
       status: 500,
     });
   }

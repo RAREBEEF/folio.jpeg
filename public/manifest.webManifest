@@ -9,13 +9,6 @@
   "short_name": "folio.JPEG",
   "icons": [
     {
-      "src": "/images/favicon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "rel": "icon",
-      "purpose": "any maskable"
-    },
-    {
       "src": "/images/favicon-16x16.png",
       "sizes": "16x16",
       "type": "image/png",

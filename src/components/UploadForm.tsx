@@ -154,18 +154,17 @@ const UploadForm = () => {
   );
 
   useEffect(() => {
-    if (init || isImageLoading) return;
+    if (init || isImageLoading || authStatus.status === "pending") return;
+
+    const hasPermission =
+      authStatus.status === "signedIn" &&
+      (!isEdit || (imageData && authStatus.data.uid === imageData.uid));
+
     // 로그인 여부 체크
     // 로그인이 안되었거나 수정 권한이 없으면 나가기
-    if (
-      (authStatus.status !== "pending" && authStatus.status !== "signedIn") ||
-      (isEdit &&
-        authStatus.data &&
-        imageData &&
-        authStatus.data.uid !== imageData.uid)
-    ) {
+    if (!hasPermission) {
       replace("/");
-    } else if (authStatus.status === "signedIn") {
+    } else {
       // 수정모드 구분
       if (isEdit) {
         // 수정할 이미지 데이터가 아직 없으면 불러오기

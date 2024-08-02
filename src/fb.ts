@@ -35,9 +35,10 @@ if (typeof window !== "undefined" && typeof window.navigator !== "undefined") {
   const isIos =
     userAgent?.indexOf("iphone") !== -1 || userAgent?.indexOf("ipad") !== -1;
   const isStandalone = window?.matchMedia("(display-mode: standalone)").matches;
+  const canPush = !isIos || (isIos && isStandalone);
 
   // ios이면서 스탠드얼론이 아니면 푸시를 보낼 수 없다.
-  if (!(isIos && !isStandalone)) {
+  if (canPush) {
     try {
       const messaging = getMessaging(app);
       if (localStorage.getItem("pushRequest") === "unsupport")

@@ -43,68 +43,90 @@ const SignInForm = () => {
 
   const onGoogleSignInClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (!credential) return;
-        const token = credential.accessToken;
-        const user = result.user;
-        setAuthStatus({
-          status: "pending",
-          data: _.cloneDeep(user),
-        });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+
+      if (!credential) return;
+
+      const token = credential.accessToken;
+      const user = result.user;
+      setAuthStatus({
+        status: "pending",
+        data: _.cloneDeep(user),
       });
+    } catch (error) {
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "로그인 과정에서 문제가 발생하였습니다.",
+        },
+      ]);
+    }
   };
+
   const onGithubSignInClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const provider = new GithubAuthProvider();
-    await signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GithubAuthProvider.credentialFromResult(result);
-        if (!credential) return;
-        const token = credential.accessToken;
-        const user = result.user;
-        setAuthStatus({
-          status: "pending",
-          data: _.cloneDeep(user),
-        });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = GithubAuthProvider.credentialFromError(error);
+
+    try {
+      const provider = new GithubAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+
+      if (!credential) return;
+
+      const token = credential.accessToken;
+      const user = result.user;
+      setAuthStatus({
+        status: "pending",
+        data: _.cloneDeep(user),
       });
+    } catch (error) {
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "로그인 과정에서 문제가 발생하였습니다.",
+        },
+      ]);
+    }
   };
   const onFacebookSignInClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const provider = new FacebookAuthProvider();
-    await signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = FacebookAuthProvider.credentialFromResult(result);
-        if (!credential) return;
-        const token = credential.accessToken;
-        const user = result.user;
-        setAuthStatus({
-          status: "pending",
-          data: _.cloneDeep(user),
-        });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = FacebookAuthProvider.credentialFromError(error);
-        // ...
+    try {
+      const provider = new FacebookAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const credential = FacebookAuthProvider.credentialFromResult(result);
+
+      if (!credential) return;
+
+      const token = credential.accessToken;
+      const user = result.user;
+      setAuthStatus({
+        status: "pending",
+        data: _.cloneDeep(user),
       });
+    } catch (error) {
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "로그인 과정에서 문제가 발생하였습니다.",
+        },
+      ]);
+    }
   };
 
   const onCovertSignInUpClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -146,18 +168,17 @@ const SignInForm = () => {
     try {
       // 비밀번호 재설정
       if (pwReset) {
-        await sendPasswordResetEmail(auth, email).then(() => {
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "success",
-              createdAt: Date.now(),
-              text: "메일이 발송되었습니다.",
-            },
-          ]);
-        });
+        await sendPasswordResetEmail(auth, email);
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "메일이 발송되었습니다.",
+          },
+        ]);
         // 회원가입
       } else if (createAccount) {
         if (pw !== pwCheck) {
@@ -173,34 +194,32 @@ const SignInForm = () => {
           ]);
           return;
         }
-        await createUserWithEmailAndPassword(auth, email, pw).then(() => {
-          setLoginModal({ show: false });
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "success",
-              createdAt: Date.now(),
-              text: "회원가입이 완료되었습니다.",
-            },
-          ]);
-        });
+        await createUserWithEmailAndPassword(auth, email, pw);
+        setLoginModal({ show: false });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "회원가입이 완료되었습니다.",
+          },
+        ]);
         // 로그인
       } else {
-        await signInWithEmailAndPassword(auth, email, pw).then(() => {
-          setLoginModal({ show: false });
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "success",
-              createdAt: Date.now(),
-              text: "로그인 되었습니다.",
-            },
-          ]);
-        });
+        await signInWithEmailAndPassword(auth, email, pw);
+        setLoginModal({ show: false });
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "로그인 되었습니다.",
+          },
+        ]);
       }
     } catch (error) {
       setAlerts((prev) => [
@@ -219,7 +238,7 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="m-auto flex h-full w-fit flex-col pb-12">
+    <div className="m-auto flex h-full w-fit flex-col pb-12 pt-8">
       {(createAccount || pwReset) && (
         <h3 className="text-center text-lg font-semibold text-astronaut-700">
           {createAccount ? "계정 생성하기" : "비밀번호 재설정"}

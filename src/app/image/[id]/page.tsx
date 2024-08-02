@@ -37,7 +37,7 @@ export async function generateMetadata(
     const user = await admin.auth().getUser(data.uid);
 
     return {
-      title: data.title || `${user.displayName}님의 사진`,
+      title: "folio.JPEG - " + (data.title || `${user.displayName}님의 사진`),
       description:
         data.description ||
         `${user.displayName}님이 업로드한 사진입니다. ` +
@@ -58,7 +58,7 @@ export async function generateMetadata(
       openGraph: {
         type: "website",
         url: `https://folio-jpeg.rarebeef.co.kr/image/${id}`,
-        title: data.title || `${user.displayName}님의 사진`,
+        title: "folio.JPEG - " + (data.title || `${user.displayName}님의 사진`),
         description:
           data.description ||
           `${user.displayName}님이 업로드한 사진입니다. ` +
@@ -72,7 +72,7 @@ export async function generateMetadata(
       },
       twitter: {
         card: "summary_large_image",
-        title: data.title || `${user.displayName}님의 사진`,
+        title: "folio.JPEG - " + (data.title || `${user.displayName}님의 사진`),
         description:
           data.description ||
           `${user.displayName}님이 업로드한 사진입니다. ` +

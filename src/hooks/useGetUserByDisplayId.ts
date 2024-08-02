@@ -7,7 +7,7 @@ import useGetExtraUserDataByDisplayId from "./useGetExtraUserDataByDisplayId";
 import useErrorAlert from "./useErrorAlert";
 import useFetchWithRetry from "./useFetchWithRetry";
 
-const useGetUserBydisplayId = () => {
+const useGetUserByDisplayId = () => {
   const { fetchWithRetry } = useFetchWithRetry();
   const showErrorAlert = useErrorAlert();
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
@@ -19,34 +19,32 @@ const useGetUserBydisplayId = () => {
   }: {
     displayId: string;
   }): Promise<UserData | null> => {
-    return await getExtraUserDataByDisplayId({ displayId }).then(
-      async (extraUserData) => {
-        if (!extraUserData?.data) {
-          return null;
-        }
+    const extraUserData = await getExtraUserDataByDisplayId({ displayId });
 
-        const { uid } = extraUserData.data;
+    if (!extraUserData?.data) {
+      return null;
+    }
 
-        // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
-        const userData = await fetch(`/api/user/${uid}`, {
-          method: "GET",
-        }).then(async (response) => {
-          return await response.json();
-        });
+    const { uid } = extraUserData.data;
 
-        if (userData.data) {
-          const data: UserData = {
-            ...userData.data,
-            ...extraUserData.data,
-            uid,
-          };
-          setUsersData((prev) => ({ ...prev, [uid]: data }));
-          return data;
-        } else {
-          return null;
-        }
-      },
-    );
+    // 불러온 extraUserData의 uid에 해당하는 userData를 서버에 요청
+    const userData = await fetch(`/api/user/${uid}`, {
+      method: "GET",
+    }).then(async (response) => {
+      return await response.json();
+    });
+
+    if (userData.data) {
+      const data: UserData = {
+        ...userData.data,
+        ...extraUserData.data,
+        uid,
+      };
+      setUsersData((prev) => ({ ...prev, [uid]: data }));
+      return data;
+    } else {
+      return null;
+    }
   };
 
   const getUserByDisplayIdAsync = async ({
@@ -54,7 +52,7 @@ const useGetUserBydisplayId = () => {
   }: {
     displayId: string;
   }): Promise<UserData | null> => {
-    console.log("useGetUserBydisplayId");
+    console.log("useGetUserByDisplayId");
     return await fetchUser({ displayId });
   };
 
@@ -82,4 +80,4 @@ const useGetUserBydisplayId = () => {
   return { getUserByDisplayId, isLoading };
 };
 
-export default useGetUserBydisplayId;
+export default useGetUserByDisplayId;

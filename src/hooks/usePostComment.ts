@@ -43,46 +43,44 @@ const usePostComment = ({
     // 댓글
     if (!parentId) {
       const docRef = doc(db, "images", imageData.id, "comments", comment.id);
-      await setDoc(docRef, comment).then(async () => {
-        // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
-        await Promise.all([
-          sendFcm({
-            data: {
-              title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
-              body: `${authStatus.data?.displayName}님: ${comment.content}`,
-              profileImage: authStatus.data?.photoURL,
-              targetImage: imageData?.URL,
-              click_action: `/image/${imageData.id}`,
-              fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
-              tokenPath: author?.fcmToken ? null : `users/${imageData?.uid}`,
-              uids: author?.uid ? [author.uid] : null,
-            },
-          }),
-        ]);
-      });
+      await setDoc(docRef, comment);
+      // 댓글 등록이 완료되면 사진 게시자에게 푸시를 발송한다.
+      await Promise.all([
+        sendFcm({
+          data: {
+            title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
+            body: `${authStatus.data?.displayName}님: ${comment.content}`,
+            profileImage: authStatus.data?.photoURL,
+            targetImage: imageData?.URL,
+            click_action: `/image/${imageData.id}`,
+            fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
+            tokenPath: author?.fcmToken ? null : `users/${imageData?.uid}`,
+            uids: author?.uid ? [author.uid] : null,
+          },
+        }),
+      ]);
       // 답글
     } else {
       const docRef = doc(db, "images", imageData.id, "comments", parentId);
       await updateDoc(docRef, {
         replies: arrayUnion(comment),
         fcmTokens: arrayUnion(authStatus.data!.fcmToken || ""),
-      }).then(async () => {
-        await sendFcm({
-          data: {
-            title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
-            body: `${authStatus.data?.displayName}님: ${comment.content}`,
-            profileImage: authStatus.data?.photoURL,
-            targetImage: imageData?.URL,
-            click_action: `/image/${imageData.id}`,
-            fcmTokens: tokens,
-            tokenPath: tokens
-              ? null
-              : `images/${imageData.id}/comments/${parentId}`,
-            uids: parentComment
-              ? parentComment.replies.map((reply) => reply.uid)
-              : null,
-          },
-        });
+      });
+      await sendFcm({
+        data: {
+          title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
+          body: `${authStatus.data?.displayName}님: ${comment.content}`,
+          profileImage: authStatus.data?.photoURL,
+          targetImage: imageData?.URL,
+          click_action: `/image/${imageData.id}`,
+          fcmTokens: tokens,
+          tokenPath: tokens
+            ? null
+            : `images/${imageData.id}/comments/${parentId}`,
+          uids: parentComment
+            ? parentComment.replies.map((reply) => reply.uid)
+            : null,
+        },
       });
     }
 

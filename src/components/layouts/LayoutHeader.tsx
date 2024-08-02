@@ -20,9 +20,8 @@ const LayoutHeader = () => {
   };
   const onLogoutClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    await auth.signOut().then(() => {
-      setAuthStatus({ status: "signedOut", data: null });
-    });
+    await auth.signOut();
+    setAuthStatus({ status: "signedOut", data: null });
   };
 
   return (

@@ -40,6 +40,7 @@ export async function generateMetadata(
   let userData: ExtraUserData = {
     displayId,
     photoURL: logo.src,
+    bgPhotoURL: "",
     follower: [],
     following: [],
     fcmToken: "",
@@ -94,7 +95,7 @@ export async function generateMetadata(
   return {
     title: `${folderName} - ${user.displayName}님의 폴더`,
     description:
-      `${user.displayName}님이 업로드한 이미지들을 확인해 보세요. ` +
+      `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
       "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
     keywords: [
       "SNS",
@@ -110,10 +111,10 @@ export async function generateMetadata(
     ],
     openGraph: {
       type: "website",
-      url: `https://folio-jpeg.rarebeef.co.kr/${displayId}`,
+      url: `https://folio-jpeg.rarebeef.co.kr/${displayId}/${folderName}`,
       title: `${folderName} - ${user.displayName}님의 폴더`,
       description:
-        `${user.displayName}님이 업로드한 이미지들을 확인해 보세요. ` +
+        `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
         "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
       siteName: "folio.JPEG",
       images: thumbnailURLs.map((url) => ({ url })),
@@ -122,7 +123,7 @@ export async function generateMetadata(
       card: "summary_large_image",
       title: `${folderName} - ${user.displayName}님의 폴더`,
       description:
-        `${user.displayName}님이 업로드한 이미지들을 확인해 보세요. ` +
+        `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
         "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
       images: thumbnailURLs,
     },
@@ -132,7 +133,6 @@ export async function generateMetadata(
 const FolderDetailPage = () => {
   return (
     <main id="folder-detail">
-      {/* <PageHeader header={currentFolder?.name || ""} /> */}
       <FolderDetail />
     </main>
   );

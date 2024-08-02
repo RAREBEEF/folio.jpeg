@@ -85,10 +85,11 @@ const Search = () => {
     const newSuggestions = _.cloneDeep(existTagList);
 
     for (const [tag, count] of Object.entries(newSuggestions)) {
-      if (
-        count <= 0 ||
-        !(hangulIncludes(tag, value) || choseongIncludes(tag, value))
-      ) {
+      const noResult = count <= 0;
+      const notIncludes = !(
+        hangulIncludes(tag, value) || choseongIncludes(tag, value)
+      );
+      if (noResult || notIncludes) {
         delete newSuggestions[tag];
       }
     }

@@ -29,7 +29,7 @@ const EditFolderModal = ({
   );
   const setAlerts = useSetRecoilState(alertsState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { value: name, onChange: onnameChange } = useInput(currentFolder.name);
+  const { value: name, onChange: onNameChange } = useInput(currentFolder.name);
   const [isPrivate, setIsPrivate] = useState<"true" | "false">(
     `${currentFolder.isPrivate}`,
   );
@@ -43,11 +43,20 @@ const EditFolderModal = ({
   const onAddFolder = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
+    const hasPermission =
+      authStatus.status === "signedIn" && authStatus.data.uid === userData.uid;
+    const invalidName = name.includes("-") || name.includes("/");
+    const nameChanged = currentFolder.name !== name;
+    const privateChanged = `${currentFolder.isPrivate}` !== isPrivate;
+    const noChanged = !nameChanged && !privateChanged;
+    const duplicatedName =
+      folders?.filter((folder) => folder.name === name).length !== 0;
+
     // 현재 로딩중일 경우 리턴
     if (isLoading) {
       return;
       // 인증 상태가 유효하지 않으면
-    } else if (!authStatus.data || authStatus.data.uid !== userData.uid) {
+    } else if (!hasPermission) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -73,7 +82,7 @@ const EditFolderModal = ({
       ]);
       return;
       // 사용 불가능한 문자 필터링
-    } else if (name.includes("-" || name.includes("/"))) {
+    } else if (invalidName) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -85,10 +94,7 @@ const EditFolderModal = ({
         },
       ]);
       return;
-    } else if (
-      currentFolder.name === name &&
-      `${currentFolder.isPrivate}` === isPrivate
-    ) {
+    } else if (noChanged) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -102,11 +108,7 @@ const EditFolderModal = ({
       return;
     }
     // 폴더명은 중복될 수 없다.
-    else if (
-      folders?.filter(
-        (folder) => folder.name !== currentFolder.name && folder.name === name,
-      ).length !== 0
-    ) {
+    else if (duplicatedName) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -137,55 +139,53 @@ const EditFolderModal = ({
       const docRef = doc(db, "users", uid, "folders", currentFolder.id);
 
       // 이전 상태 백업
-      let prevFolders: Folders | null;
+      let prevFolders: Folders | null = folders;
 
-      // 상태 업데이트
-      setFolders((prev) => {
-        prevFolders = prev;
-        if (!prev) {
-          return [newFolder];
-        } else {
-          return [
-            newFolder,
-            ...prev.filter((folder) => folder.id !== currentFolder.id),
-          ];
-        }
-      });
-
-      // db에 폴더 데이터 추가
-      await updateDoc(docRef, newFolder)
-        .then(() => {
-          closeModal();
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "success",
-              createdAt: Date.now(),
-              text: "폴더 수정이 완료되었습니다.",
-            },
-          ]);
-          if (currentFolder.name !== name)
-            replace(`/${userData.displayId}/${name.replaceAll(" ", "-")}`);
-        })
-        .catch((error) => {
-          // 에러 시 백업 상태로 롤백
-          setFolders(prevFolders);
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "warning",
-              createdAt: Date.now(),
-              text: "폴더 수정 중 문제가 발생하였습니다.",
-            },
-          ]);
-        })
-        .finally(() => {
-          setIsLoading(false);
+      try {
+        // 상태 업데이트
+        setFolders((prev) => {
+          if (!prev) {
+            return [newFolder];
+          } else {
+            return [
+              newFolder,
+              ...prev.filter((folder) => folder.id !== currentFolder.id),
+            ];
+          }
         });
+
+        // db에 폴더 데이터 추가
+        await updateDoc(docRef, newFolder);
+        closeModal();
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "success",
+            createdAt: Date.now(),
+            text: "폴더 수정이 완료되었습니다.",
+          },
+        ]);
+
+        nameChanged &&
+          replace(`/${userData.displayId}/${name.replaceAll(" ", "-")}`);
+      } catch (error) {
+        // 에러 시 백업 상태로 롤백
+        setFolders(prevFolders);
+        setAlerts((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            show: true,
+            type: "warning",
+            createdAt: Date.now(),
+            text: "폴더 수정 중 문제가 발생하였습니다.",
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   };
 
@@ -195,14 +195,14 @@ const EditFolderModal = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 px-10 pb-12 pt-4">
+    <div className="flex flex-col gap-8 px-10 pb-12 pt-8">
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input
           className="w-full rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none"
           type="text"
           value={name}
-          onChange={onnameChange}
+          onChange={onNameChange}
           onKeyDown={restrictingInputChar}
           maxLength={20}
         />

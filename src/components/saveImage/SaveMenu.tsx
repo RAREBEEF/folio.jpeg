@@ -36,7 +36,7 @@ const SaveMenu = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col justify-between gap-2 p-8 pt-0 text-sm">
+    <div className="flex h-full w-full flex-col justify-between gap-2 p-8 pt-8 text-sm">
       <div className="flex grow items-center justify-center gap-2 text-center">
         {folders && (
           <Select onChange={onSelectedFolderChange} value={selectedFolderId}>

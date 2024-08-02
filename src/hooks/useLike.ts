@@ -63,36 +63,34 @@ const useLike = ({ imageId }: { imageId: string }) => {
       return { ...prev, likes: [...prevLikes, authStatus.data!.uid] };
     });
 
-    await updateDoc(docRef, {
-      likes: arrayUnion(authStatus.data.uid),
-    })
-      .then(async () => {
-        // 사진 게시자에게 푸시 알림 전송
-        await sendFcm({
-          data: {
-            title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
-            body: null,
-            profileImage: authStatus.data?.photoURL,
-            targetImage: imageData?.URL,
-            click_action: `/image/${imageId}`,
-            fcmTokens: tokens ? tokens : null,
-            tokenPath: tokens ? null : `users/${imageData?.uid}`,
-            uids: imageData?.uid ? [imageData.uid] : null,
-          },
-        });
-      })
-      .catch((error) => {
-        // 에러 시 롤백
-        setImageData((prev) => {
-          if (prev === null) return null;
-          return { ...prev, likes: [...prevLikes] };
-        });
-        showErrorAlert();
-      })
-      .finally(async () => {
-        await adjustPopularity(2);
-        setIsLoading(false);
+    try {
+      await updateDoc(docRef, {
+        likes: arrayUnion(authStatus.data.uid),
       });
+      // 사진 게시자에게 푸시 알림 전송
+      await sendFcm({
+        data: {
+          title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
+          body: null,
+          profileImage: authStatus.data?.photoURL,
+          targetImage: imageData?.URL,
+          click_action: `/image/${imageId}`,
+          fcmTokens: tokens ? tokens : null,
+          tokenPath: tokens ? null : `users/${imageData?.uid}`,
+          uids: imageData?.uid ? [imageData.uid] : null,
+        },
+      });
+    } catch (error) {
+      // 에러 시 롤백
+      setImageData((prev) => {
+        if (prev === null) return null;
+        return { ...prev, likes: [...prevLikes] };
+      });
+      showErrorAlert();
+    } finally {
+      await adjustPopularity(2);
+      setIsLoading(false);
+    }
   };
 
   // 좋아요 취소
@@ -108,29 +106,31 @@ const useLike = ({ imageId }: { imageId: string }) => {
 
     setIsLoading(true);
 
-    const docRef = doc(db, "images", imageId);
-    setImageData((prev) => {
-      if (prev === null) return null;
-      prevLikes = prev.likes;
-      const newlikes = prevLikes.filter((uid) => uid !== authStatus.data!.uid);
-      return { ...prev, likes: newlikes };
-    });
-
-    await updateDoc(docRef, {
-      likes: arrayRemove(authStatus.data.uid),
-    })
-      .catch((error) => {
-        // 에러 시 롤백
-        setImageData((prev) => {
-          if (prev === null) return null;
-          return { ...prev, likes: [...prevLikes] };
-        });
-        showErrorAlert();
-      })
-      .finally(async () => {
-        await adjustPopularity(-2);
-        setIsLoading(false);
+    try {
+      const docRef = doc(db, "images", imageId);
+      setImageData((prev) => {
+        if (prev === null) return null;
+        prevLikes = prev.likes;
+        const newlikes = prevLikes.filter(
+          (uid) => uid !== authStatus.data!.uid,
+        );
+        return { ...prev, likes: newlikes };
       });
+
+      await updateDoc(docRef, {
+        likes: arrayRemove(authStatus.data.uid),
+      });
+    } catch (error) {
+      // 에러 시 롤백
+      setImageData((prev) => {
+        if (prev === null) return null;
+        return { ...prev, likes: [...prevLikes] };
+      });
+      showErrorAlert();
+    } finally {
+      await adjustPopularity(-2);
+      setIsLoading(false);
+    }
   };
 
   return { like, dislike, alreadyLiked, isLoading };
