@@ -4,7 +4,6 @@ import Button from "./Button";
 import { getMessaging, getToken } from "firebase/messaging";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { alertsState, authStatusState } from "@/recoil/states";
-import { UserData } from "@/types";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { uniqueId } from "lodash";
@@ -20,6 +19,18 @@ const PushRequest = () => {
 
   useEffect(() => {
     if (authStatus.status !== "signedIn") return;
+
+    const userAgent = navigator?.userAgent?.toLowerCase();
+    const isIos =
+      userAgent?.indexOf("iphone") !== -1 || userAgent?.indexOf("ipad") !== -1;
+    const isStandalone = window?.matchMedia(
+      "(display-mode: standalone)",
+    ).matches;
+    const canPush = !isIos || (isIos && isStandalone);
+
+    if (!canPush) {
+      return;
+    }
 
     const requestHistory = localStorage.getItem("pushRequest");
     switch (requestHistory) {
@@ -169,7 +180,7 @@ const PushRequest = () => {
       {showPushRequestModal && (
         <Modal close={onCloseModal} title="푸시 알림 받기">
           <div className="break-keep px-8 text-lg">
-            <div className="pb-4 leading-6">
+            <div className="pb-4 text-base leading-6">
               회원님의 사진에 대한 반응이나 새로운 팔로워 등을 알림으로 받아보실
               수 있습니다.
             </div>

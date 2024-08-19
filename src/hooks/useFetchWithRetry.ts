@@ -13,8 +13,14 @@ const useFetchWithRetry = () => {
     try {
       // 전달할 인자 종합하기
       const argList = [];
-      args && argList.push(args);
-      multipleArgs && argList.push(multipleArgs);
+      if (args) {
+        argList.push(args);
+      }
+      if (multipleArgs && multipleArgs.length > 0) {
+        argList.push(...multipleArgs);
+      }
+
+      console.log(argList);
 
       return await asyncFn(...argList);
     } catch (error) {

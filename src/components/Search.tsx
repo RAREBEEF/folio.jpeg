@@ -241,11 +241,11 @@ const Search = () => {
           minLength={1}
           maxLength={30}
           type="search"
-          className={`w-full pl-6 pr-2 text-base outline-none transition-all ${showDropdown ? "h-10 border bg-white text-astronaut-950" : "h-7 bg-astronaut-50 text-astronaut-400"} ${
+          className={`w-full rounded-lg pl-6 pr-2 text-base outline-none transition-all ${showDropdown ? "h-10 border bg-white text-astronaut-950" : "h-7 bg-astronaut-50 text-astronaut-400"} ${
             showDropdown &&
             (!value || (value && Object.keys(suggestions).length !== 0))
-              ? "rounded-t-lg"
-              : "rounded-lg"
+              ? "rounded-b-none"
+              : ""
           }`}
         />
         <SearchSvg
