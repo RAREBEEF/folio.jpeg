@@ -195,7 +195,7 @@ const EditFolderModal = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 px-10 pb-12 pt-8">
+    <div className="flex flex-col gap-8 px-6 pb-6 pt-8">
       <label>
         <h3 className="pb-1 font-semibold">폴더명</h3>
         <input

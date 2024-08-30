@@ -153,47 +153,57 @@ const UploadForm = () => {
       "",
   );
 
+  // 초기화
   useEffect(() => {
-    if (init || isImageLoading || authStatus.status === "pending") return;
+    if (isImageLoading || authStatus.status === "pending") return;
 
-    const hasPermission =
-      authStatus.status === "signedIn" &&
-      (!isEdit || (imageData && authStatus.data.uid === imageData.uid));
-
-    // 로그인 여부 체크
-    // 로그인이 안되었거나 수정 권한이 없으면 나가기
-    if (!hasPermission) {
+    // 미로그인시 홈으로
+    if (authStatus.status !== "signedIn") {
       replace("/");
+      // 이미 초기화 했으면 리턴
+    } else if (init) {
+      return;
+      // 새 이미지 업로드 모드
+      // 초기화 완료
+    } else if (!isEdit) {
+      setInit(true);
+      // 수정모드
+      // 이미지 데이터 체크 후 초기화 환료
     } else {
-      // 수정모드 구분
-      if (isEdit) {
-        // 수정할 이미지 데이터가 아직 없으면 불러오기
-        if (!imageData) {
-          (async () => {
-            console.log("불러오기");
-            const data = await getImageData({
-              imageId: currentImageId,
-            });
-            if (!data) {
-              replace("/");
-            } else {
-              setImageData(data);
-              setTitle(data.title || "");
-              setDesc(data.description || "");
-              setCustomCameraModel(data.metadata.model || "");
-              setCustomLensModel(data.metadata.lensModel || "");
-              setCustomShutterSpeed(data.metadata.shutterSpeed || "");
-              setCustomFNumber(data.metadata.fNumber?.toString() || "");
-              setCustomISO(data.metadata.ISO?.toString() || "");
-              setCustomFocalLength(data.metadata.focalLength?.toString() || "");
-              setInit(true);
-            }
-          })();
-        } else {
-          setInit(true);
-        }
-        // 신규 업로드는 딱히 초기화 할거 없음
+      // 수정할 이미지 데이터 없으면 불러오고 초기화
+      if (!imageData) {
+        (async () => {
+          const data = await getImageData({
+            imageId: currentImageId,
+          });
+
+          // 불러온 이미지 없으면 돌아가기
+          if (!data) {
+            replace("/");
+          } else {
+            setImageData(data);
+            setTitle(data.title || "");
+            setDesc(data.description || "");
+            setCustomCameraModel(data.metadata.model || "");
+            setCustomLensModel(data.metadata.lensModel || "");
+            setCustomShutterSpeed(data.metadata.shutterSpeed || "");
+            setCustomFNumber(data.metadata.fNumber?.toString() || "");
+            setCustomISO(data.metadata.ISO?.toString() || "");
+            setCustomFocalLength(data.metadata.focalLength?.toString() || "");
+            setInit(true);
+          }
+        })();
+        // 이미지 데이터 있으면 초기화
       } else {
+        setImageData(imageData);
+        setTitle(imageData.title || "");
+        setDesc(imageData.description || "");
+        setCustomCameraModel(imageData.metadata.model || "");
+        setCustomLensModel(imageData.metadata.lensModel || "");
+        setCustomShutterSpeed(imageData.metadata.shutterSpeed || "");
+        setCustomFNumber(imageData.metadata.fNumber?.toString() || "");
+        setCustomISO(imageData.metadata.ISO?.toString() || "");
+        setCustomFocalLength(imageData.metadata.focalLength?.toString() || "");
         setInit(true);
       }
     }

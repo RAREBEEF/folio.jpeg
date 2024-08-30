@@ -16,7 +16,9 @@ const ProfileCard = ({ profileData }: { profileData: UserData | null }) => {
       <div className="w-10">
         <ProfileImage URL={profileData?.photoURL || null} />
       </div>
-      <div className="font-bold">{profileData?.displayName || ""}</div>
+      <div className="text-base font-semibold">
+        {profileData?.displayName || ""}
+      </div>
     </Link>
   );
 };

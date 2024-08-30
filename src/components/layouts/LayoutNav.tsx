@@ -181,7 +181,7 @@ const LayoutNav = () => {
             </Link>
           </li>
           <li
-            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "upload" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${(curPath === "upload" || curPath === "edit") && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
@@ -190,14 +190,14 @@ const LayoutNav = () => {
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "upload" ? "text-astronaut-300" : "text-astronaut-500 hover:text-astronaut-300"}`}
+                  className={`${curPath === "upload" || curPath === "edit" ? "text-astronaut-300" : "text-astronaut-500 hover:text-astronaut-300"}`}
                 >
                   Upload
                 </div>
               ) : (
                 <IconWithTooltip text="업로드" tooltipDirection="right">
                   <ImageSvg
-                    className={`aspect-square w-[30px] ${curPath === "upload" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                    className={`aspect-square w-[30px] ${curPath === "upload" || curPath === "edit" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
                   />
                 </IconWithTooltip>
               )}

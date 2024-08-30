@@ -29,16 +29,16 @@ const usePostComment = ({
 
   const postCommentAsync = async ({
     comment,
-    tokens = null,
     parentComment = null,
   }: {
     comment: Comment;
-    tokens: Array<string> | null;
     parentComment: Comment | null;
   }): Promise<"success" | "error"> => {
     console.log("useSetComment");
 
     if (!imageData) throw new Error("No image item");
+
+    if (authStatus.status !== "signedIn") throw new Error("auth error");
 
     // 댓글
     if (!parentId) {
@@ -48,14 +48,19 @@ const usePostComment = ({
       await Promise.all([
         sendFcm({
           data: {
-            title: `${authStatus.data?.displayName}님이 사진에 댓글을 남겼습니다.`,
-            body: `${authStatus.data?.displayName}님: ${comment.content}`,
-            profileImage: authStatus.data?.photoURL,
-            targetImage: imageData?.URL,
+            title: `${authStatus.data.displayName}님이 사진에 댓글을 남겼습니다.`,
+            body: `${authStatus.data.displayName}님: ${comment.content}`,
+            profileImage: authStatus.data.photoURL,
+            targetImage: imageData.URL,
             click_action: `/image/${imageData.id}`,
-            fcmTokens: author?.fcmToken ? [author?.fcmToken] : null,
-            tokenPath: author?.fcmToken ? null : `users/${imageData?.uid}`,
-            uids: author?.uid ? [author.uid] : null,
+            uids: author?.uid ? [author?.uid] : null,
+            sender: {
+              uid: authStatus.data.uid,
+              displayName: authStatus.data.displayName,
+              displayId: authStatus.data.displayId || null,
+            },
+            type: "comment",
+            subject: comment.id,
           },
         }),
       ]);
@@ -64,22 +69,24 @@ const usePostComment = ({
       const docRef = doc(db, "images", imageData.id, "comments", parentId);
       await updateDoc(docRef, {
         replies: arrayUnion(comment),
-        fcmTokens: arrayUnion(authStatus.data!.fcmToken || ""),
       });
       await sendFcm({
         data: {
-          title: `${authStatus.data?.displayName}님이 답글을 남겼습니다.`,
-          body: `${authStatus.data?.displayName}님: ${comment.content}`,
-          profileImage: authStatus.data?.photoURL,
-          targetImage: imageData?.URL,
+          title: `${authStatus.data.displayName}님이 답글을 남겼습니다.`,
+          body: `${authStatus.data.displayName}님: ${comment.content}`,
+          profileImage: authStatus.data.photoURL,
+          targetImage: imageData.URL,
           click_action: `/image/${imageData.id}`,
-          fcmTokens: tokens,
-          tokenPath: tokens
-            ? null
-            : `images/${imageData.id}/comments/${parentId}`,
           uids: parentComment
             ? parentComment.replies.map((reply) => reply.uid)
             : null,
+          sender: {
+            uid: authStatus.data.uid,
+            displayName: authStatus.data.displayName,
+            displayId: authStatus.data.displayId || null,
+          },
+          type: "reply",
+          subject: parentComment?.id,
         },
       });
     }
@@ -89,11 +96,9 @@ const usePostComment = ({
 
   const postComment = async ({
     comment,
-    tokens = null,
     parentComment = null,
   }: {
     comment: Comment;
-    tokens?: Array<string> | null;
     parentComment?: Comment | null;
   }): Promise<"success" | "error"> => {
     if (isLoading || !imageData) return "error";
@@ -105,7 +110,6 @@ const usePostComment = ({
         asyncFn: postCommentAsync,
         args: {
           comment,
-          tokens,
           parentComment,
         },
       });

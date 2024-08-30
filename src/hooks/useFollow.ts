@@ -139,18 +139,20 @@ const useFollow = ({ targetUid }: { targetUid: string }) => {
       // 팔로우 대상에게 푸시 전송
       await sendFcm({
         data: {
-          title: `${authStatus.data?.displayName}님이 회원님을 팔로우하기 시작했습니다.`,
-          body: null,
-          profileImage: authStatus.data?.photoURL,
+          title: `새로운 팔로워`,
+          body: `${authStatus.data.displayName}님이 회원님을 팔로우하기 시작했습니다.`,
+          profileImage: authStatus.data.photoURL,
           targetImage: null,
-          click_action: authStatus.data?.displayId
+          click_action: authStatus.data.displayId
             ? `/${authStatus.data?.displayId}`
             : "/",
-          fcmTokens: targetUserData?.fcmToken
-            ? [targetUserData?.fcmToken]
-            : null,
-          tokenPath: targetUserData?.fcmToken ? null : `users/${targetUid}`,
           uids: [targetUid],
+          sender: {
+            uid: authStatus.data.uid,
+            displayName: authStatus.data.displayName,
+            displayId: authStatus.data.displayId || null,
+          },
+          type: "follow",
         },
       });
     } catch (error) {

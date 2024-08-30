@@ -14,20 +14,20 @@ export interface UserData extends User {
   displayId?: string | undefined | null;
   following?: Array<string>;
   follower?: Array<string>;
-  fcmToken?: string | null;
-  bgPhotoURL?: string;
+  allowPush?: boolean | undefined;
+  currentPushToken?: string;
 }
 export type UserDataWithoutExtraData = Exclude<
   UserData,
-  "displayId" | "following" | "follower" | "fcmToken"
+  "displayId" | "following" | "follower" | "allowPush"
 >;
 export interface ExtraUserData {
   displayId: string;
   photoURL: string;
-  bgPhotoURL: string;
   following: Array<string>;
   follower: Array<string>;
-  fcmToken: string | null;
+  allowPush: boolean | undefined;
+  currentPushToken?: string;
 }
 
 export type AuthStatus =
@@ -96,7 +96,6 @@ export interface Comment {
   createdAt: number;
   uid: string;
   replies: Array<Comment>;
-  fcmTokens: Array<string>;
 }
 export type Comments = { [key in string]: Comment };
 
@@ -146,6 +145,21 @@ export interface InAppNotification {
   profileImage: string;
   targetImage?: string | null;
   URL: string;
+  sender:
+    | {
+        uid: string | null;
+        displayName: string | null;
+        displayId: string | null;
+      }
+    | Array<{
+        uid: string | null;
+        displayName: string | null;
+        displayId: string | null;
+      }>
+    | null;
+  uids: Array<string>;
+  type: "comment" | "reply" | "like" | "follow" | "other";
+  subject: string;
 }
 
 export type AnalysisResult =
@@ -156,6 +170,12 @@ export type AnalysisResult =
       feedback: Feedback;
     }
   | "inappreciate";
+
+export type ProfileAnalysisResult = {
+  displayNameValid: boolean;
+  displayIdValid: boolean;
+  profileImageValid: boolean;
+};
 
 export interface Feedback {
   detail: string;

@@ -39,10 +39,9 @@ export async function generateMetadata(
   let data: ExtraUserData = {
     displayId,
     photoURL: logo.src,
-    bgPhotoURL: "",
     follower: [],
     following: [],
-    fcmToken: "",
+    allowPush: undefined,
   };
   let uid: string = "";
 

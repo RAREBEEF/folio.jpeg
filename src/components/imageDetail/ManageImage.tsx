@@ -69,6 +69,9 @@ const ManageImage = ({ imageId }: { imageId: string }) => {
         },
       );
 
+      // 뒤로가기
+      back();
+
       setImageData(null);
       resetHomeCreatedAtGrid();
       resetHomePopularityGrid();
@@ -88,8 +91,6 @@ const ManageImage = ({ imageId }: { imageId: string }) => {
           text: "삭제가 완료되었습니다.",
         },
       ]);
-      // 뒤로가기
-      back();
     } catch (error) {
       setAlerts((prev) => [
         ...prev,

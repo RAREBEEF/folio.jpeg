@@ -13,6 +13,7 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
   const [userStack, setUserStack] = useState<Array<string>>(users);
   const [usersData, setUsersData] = useRecoilState(usersDataState);
   const [userList, setUserList] = useState<Array<UserData>>([]);
+  const [initLoad, setInitLoad] = useState<boolean>(true);
 
   // users의 user들 데이터 불러오기
   const loadUsers = useCallback(async () => {
@@ -49,6 +50,7 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(async (entry) => {
         if (entry.isIntersecting) {
+          !initLoad && setInitLoad(true);
           await loadUsers();
         }
       });
@@ -58,12 +60,12 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
     return () => {
       observer.unobserve(loadBtn);
     };
-  }, [loadUsers]);
+  }, [initLoad, loadUsers]);
 
   return (
     <div className="h-[40vh] max-h-[500px] min-h-[200px]">
       <ul className="flex h-full flex-col gap-4 overflow-scroll p-4 px-6 pt-4">
-        {!isLoading && userList.length <= 0 ? (
+        {!isLoading && initLoad && userList.length <= 0 ? (
           <div className="flex h-[80%] items-center justify-center text-center text-astronaut-700">
             목록이 비어있습니다.
           </div>
@@ -74,15 +76,15 @@ const UserListModal = ({ users }: { users: Array<string> }) => {
             </li>
           ))
         )}
+        {userList.length !== users.length && (
+          <div
+            ref={loadRef}
+            className="pb-24 pt-12 text-center text-sm text-astronaut-500"
+          >
+            <Loading />
+          </div>
+        )}
       </ul>
-      {userList.length !== users.length && (
-        <div
-          ref={loadRef}
-          className="pb-24 pt-12 text-center text-sm text-astronaut-500"
-        >
-          <Loading />
-        </div>
-      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
-import { alertsState, uploadStatusState } from "@/recoil/states";
+import { alertsState, modalState, uploadStatusState } from "@/recoil/states";
 import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import CircleCheckIcon from "@/icons/circle-check-solid.svg";
 import CircleExclamationIcon from "@/icons/circle-exclamation-solid.svg";
 import _ from "lodash";
@@ -38,6 +38,7 @@ const Alert = () => {
   }>({ width: 0, height: 0 });
   const [showAnalysisResultModal, setShowAnalysisResultModal] =
     useState<boolean>(false);
+  const isModalVisible = useRecoilValue(modalState);
 
   useEffect(() => {
     const newAlertArrival = alerts.filter((alert) => !alert.cleanUp).length > 0;
@@ -110,10 +111,10 @@ const Alert = () => {
   };
 
   return (
-    <div className="pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex w-screen flex-col items-center justify-end gap-4 overflow-visible xs:bottom-[80px]">
-      <div className="flex w-full items-end xs:flex-col xs:items-center">
+    <div className="pointer-events-none fixed bottom-[50px] left-0 right-0 z-[10000] m-auto flex w-screen flex-col items-center justify-end gap-4 overflow-visible px-4 sm:bottom-[80px]">
+      <div className="flex w-full items-end gap-4 sm:flex-col sm:items-center">
         {/* 알림 */}
-        <div className="flex grow flex-col items-center xs:mb-4">
+        <div className="flex grow flex-col items-center sm:mb-4">
           {alerts
             .filter((alert) => alert.fixed)
             .map((alert) => (
@@ -133,7 +134,7 @@ const Alert = () => {
             ))}
           {alerts
             .filter((alert) => !alert.fixed)
-            .splice(-5)
+            .splice(-3)
             .map((alert) => (
               <div
                 key={alert.createdAt}
@@ -151,14 +152,14 @@ const Alert = () => {
             ))}
         </div>
         {/* 업로드 목록 */}
-        {uploadStatus.length > 0 && (
+        {uploadStatus.length > 0 && !isModalVisible && (
           <div
-            className={`pointer-events-auto mr-5 flex w-fit min-w-[300px] max-w-[50vw] shrink-0 animate-alert select-none flex-col items-center gap-2 overflow-hidden break-keep rounded-xl bg-astronaut-50 px-4 py-4 text-lg font-semibold text-astronaut-800 shadow-lg transition-all xs:mr-0`}
+            className={`pointer-events-auto mr-5 flex w-fit min-w-[300px] max-w-[50vw] shrink-0 animate-alert select-none flex-col items-center gap-2 overflow-hidden break-keep rounded-xl bg-astronaut-50 px-2 py-2 text-lg text-astronaut-800 shadow-lg transition-all sm:mr-0`}
           >
             <div className="self-start px-4">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 text-sm font-semibold">
                 진행 중인 업로드{" "}
-                <span className="text-sm">
+                <span className="text-xs">
                   (
                   {
                     uploadStatus.filter(
@@ -168,7 +169,7 @@ const Alert = () => {
                   )
                 </span>
               </div>
-              <div className="text-xs">
+              <div className="text-xs font-normal">
                 업로드가 완료될 때까지 앱을 종료하지 마세요.
               </div>
             </div>
@@ -179,7 +180,7 @@ const Alert = () => {
             >
               <summary className="group m-auto w-fit cursor-pointer">
                 <ArrowSvg
-                  className={`h-4 w-4 fill-astronaut-500 transition-transform hover:fill-astronaut-600 active:fill-astronaut-700 ${isListOpen ? "rotate-90 group-hover:translate-y-[-5px]" : "rotate-[270deg] group-hover:translate-y-[5px]"}`}
+                  className={`h-4 w-4 fill-astronaut-500 transition-transform hover:fill-astronaut-600 active:fill-astronaut-700 ${isListOpen ? "rotate-[270deg] group-hover:translate-y-[5px]" : "rotate-90 group-hover:translate-y-[-5px]"}`}
                 />
               </summary>
               <div className="mt-2 flex max-h-[50vh] flex-col gap-2 overflow-scroll px-5">
@@ -192,7 +193,7 @@ const Alert = () => {
                 {uploadStatus.map((upload) => (
                   <div
                     key={upload.id}
-                    className={`relative flex w-full items-center gap-2 whitespace-pre-line border-t-2 border-astronaut-200 pt-2 text-base leading-tight ${upload.status === "fail" && "text-[firebrick]"}`}
+                    className={`relative flex w-full items-center gap-2 whitespace-pre-line border-t-2 border-astronaut-200 py-2 text-base leading-tight ${upload.status === "fail" && "text-[firebrick]"}`}
                   >
                     {["done", "fail"].includes(upload.status) && (
                       <button
@@ -206,12 +207,13 @@ const Alert = () => {
                       <Image
                         className="overflow-hidden rounded-lg"
                         layout="fill"
+                        objectFit="cover"
                         src={upload.previewURL || ""}
                         alt={upload.id}
                       />
                     </div>
                     <div className="flex grow flex-col justify-between self-stretch">
-                      <div>
+                      <div className="font-semibold">
                         <div className="shrink-0 text-xs">
                           {!["fail", "done"].includes(upload.status) &&
                             `STEP ${STEPS[upload.status]}`}

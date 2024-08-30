@@ -130,3 +130,8 @@ export const searchHistoryState = atom<Array<string>>({
   key: "searchHistory",
   default: [],
 });
+
+export const modalState = atom<boolean>({
+  key: "modalState",
+  default: false,
+});

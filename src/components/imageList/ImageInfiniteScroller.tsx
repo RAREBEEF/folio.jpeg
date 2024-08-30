@@ -83,7 +83,7 @@ const ImageInfiniteScroller = ({
               className="group m-auto mt-4 flex items-center gap-1 whitespace-nowrap text-astronaut-500"
               onClick={onScrollToTopClick}
             >
-              <ArrowSvg className="h-3 w-3 rotate-90 fill-astronaut-500 transition-transform  group-hover:translate-y-[-5px]" />
+              <ArrowSvg className="h-3 w-3 rotate-90 fill-astronaut-500 transition-transform group-hover:translate-y-[-5px]" />
               <div>맨 위로</div>
             </button>
           </div>

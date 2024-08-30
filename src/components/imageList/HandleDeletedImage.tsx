@@ -17,7 +17,9 @@ const HandleDeletedImage = ({
     const notFoundImgIds = folder.images.filter(
       (id) => !loadedImgIds.includes(id),
     );
+
     if (notFoundImgIds.length <= 0) return;
+
     (async () => {
       try {
         const docRef = doc(db, "users", folder.uid, "folders", folder.id);

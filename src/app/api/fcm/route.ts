@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
+import _ from "lodash";
 
 export async function POST(req: Request) {
   const data = await req.json();
@@ -10,11 +11,10 @@ export async function POST(req: Request) {
     targetImage,
     icon,
     click_action,
-    fcmTokens,
-    tokenPath,
-    myToken,
-    myUid,
     uids,
+    sender,
+    type,
+    subject,
   }: {
     title: string;
     body: string;
@@ -22,18 +22,21 @@ export async function POST(req: Request) {
     targetImage: string | null;
     icon: string;
     click_action: string;
-    fcmTokens: Array<string> | undefined | null;
-    tokenPath: string | undefined | null;
     uids: Array<string> | undefined | null;
-    myToken: string | null;
-    myUid: string | null;
+    sender: {
+      uid: string | null;
+      displayName: string | null;
+      displayId: string | null;
+    } | null;
+    type: "comment" | "reply" | "like" | "follow" | "other";
+    subject: string;
   } = data;
 
   // title은 푸시의 메인 내용에 해당하는 부분.
   if (!title) {
     return NextResponse.json({ data: "Missing content", status: 400 });
     // 토큰과 uid가 없으면 알림을 보낼 수 없다.
-  } else if (!fcmTokens && !tokenPath && !uids) {
+  } else if (!uids || data.uids.length <= 0) {
     return NextResponse.json({ data: "Missing token and uid", status: 400 });
   }
 
@@ -62,9 +65,12 @@ export async function POST(req: Request) {
       profileImage,
       targetImage,
       URL: click_action,
+      sender,
+      type,
+      subject,
     };
 
-    const uidList = uids ? uids.filter((uid) => uid !== myUid) : [];
+    const uidList = uids;
 
     const sendInappNotifications = uidList.map(async (uid) => {
       return await admin
@@ -82,66 +88,33 @@ export async function POST(req: Request) {
     // fcm 보내기
     //
     // 토큰 로드
-    let tokenList: Array<string> = [];
+    // uids에 속해있는 유저들의 기기 토큰 모두 불러오기
+    const tokenList: Array<any> = [];
+    // 토큰을 각 uid별로 정리해 저장.(토큰 삭제 시 쿼리에 활용).
+    const uidTokenMap: { [uid in string]: Array<string> } = {};
+    // id 배열을 길이 30으로 제한하여 나누기
+    const uidListChunk = _.chunk(uidList, 30);
 
-    // 토큰 자체를 전달받은 경우 해당 토큰에 푸시 전송
-    if (fcmTokens) {
-      tokenList = fcmTokens.filter((token: string) => token !== myToken);
-      // 토큰 경로를 전달받은 경우 해당 경로에서 토큰을 불러온다.
-    } else if (tokenPath) {
-      let docRef: admin.firestore.DocumentReference<
-        admin.firestore.DocumentData,
-        admin.firestore.DocumentData
-      > | null = null;
+    const getDeviceDataListChunk = uidListChunk.map((uids) =>
+      admin
+        .firestore()
+        .collection("devices")
+        .where(admin.firestore.FieldPath.documentId(), "in", uids)
+        .get(),
+    );
 
-      // 전달받은 string 경로를 /로 끊어서 배열로 저장
-      const pathSplit = tokenPath.split("/");
-      const pathLength = pathSplit.length;
+    const deviceDataList = await Promise.all(getDeviceDataListChunk);
 
-      // 경로 배열이 2인 경우의 docRef(이미지와 유저 데이터 등에 해당)
-      if (pathLength === 2) {
-        docRef = admin.firestore().collection(pathSplit[0]).doc(pathSplit[1]);
-        // 경로 배열이 4인 경우의 docRef(이미지의 댓글 데이터 등에 해당)
-      } else if (pathLength === 4) {
-        docRef = admin
-          .firestore()
-          .collection(pathSplit[0])
-          .doc(pathSplit[1])
-          .collection(pathSplit[2])
-          .doc(pathSplit[3]);
-      }
+    deviceDataList.forEach((deviceData) => {
+      deviceData.forEach((device) => {
+        const uid = device.id;
+        const data = device.data();
+        const tokens = [...Object.keys(data)];
+        tokenList.push(...tokens);
+        uidTokenMap[uid] = tokens;
+      });
+    });
 
-      if (!docRef) {
-        return NextResponse.json({
-          data: null,
-          error: "Invalid token path",
-          status: 500,
-        });
-      } else {
-        const docSnap = await docRef.get();
-        const data = docSnap.data();
-
-        // 불러온 토큰 데이터는 배열일 수도, 문자열일 수도 있다.
-        const fcmTokens: Array<string> | undefined = data?.fcmTokens.filter(
-          (token: string) => token !== myToken, // 내 토큰 제외
-        );
-        const fcmToken: string | undefined =
-          data?.fcmToken === myToken ? undefined : data?.fcmToken;
-
-        if (fcmTokens) {
-          tokenList = fcmTokens;
-        } else if (fcmToken) {
-          tokenList = [fcmToken];
-        } else {
-          // 데이터에 토큰이 없는 경우
-          return NextResponse.json({
-            data: null,
-            error: "Invalid token path",
-            status: 500,
-          });
-        }
-      }
-    }
     const notificationData = {
       notification: {
         title: title,
@@ -152,13 +125,74 @@ export async function POST(req: Request) {
         image: profileImage,
         icon,
       },
-      tokens: tokenList,
+      tokens: [...tokenList],
     };
 
     const res = await Promise.all([
       admin.messaging().sendEachForMulticast(notificationData),
       ...sendInappNotifications,
     ]);
+
+    // 토큰 삭제
+    // 전송 실패한 토큰이 존재하는 경우. 단, 성공한 토큰이 하나라도 있는 경우에만 해당 (전체 실패가 아닌 경우에만 해당).
+    if (res[0].failureCount > 0 && res[0].successCount > 0) {
+      try {
+        // 실패한 토큰 찾는다.
+        const failureTokens: Array<string> = res[0].responses.reduce(
+          (acc, cur, i) => {
+            if (!cur.success) {
+              acc.push(tokenList[i]);
+            }
+            return acc;
+          },
+          [] as Array<string>,
+        );
+
+        // 실패한 토큰들을 소유한 uid를 찾는다.
+        const failureUidTokenMap = Object.entries(uidTokenMap).reduce(
+          (acc, [uid, tokens]) => {
+            const foundedTokens = tokens.filter((token) =>
+              failureTokens.includes(token),
+            );
+
+            if (foundedTokens.length > 0) {
+              acc[uid] = foundedTokens;
+            }
+
+            return acc;
+          },
+          {} as { [uid in string]: Array<string> },
+        );
+
+        // uid 쿼리 후 토큰 삭제
+        const deleteFailureTokens = Object.entries(failureUidTokenMap).map(
+          ([uid, tokens]) => {
+            const userDeviceDocRef = admin
+              .firestore()
+              .collection("devices")
+              .doc(uid);
+
+            const updateData = tokens.reduce(
+              (acc, cur) => {
+                acc[cur] = admin.firestore.FieldValue.delete();
+                return acc;
+              },
+              {} as { [token in string]: admin.firestore.FieldValue },
+            );
+
+            return userDeviceDocRef.update(updateData);
+          },
+        );
+
+        await Promise.all(deleteFailureTokens);
+      } catch (error) {
+        return NextResponse.json({
+          data: "failed to delete invalid tokens.",
+          error,
+          status: 500,
+        });
+      }
+    }
 
     return NextResponse.json({
       data: { notificationData, res },

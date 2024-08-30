@@ -108,14 +108,6 @@ const UserDetail = () => {
         <div className="flex flex-col gap-4 pb-12">
           <div className="relative flex flex-col items-center gap-5 pb-4">
             <div className="relative w-full">
-              {userData.bgPhotoURL && (
-                <Image
-                  src={userData.bgPhotoURL}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="background image"
-                />
-              )}
               <div className="relative m-auto w-[50%] max-w-72 pb-6 pt-12">
                 <ProfileImage URL={userData.photoURL} />
               </div>

@@ -42,11 +42,11 @@ const useLike = ({ imageId }: { imageId: string }) => {
   let prevLikes: Array<string>;
 
   // 좋아요
-  const like = async (tokens: Array<string> | null) => {
+  const like = async () => {
     console.log("useLike");
     if (typeof imageId !== "string" || isLoading) return;
 
-    if (authStatus.status !== "signedIn" || !authStatus.data) {
+    if (authStatus.status !== "signedIn") {
       setLoginModal({
         show: true,
         showInit: authStatus.status === "noExtraData",
@@ -70,14 +70,19 @@ const useLike = ({ imageId }: { imageId: string }) => {
       // 사진 게시자에게 푸시 알림 전송
       await sendFcm({
         data: {
-          title: `${authStatus.data?.displayName}님이 사진에 좋아요를 눌렀습니다.`,
-          body: null,
+          title: "새로운 좋아요",
+          body: `${authStatus.data?.displayName}님이 회원님의 사진에 좋아요를 눌렀습니다.`,
           profileImage: authStatus.data?.photoURL,
           targetImage: imageData?.URL,
           click_action: `/image/${imageId}`,
-          fcmTokens: tokens ? tokens : null,
-          tokenPath: tokens ? null : `users/${imageData?.uid}`,
           uids: imageData?.uid ? [imageData.uid] : null,
+          sender: {
+            uid: authStatus.data.uid,
+            displayName: authStatus.data.displayName,
+            displayId: authStatus.data.displayId || null,
+          },
+          type: "like",
+          subject: imageId,
         },
       });
     } catch (error) {
@@ -99,7 +104,6 @@ const useLike = ({ imageId }: { imageId: string }) => {
     if (
       typeof imageId !== "string" ||
       authStatus.status !== "signedIn" ||
-      !authStatus.data ||
       isLoading
     )
       return;

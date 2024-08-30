@@ -9,10 +9,12 @@ import _ from "lodash";
 import logo from "@/images/logo.png";
 import Image from "next/image";
 import Search from "../Search";
+import useDevicePushToken from "@/hooks/useDevicePushToken";
 
 const LayoutHeader = () => {
   const setLoginModal = useSetRecoilState(loginModalState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
+  const { deleteDeviceData } = useDevicePushToken();
 
   const onLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -20,6 +22,8 @@ const LayoutHeader = () => {
   };
   const onLogoutClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    await deleteDeviceData({ all: false });
     await auth.signOut();
     setAuthStatus({ status: "signedOut", data: null });
   };
@@ -29,10 +33,10 @@ const LayoutHeader = () => {
     <Suspense>
       <header
         id="header"
-        className="bg-red fixed top-0 z-[41] flex h-16 w-full min-w-[300px] items-end bg-white pb-[7px] text-astronaut-50 shadow-lg"
+        className="bg-red fixed top-0 z-40 flex h-16 w-full min-w-[300px] items-end bg-white pb-[7px] text-astronaut-50 shadow-lg"
       >
         <div className="flex w-full items-center justify-between">
-          <h1 className="font-bold xs:pl-2">
+          <h1 className="font-bold ">
             <Link href="/" className="relative flex w-[50px] items-center">
               <div className="flex h-[50px] w-[50px] items-center justify-center">
                 <Image

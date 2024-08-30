@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import ProfileSvg from "@/icons/user-solid.svg";
 import { useState } from "react";
-import defaultProfileImage from "@/images/user-solid.png";
+import defaultProfileImage from "@/images/user.png";
+// import defaultProfileImage from "@/images/user-solid.png";
 
 const ProfileImage = ({ URL }: { URL: string | null }) => {
   const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
   return (
     <div
-      className={`from-astronaut-100 to-astronaut-300 relative aspect-square overflow-hidden rounded-full bg-gradient-to-br`}
+      className={`relative aspect-square overflow-hidden rounded-full bg-white`}
     >
       {/* {URL && !isImageBroken ? ( */}
       <Image

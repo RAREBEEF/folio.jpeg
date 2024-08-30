@@ -5,7 +5,6 @@ const useInput = (initValue: string) => {
 
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { value } = e.target;
-
     setValue(value);
   };
 

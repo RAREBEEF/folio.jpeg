@@ -20,8 +20,6 @@ const useFetchWithRetry = () => {
         argList.push(...multipleArgs);
       }
 
-      console.log(argList);
-
       return await asyncFn(...argList);
     } catch (error) {
       if (retries > 0) {

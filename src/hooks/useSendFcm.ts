@@ -1,21 +1,14 @@
 import { authStatusState } from "@/recoil/states";
-import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import logoIcon from "@/icons/favicon.ico";
-import defaultProfileIcon from "@/images/user-solid.png";
+import defaultProfileIcon from "@/images/user.png";
 
 const useSendFcm = () => {
   const authStatus = useRecoilValue(authStatusState);
-  // 내 토큰
-  // 알림을 전송할 때, 현재 내 토큰은 제외해야함
-  const myToken = useMemo(
-    () => authStatus.data?.fcmToken || null,
-    [authStatus],
-  );
-  const myUid = useMemo(() => authStatus.data?.uid || null, [authStatus]);
 
   const sendFcm = async ({
     data,
+    exceptSelf = true,
   }: {
     data: {
       title: string;
@@ -23,16 +16,31 @@ const useSendFcm = () => {
       profileImage: string | undefined | null;
       targetImage?: string | undefined | null;
       click_action: string;
-      fcmTokens?: Array<string> | null;
-      tokenPath?: string | null;
       uids?: Array<string> | null;
+      sender: {
+        uid: string | null;
+        displayName: string | null;
+        displayId: string | null;
+      } | null;
+      type?: "comment" | "reply" | "like" | "follow" | "other";
+      subject?: string;
     };
+    exceptSelf?: boolean;
   }) => {
     console.log("useSendFcm");
     // 토큰이나 토큰의 경로, uid가 전달되지 않았으면 리턴
-    if (!data.fcmTokens && !data.tokenPath && !data.uids) {
+    // 미로그인시 리턴, 미로그인 상태에서는 푸시 기능 쓸 일 없음.
+    if (
+      !data.uids ||
+      data.uids.length <= 0 ||
+      authStatus.status !== "signedIn"
+    ) {
       return;
     } else {
+      // 푸시 알림을 자신을 제외하고 전송할지
+      const targetUids = exceptSelf
+        ? data.uids.filter((uid) => uid !== authStatus.data.uid)
+        : data.uids;
       // 토큰 전송 요청
       await fetch("/api/fcm", {
         method: "POST",
@@ -46,11 +54,10 @@ const useSendFcm = () => {
           targetImage: data.targetImage || null,
           icon: logoIcon.src,
           click_action: data.click_action || "/",
-          fcmTokens: data.fcmTokens,
-          tokenPath: data.tokenPath,
-          uids: data.uids,
-          myToken,
-          myUid,
+          uids: targetUids,
+          sender: data.sender,
+          type: data.type || "other",
+          subject: data.subject || "",
         }),
       })
         .then(async (response) => {})

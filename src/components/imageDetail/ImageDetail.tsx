@@ -1,17 +1,15 @@
 "use client";
 
 import {
-  commentsState,
   deviceState,
   imageDataState,
-  lastVisibleState,
   userDataState,
   usersDataState,
 } from "@/recoil/states";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import CommentList from "@/components/comment/CommentList";
 import Like from "./Like";
 import useGetImage from "@/hooks/useGetImage";
@@ -19,12 +17,7 @@ import Loading from "@/components/loading/Loading";
 import RecommendImageList from "../imageList/RecommendImageList";
 import ArrowIcon from "@/icons/arrow-left-solid.svg";
 import CommentForm from "@/components/comment/CommentForm";
-import {
-  DocumentData,
-  QueryDocumentSnapshot,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { ExtraUserData, UserData } from "@/types";
 import ProfileCard from "@/components/user/ProfileCard";
@@ -36,6 +29,8 @@ import XSvg from "@/icons/xmark-solid.svg";
 import _ from "lodash";
 import MetadataInfo from "./MetadataInfo";
 import useImagePopularity from "@/hooks/useImagePopularity";
+import SadSvg from "@/icons/face-frown-regular.svg";
+import Button from "../Button";
 
 const ImageDetail = () => {
   const device = useRecoilValue(deviceState);
@@ -59,11 +54,11 @@ const ImageDetail = () => {
   const [infoPos, setInfoPos] = useState<[number, number]>([0, 0]);
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [zoomIn, setZoomIn] = useState<boolean>(false);
-
   const { adjustPopularity } = useImagePopularity({
     imageId,
   });
   const [viewActionDone, setViewActionDone] = useState<boolean>(false);
+  const [notFound, setNotFound] = useState<boolean>(false);
 
   // imageData이 null이면 직접 불러오기
   useEffect(() => {
@@ -71,20 +66,24 @@ const ImageDetail = () => {
       isInitialMount.current = false;
       return;
     }
+
     if (!viewActionDone) {
       setViewActionDone(true);
       (async () => {
         await adjustPopularity(1);
       })();
     }
-    const needToGetImageData = imageId && !imageData && !isLoading;
+
+    const needToGetImageData = imageId && !imageData && !isLoading && !notFound;
+
     if (needToGetImageData) {
       (async () => {
         const imageData = await getImageData({ imageId: imageId });
         if (imageData) {
           setImageData(imageData);
         } else {
-          replace("/");
+          // replace("/");
+          setNotFound(true);
         }
       })();
     }
@@ -97,6 +96,7 @@ const ImageDetail = () => {
     replace,
     viewActionDone,
     adjustPopularity,
+    notFound,
   ]);
 
   // 작성자 상태 업데이트
@@ -237,7 +237,21 @@ const ImageDetail = () => {
 
   return (
     <div className="relative h-full bg-white px-10 xs:px-4">
-      {imageData ? (
+      {notFound ? (
+        <div className="flex h-full items-center justify-center py-12">
+          <div className="text-center">
+            <SadSvg className="m-auto mb-8 w-[50%] fill-astronaut-200" />
+            <p className="text-xl font-semibold text-astronaut-500">
+              존재하지 않거나 삭제된 이미지입니다.
+            </p>
+            <nav className="mt-4 flex justify-center">
+              <Button href="/">
+                <div className="text-sm">홈으로</div>
+              </Button>
+            </nav>
+          </div>
+        </div>
+      ) : imageData ? (
         <div>
           <nav className="sticky top-16 z-10 flex items-center justify-between py-4 xs:hidden">
             <button
@@ -359,6 +373,7 @@ const ImageDetail = () => {
           <Loading />
         </div>
       )}
+
       {imageData && zoomIn && (
         <div
           onClick={onZoomOut}

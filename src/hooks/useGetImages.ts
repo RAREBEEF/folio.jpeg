@@ -4,7 +4,7 @@ import {
   imageDataPagesState,
   lastVisibleState,
 } from "@/recoil/states";
-import { ImageDocData, ImageData } from "@/types";
+import { ImageData } from "@/types";
 import {
   DocumentData,
   QueryDocumentSnapshot,

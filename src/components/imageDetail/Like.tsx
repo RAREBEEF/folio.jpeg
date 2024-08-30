@@ -21,10 +21,7 @@ const Like = ({ author }: { author: UserData | null }) => {
   // 좋아용
   const onLikeClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (imageId && imageData && !isLoading)
-      !alreadyLiked
-        ? like(author?.fcmToken ? [author.fcmToken] : null)
-        : dislike();
+    if (imageId && imageData && !isLoading) !alreadyLiked ? like() : dislike();
   };
 
   const onLikeListClick = (e: MouseEvent<HTMLButtonElement>) => {

@@ -56,6 +56,7 @@ const usePostImageFile = () => {
     const compressedImage = await imageCompression(targetImage, {
       maxSizeMB: 10,
       useWebWorker: false,
+      fileType: "image/webp",
     });
     return compressedImage;
   };
@@ -65,6 +66,8 @@ const usePostImageFile = () => {
     const fileList = e.target.files;
 
     if (!fileList || fileList.length === 0) return;
+
+    setIsInputUploading(true);
 
     // 상태 초기화
     reset();

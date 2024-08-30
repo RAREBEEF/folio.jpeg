@@ -11,7 +11,7 @@ const AnalysisResultModal = ({
   imgSize: { width: number; height: number } | null;
 }) => {
   return result === "inappreciate" ? null : (
-    <div className="flex flex-col gap-8 break-keep px-8 pb-12 pt-8">
+    <div className="flex flex-col gap-8 break-keep px-6 pb-12 pt-8">
       {imgURL && (
         <div
           style={{

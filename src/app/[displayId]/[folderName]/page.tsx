@@ -40,10 +40,9 @@ export async function generateMetadata(
   let userData: ExtraUserData = {
     displayId,
     photoURL: logo.src,
-    bgPhotoURL: "",
     follower: [],
     following: [],
-    fcmToken: "",
+    allowPush: undefined,
   };
 
   userDocSnap.forEach((doc) => {

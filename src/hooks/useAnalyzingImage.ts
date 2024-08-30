@@ -1,33 +1,32 @@
-import { model } from "@/fb";
 import useErrorAlert from "./useErrorAlert";
 import { useState } from "react";
 import { AnalysisResult } from "@/types";
 import useFetchWithRetry from "./useFetchWithRetry";
+import useGemini from "./useGemini";
 
-async function fileToGenerativePart(file: File) {
-  const base64EncodedDataPromise = new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
-    reader.readAsDataURL(file);
-  });
-  return {
-    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-  };
-}
+const useAnalyzingImage = () => {
+  const { gemini } = useGemini();
+  const { fetchWithRetry } = useFetchWithRetry();
+  const showErrorAlert = useErrorAlert();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-const analyzing = async (
-  targetImage: File,
-  title: string,
-  desc: string,
-): Promise<string> => {
-  const imagePart = await fileToGenerativePart(targetImage);
+  const analyzingImageAsync = async ({
+    targetImage,
+    title,
+    desc,
+  }: {
+    targetImage: File;
+    title: string;
+    desc: string;
+  }): Promise<AnalysisResult | null> => {
+    console.log("useAnalyzingImage");
 
-  const content = `
+    const content = `
   글제목: ${title || "없음"}
   글내용: ${desc || "없음"} 
   `;
 
-  const prompt = `
+    const prompt = `
     만약 이미지가 18세 미만에게 부적절한 내용은 선정적, 폭력적 등의 내용을 포함하고 있다면 "inappreciate" 를 반환하세요.
     그 외의 경우에는 분석 지침에 따라 이미지와 글 내용을 분석하고 반환 양식에 맞춰 결과를 반환해주세요.
     
@@ -88,32 +87,11 @@ const analyzing = async (
     이미지 제작자가(사진가, 일러스트레이터 등) 자신이 제작한 이미지에 대한 피드백을 요청합니다.
     이미지들에 대한 구도, 초점, 심도, 노출, 셔터스피드, ISO, 보정, 색감, 피사체, 그림체, 질감, 채색 등 이 외에도 다양한 영역을 바탕으로 이미지 제작자의 스킬을 전문가의 관점에서 최대한 자세하게 분석하여 500자 내외의 한국어로 “feedback” 객체의 “detail” 필드에 작성하세요.
     그리고 분석 결과를 바탕으로 이미지에서 좋았던 부분과 다음 작품에서는 개선했으면 하는 부분을 “feedback” 객체의 “summary” 필드 안에 있는 “good” 필드와 “improve” 필드에 각각 100자 이내로 요약하여 한국어로 작성하세요.
+    좋았던 부분은 되도록이면 찾을 수 있도록하고, 개선했으면 하는 부분은 없다고 판단될 경우 억지로 찾지 말고 없다고 말해도 좋습니다.
     주의할 점: 분석 결과는 이미지 제작자와 직접 대화하는 형태의 문장을 사용해 주세요. 다만 청자의 호칭이 명확하지 않으므로 대상을 직접적으로 호명하는 것은 피해주세요.
     `;
-  // @ts-ignore
-  const result = await model.generateContent([prompt, imagePart]);
-  const response = result.response;
-  const text = response.text();
 
-  return text;
-};
-
-const useAnalyzingImage = () => {
-  const { fetchWithRetry } = useFetchWithRetry();
-  const showErrorAlert = useErrorAlert();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const analyzingImageAsync = async ({
-    targetImage,
-    title,
-    desc,
-  }: {
-    targetImage: File;
-    title: string;
-    desc: string;
-  }): Promise<AnalysisResult | null> => {
-    console.log("useAnalyzingImage");
-    const result = await analyzing(targetImage, title, desc);
+    const result = await gemini({ text: prompt, image: targetImage });
 
     if (result.includes("inappreciate")) {
       return "inappreciate";

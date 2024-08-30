@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import Auth from "./Auth";
-import PushRequest from "../PushRequest";
+import WebPush from "./WebPush";
 import ExtraUserDataListener from "./ExtraUserDataListener";
 import InAppNotificationListener from "./InAppNotificationListener";
 import SaveImageListener from "./SaveImageListener";
@@ -91,7 +91,7 @@ const Init = () => {
   return (
     <Fragment>
       <Auth />
-      <PushRequest />
+      <WebPush />
       <ExtraUserDataListener />
       <InAppNotificationListener />
       <SaveImageListener />
