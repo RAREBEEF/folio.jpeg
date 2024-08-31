@@ -69,7 +69,7 @@ const WebPush = () => {
           setUserAllow(false);
       }
     })();
-  }, [authStatus.data?.allowPush, authStatus.status]);
+  }, [authStatus.data, authStatus.status]);
 
   // 브라우저 푸시 권한 체크
   useEffect(() => {

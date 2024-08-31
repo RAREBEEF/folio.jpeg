@@ -220,7 +220,7 @@ const LayoutNav = () => {
               ) : (
                 <IconWithTooltip text="프로필" tooltipDirection="right">
                   <ProfileSvg
-                    className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                    className={`aspect-square w-[30px] ${curPath === "profile" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400"}`}
                   />
                 </IconWithTooltip>
               )}

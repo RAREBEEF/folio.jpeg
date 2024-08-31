@@ -143,7 +143,7 @@ const Search = () => {
   };
 
   return (
-    <div className="relative mr-4 grow">
+    <div className="relative mx-4 grow">
       {showDropdown &&
         (!value || (value && Object.keys(suggestions).length !== 0)) && (
           <div

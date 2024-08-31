@@ -382,6 +382,7 @@ const ProfileForm = () => {
             displayName,
             displayId: lowercaseDisplayId,
             photoURL: profileImageURL,
+            allowPush: allowPush === "true",
           },
         };
       });
@@ -393,6 +394,7 @@ const ProfileForm = () => {
           displayName,
           displayId: lowercaseDisplayId,
           photoURL: profileImageURL,
+          allowPush: allowPush === "true",
         };
       });
 
@@ -405,6 +407,7 @@ const ProfileForm = () => {
             displayName,
             displayId: lowercaseDisplayId,
             photoURL: profileImageURL,
+            allowPush: allowPush === "true",
           },
         };
       });

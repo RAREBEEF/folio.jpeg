@@ -10,6 +10,7 @@ const useUploadValidCheck = () => {
   const uploadValidCheck = ({
     isEdit,
     isEditing,
+    isInputUploading,
     error,
     file,
     imageData,
@@ -29,6 +30,7 @@ const useUploadValidCheck = () => {
   }: {
     isEdit: boolean;
     isEditing: boolean;
+    isInputUploading: boolean;
     error: unknown;
     file: File | null;
     imageData: ImageData | null;
@@ -87,6 +89,18 @@ const useUploadValidCheck = () => {
           type: "warning",
           show: true,
           text: "로그인 후 다시 시도해 주세요.",
+        },
+      ]);
+      return false;
+    } else if (isInputUploading) {
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          createdAt: Date.now(),
+          type: "warning",
+          show: true,
+          text: "이미지 압축 및 변환 중입니다.",
         },
       ]);
       return false;

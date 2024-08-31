@@ -29,7 +29,6 @@ const UploadForm = () => {
     error,
     reset,
     isInputUploading,
-    isLoading: isImageFileUploading,
     data: {
       file,
       previewURL,
@@ -257,6 +256,7 @@ const UploadForm = () => {
       !uploadValidCheck({
         isEdit,
         isEditing,
+        isInputUploading,
         error,
         file,
         imageData,
