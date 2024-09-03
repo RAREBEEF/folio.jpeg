@@ -52,7 +52,7 @@ const Modal = ({
             className="justify-items group flex h-5 w-5 items-center"
             onClick={closeModal}
           >
-            <XSvg className="fill-astronaut-400 group-hover:fill-astronaut-500" />
+            <XSvg className="h-full w-full fill-astronaut-400 group-hover:fill-astronaut-500" />
           </button>
         </div>
 

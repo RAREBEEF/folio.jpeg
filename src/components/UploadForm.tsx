@@ -471,7 +471,7 @@ const UploadForm = () => {
   };
 
   return (
-    <div className="h-full w-full bg-white px-12 py-24">
+    <div className="w-full bg-white px-12 py-12 py-24 xs:py-12">
       {init ? (
         <div className="flex h-full items-center justify-center gap-12 gap-x-24 sm:flex-col md:gap-x-12">
           <label

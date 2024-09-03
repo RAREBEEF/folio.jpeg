@@ -159,11 +159,11 @@ const LayoutNav = () => {
           className={`absolute mt-4 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >
           <li
-            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-white "}`} xs:inline xs:aspect-auto`}
+            className={`group relative h-full w-full ${!nav.show && `flex aspect-square items-center ${curPath === "home" && "bg-white "}`} xs:inline xs:aspect-auto`}
           >
             <Link
               href="/"
-              className="m-auto flex h-[30px] w-fit items-center justify-center"
+              className="m-auto flex h-full w-full items-center justify-center "
             >
               {nav.show ? (
                 <div
@@ -174,19 +174,19 @@ const LayoutNav = () => {
               ) : (
                 <IconWithTooltip text="홈" tooltipDirection="right">
                   <HomeSvg
-                    className={`aspect-square w-[30px] ${curPath === "home" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                    className={`aspect-square w-[30px] ${curPath === "home" ? "fill-astronaut-500" : "fill-astronaut-300 group-hover:fill-astronaut-400 "}`}
                   />
                 </IconWithTooltip>
               )}
             </Link>
           </li>
           <li
-            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${(curPath === "upload" || curPath === "edit") && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative h-full w-full ${!nav.show && `flex aspect-square items-center ${(curPath === "upload" || curPath === "edit") && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
               href="/upload"
-              className="m-auto flex h-[30px] w-fit items-center justify-center"
+              className="m-auto flex h-full w-full items-center justify-center "
             >
               {nav.show ? (
                 <div
@@ -197,23 +197,23 @@ const LayoutNav = () => {
               ) : (
                 <IconWithTooltip text="업로드" tooltipDirection="right">
                   <ImageSvg
-                    className={`aspect-square w-[30px] ${curPath === "upload" || curPath === "edit" ? "fill-astronaut-500" : "fill-astronaut-300 hover:fill-astronaut-400 "}`}
+                    className={`aspect-square w-[30px] ${curPath === "upload" || curPath === "edit" ? "fill-astronaut-500" : "fill-astronaut-300 group-hover:fill-astronaut-400 "}`}
                   />
                 </IconWithTooltip>
               )}
             </Link>
           </li>
           <li
-            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative h-full w-full ${!nav.show && `flex aspect-square items-center ${curPath === "profile" && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <Link
               onClick={checkAuthBeforeNavigate}
               href={`/${authStatus.data?.displayId}`}
-              className="m-auto flex h-[30px] w-fit items-center justify-center"
+              className="m-auto flex h-full w-full items-center justify-center "
             >
               {nav.show ? (
                 <div
-                  className={`${curPath === "profile" ? "text-astronaut-300" : "text-astronaut-500 hover:text-astronaut-300"}`}
+                  className={`${curPath === "profile" ? "text-astronaut-300" : "text-astronaut-500 group-hover:text-astronaut-300"}`}
                 >
                   Profile
                 </div>
@@ -227,11 +227,11 @@ const LayoutNav = () => {
             </Link>
           </li>
           <li
-            className={`group relative w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-white"}`} xs:inline xs:aspect-auto`}
+            className={`group relative h-full w-full ${!nav.show && `flex aspect-square items-center ${curPath === "notification" && "bg-white"}`} xs:inline xs:aspect-auto`}
           >
             <button
               onClick={onNotificationClick}
-              className="group relative m-auto flex h-[30px] w-fit items-center justify-center"
+              className="m-auto flex h-full w-full items-center justify-center "
             >
               {nav.show ? (
                 <div
@@ -247,7 +247,7 @@ const LayoutNav = () => {
                 </IconWithTooltip>
               )}
               <div
-                className={`absolute select-none text-center ${nav.show ? "left-full bg-astronaut-500 text-white" : "right-0 bg-white"} top-0 aspect-square w-4 rounded-full bg-white text-xs tracking-tighter`}
+                className={`absolute select-none text-center ${nav.show ? "left-full bg-astronaut-500 text-white" : "right-1 bg-white"} top-1 aspect-square w-4 rounded-full bg-white text-xs tracking-tighter xs:left-8 xs:right-0 xs:top-2 xs:mx-auto`}
               >
                 {Math.min(notificationCount, 99)}
               </div>

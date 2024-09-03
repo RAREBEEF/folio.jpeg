@@ -133,13 +133,13 @@ const NotificationsModal = ({ close }: { close: Function }) => {
             close();
           }}
         >
-          <div className="flex gap-4">
+          <div className="flex gap-4 xs:gap-2">
             <Link
               href={
                 `/${Array.isArray(notification.sender) ? notification.sender[0].displayId : notification.sender?.displayId}` ||
                 notification.URL
               }
-              className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-astronaut-50"
+              className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-astronaut-50 xs:h-8 xs:w-8"
             >
               <Image
                 src={notification.profileImage}
@@ -167,7 +167,7 @@ const NotificationsModal = ({ close }: { close: Function }) => {
               </div>
             </div>
             {notification.targetImage && (
-              <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-astronaut-800">
+              <div className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-astronaut-800 xs:h-10 xs:w-10">
                 <Image
                   src={notification.targetImage}
                   layout="fill"
