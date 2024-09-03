@@ -11,7 +11,7 @@ const IconWithTooltip = ({
   tooltipDirection: "left" | "right" | "bottom" | "top";
 }) => {
   return (
-    <div className="group relative flex h-full w-full items-center justify-center">
+    <div className="group relative">
       {children}
       <Tooltip text={text} direction={tooltipDirection} />
     </div>

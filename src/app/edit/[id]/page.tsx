@@ -1,5 +1,5 @@
 import PageHeader from "@/components/layouts/PageHeader";
-import UploadForm from "@/components/UploadForm";
+import UploadForm from "@/components/upload/UploadForm";
 
 const EditPage = () => {
   return (
