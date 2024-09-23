@@ -30,50 +30,37 @@ const MetadataInfo = ({
         <div className="relative z-50 flex">
           <h3>카메라 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageData?.metadata?.model ||
-              imageData?.customMetadata?.model ||
-              "--"}
+            {imageData?.metadata?.model || "--"}
           </span>
         </div>
         <div className="relative z-50 flex flex-wrap">
           <h3>렌즈 모델명: </h3>
           <span className="pl-2 font-semibold">
-            {imageData?.metadata?.lensModel ||
-              imageData?.customMetadata?.lensModel ||
-              "--"}
+            {imageData?.metadata?.lensModel || "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>초점 거리: </h3>
           <span className="pl-2 font-semibold">
-            {imageData?.metadata?.focalLength ||
-              imageData?.customMetadata?.focalLength ||
-              "--"}
-            mm
+            {imageData?.metadata?.focalLength || "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>셔터스피드: </h3>
           <span className="pl-2 font-semibold">
-            {imageData?.metadata?.shutterSpeed ||
-              imageData?.customMetadata?.shutterSpeed ||
-              "--"}
-            s
+            {imageData?.metadata?.shutterSpeed || "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>조리개: </h3>
           <span className="pl-2 font-semibold">
-            f
-            {imageData?.metadata?.fNumber ||
-              imageData?.customMetadata?.fNumber ||
-              "--"}
+            {imageData?.metadata?.fNumber || "--"}
           </span>
         </div>
         <div className="relative z-50 flex">
           <h3>ISO: </h3>
           <span className="pl-2 font-semibold">
-            {imageData?.metadata?.ISO || imageData?.customMetadata?.ISO || "--"}
+            {imageData?.metadata?.ISO || "--"}
           </span>
         </div>
       </div>

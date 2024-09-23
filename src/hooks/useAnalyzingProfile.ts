@@ -12,11 +12,11 @@ const useAnalyzingProfile = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const analyzingProfileAsync = async ({
-    profileImage,
+    // profileImage,
     displayName,
     displayId,
   }: {
-    profileImage: File | null;
+    // profileImage: File | null;
     displayName: string;
     displayId: string;
   }): Promise<ProfileAnalysisResult> => {
@@ -35,7 +35,10 @@ const useAnalyzingProfile = () => {
     {displayNameValid: boolean, displayIdValid: boolean, profileImageValid: boolean } 
     `;
 
-    const result = await gemini({ text: prompt, image: profileImage });
+    const result = await gemini({
+      text: prompt,
+      //  image: profileImage
+    });
     const jsonStringMatch = result.match(/\{[\s\S]*\}/);
     const jsonString = jsonStringMatch?.[0] || "";
 
@@ -43,11 +46,11 @@ const useAnalyzingProfile = () => {
   };
 
   const analyzingProfile = async ({
-    profileImage,
+    // profileImage,
     displayName,
     displayId,
   }: {
-    profileImage: File | null;
+    // profileImage: File | null;
     displayName: string;
     displayId: string;
   }) => {
@@ -57,7 +60,7 @@ const useAnalyzingProfile = () => {
       return await fetchWithRetry({
         asyncFn: analyzingProfileAsync,
         args: {
-          profileImage,
+          // profileImage,
           displayName,
           displayId,
         },

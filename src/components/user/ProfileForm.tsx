@@ -47,7 +47,7 @@ const ProfileForm = () => {
   const profileImageFileInputRef = useRef<HTMLInputElement>(null);
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
   const {
-    reset: resetProfileImage,
+    onReset: resetProfileImage,
     postImageFile: postProfileImageFile,
     onFileSelect: onProfileImageFileSelect,
     data: {
@@ -283,12 +283,13 @@ const ProfileForm = () => {
           displayId,
           displayName,
           // 이미지 분석은 리소스를 많이 먹으니 변경사항이 없거나 이미 검사를 한 경우에는 전달하지 않는다.
-          profileImage:
-            isProfileImageChanged &&
-            profileImageFile &&
-            isProfileImageValid !== true
-              ? profileImageFile
-              : null,
+          // 프로필 변경 과정이 너무 길어져 우선 비활성화.
+          // profileImage:
+          //   isProfileImageChanged &&
+          //   profileImageFile &&
+          //   isProfileImageValid !== true
+          //     ? profileImageFile
+          //     : null,
         });
 
         // 분석 결과를 받아오는데 실패한 경우

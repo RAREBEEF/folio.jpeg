@@ -51,16 +51,19 @@ const useTypeGuards = () => {
       (typeof target.lensModel === "string" &&
         "shutterSpeed" in target &&
         typeof target.shutterSpeed === null) ||
-      (typeof target.shutterSpeed === "string" &&
+      ((typeof target.shutterSpeed === "string" ||
+        typeof target.shutterSpeed === "number") &&
         "fNumber" in target &&
         typeof target.fNumber === null) ||
-      (typeof target.fNumber === "number" &&
+      ((typeof target.fNumber === "number" ||
+        typeof target.fNumber === "string") &&
         "ISO" in target &&
         typeof target.ISO === null) ||
-      (typeof target.ISO === "number" &&
+      ((typeof target.ISO === "number" || typeof target.ISO === "string") &&
         "focalLength" in target &&
         typeof target.focalLength === null) ||
-      typeof target.focalLength === "number"
+      typeof target.focalLength === "number" ||
+      typeof target.focalLength === "string"
     );
   };
 
@@ -121,8 +124,7 @@ const useTypeGuards = () => {
       objectContainValidItem(target, "likes", isArrayOfStrings) &&
       objectContainValidItem(target, "themeColor", "string") &&
       objectContainValidItem(target, "popularity", "number") &&
-      objectContainValidItem(target, "metadata", isImageMetaData) &&
-      objectContainValidItem(target, "customMetadata", isImageMetaData)
+      objectContainValidItem(target, "metadata", isImageMetaData)
     );
   };
 
