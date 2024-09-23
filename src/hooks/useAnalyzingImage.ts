@@ -27,7 +27,7 @@ const useAnalyzingImage = () => {
   `;
 
     const prompt = `
-    만약 이미지가 18세 미만에게 부적절한 내용은 선정적, 폭력적 등의 내용을 포함하고 있다면 "inappreciate" 를 반환하세요.
+    만약 이미지가 18세 미만에게 부적절한 내용은 선정적, 폭력적 등의 내용을 포함하고 있다면 "inapposite" 를 반환하세요.
     그 외의 경우에는 분석 지침에 따라 이미지와 글 내용을 분석하고 반환 양식에 맞춰 결과를 반환해주세요.
     
     반환 양식:
@@ -44,7 +44,7 @@ const useAnalyzingImage = () => {
 
     1. feedback 필드의와 tags 필드의 값은 한글로 작성해 주세요..
 
-    2. 부적절한 이미지가 검출된 케이스와 구분하기 위해 분석 결과에 "inappreciate"를 포함하지 마세요.
+    2. 부적절한 이미지가 검출된 케이스와 구분하기 위해 분석 결과에 "inapposite"를 포함하지 마세요.
 
     3. imgTags 배열의 길이는 10을 초과할 수 없습니다.
 
@@ -93,8 +93,8 @@ const useAnalyzingImage = () => {
 
     const result = await gemini({ text: prompt, image: targetImage });
 
-    if (result.includes("inappreciate")) {
-      return "inappreciate";
+    if (result.includes("inapposite")) {
+      return "inapposite";
     } else {
       const jsonStringMatch = result.match(/\{[\s\S]*\}/);
       const jsonString = jsonStringMatch?.[0] || "";

@@ -22,6 +22,10 @@ body {
   height: calc(64px + env(safe-area-inset-top));
 }
 
+#crop-img-toolbar {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
 #body-wrapper {
   min-height: calc(100lvh - calc(64px + env(safe-area-inset-top)));
   margin-left: calc(50px + env(safe-area-inset-left));
@@ -54,7 +58,7 @@ main {
   height: 100%;
 }
 /* 
-  페이지 헤더의 높이만큼 global.css에서 main의 padding-top 조절하기 (twailwind value * 4 = px)  
+  페이지 헤더의 높이만큼 global.css에서 main의 padding-top 조절하기 (tailwind value * 4 = px)  
 */
 main:not(#home, #search-result, #image-detail, #user-detail, #folder-detail) {
   padding-top: 0px;

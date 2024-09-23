@@ -15,10 +15,11 @@ import AnalysisResultModal from "../modal/AnalysisResultModal";
 
 const STEPS = {
   start: 0,
-  analyzing: 1,
-  uploadFile: 2,
-  uploadData: 3,
-  done: 4,
+  compressing: 1,
+  analyzing: 2,
+  uploadFile: 3,
+  uploadData: 4,
+  done: 5,
   fail: -1,
 };
 
@@ -231,6 +232,9 @@ const Alert = () => {
                             className={`h-1 grow rounded-full ${STEPS[upload.status] >= 3 ? "bg-astronaut-800" : "bg-astronaut-300"} ${upload.status === "fail" && "bg-[firebrick]"}`}
                           ></div>
                           <div
+                            className={`h-1 grow rounded-full ${STEPS[upload.status] >= 4 ? "bg-astronaut-800" : "bg-astronaut-300"} ${upload.status === "fail" && "bg-[firebrick]"}`}
+                          ></div>
+                          <div
                             className={`h-1 grow rounded-full ${upload.status === "done" ? "bg-astronaut-800" : "bg-astronaut-300"} ${upload.status === "fail" && "bg-[firebrick]"}`}
                           ></div>
                         </div>
@@ -240,10 +244,12 @@ const Alert = () => {
                           {STEPS[upload.status] === 0 &&
                             "업로드가 시작되었습니다."}
                           {STEPS[upload.status] === 1 &&
-                            "이미지 분석 중입니다."}
+                            "이미지 압축 중입니다."}
                           {STEPS[upload.status] === 2 &&
-                            "이미지 업로드 중입니다."}
+                            "이미지 분석 중입니다."}
                           {STEPS[upload.status] === 3 &&
+                            "이미지 업로드 중입니다."}
+                          {STEPS[upload.status] === 4 &&
                             "게시물 업로드 중입니다."}
                           {upload.status === "done" &&
                             "업로드가 완료되었습니다."}

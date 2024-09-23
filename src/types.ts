@@ -59,7 +59,6 @@ export interface ImageDocData {
   themeColor: string;
   popularity: number;
   metadata: ImageMetadata;
-  customMetadata: ImageMetadata;
 }
 
 export interface ImageData extends ImageDocData {
@@ -125,6 +124,7 @@ export interface Alert {
 
 export type UploadStatuses =
   | "start"
+  | "compressing"
   | "analyzing"
   | "uploadFile"
   | "uploadData"
@@ -169,7 +169,7 @@ export type AnalysisResult =
       themeColor: string;
       feedback: Feedback;
     }
-  | "inappreciate";
+  | "inapposite";
 
 export type ProfileAnalysisResult = {
   displayNameValid: boolean;
@@ -193,7 +193,8 @@ export interface ImageMetadata {
   lensMake: string | null;
   lensModel: string | null;
   shutterSpeed: string | null;
-  fNumber: number | null;
+  fNumber: string | null;
   ISO: number | null;
-  focalLength: number | null;
+  focalLength: string | null;
+  createDate: string | null;
 }

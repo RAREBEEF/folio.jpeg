@@ -45,20 +45,6 @@ export async function generateMetadata(
     allowPush: undefined,
   };
 
-  userDocSnap.forEach((doc) => {
-    userData = doc.data() as ExtraUserData;
-    uid = doc.id;
-  });
-
-  const user = await admin.auth().getUser(uid);
-
-  // 폴더 데이터 불러오기
-  const foldersCollectionRef = db.collection(`users/${uid}/folders`);
-  const folderDocSnap = await foldersCollectionRef
-    .where("name", "==", folderName)
-    .limit(1)
-    .get();
-
   let folderData: Folder = {
     createdAt: 0,
     id: "",
@@ -69,9 +55,27 @@ export async function generateMetadata(
     updatedAt: 0,
   };
 
-  folderDocSnap.forEach((doc) => {
-    folderData = doc.data() as Folder;
-  });
+  let user;
+
+  if (!userDocSnap.empty) {
+    userDocSnap.forEach((doc) => {
+      userData = doc.data() as ExtraUserData;
+      uid = doc.id;
+    });
+
+    user = await admin.auth().getUser(uid);
+
+    // 폴더 데이터 불러오기
+    const foldersCollectionRef = db.collection(`users/${uid}/folders`);
+    const folderDocSnap = await foldersCollectionRef
+      .where("name", "==", folderName)
+      .limit(1)
+      .get();
+
+    folderDocSnap.forEach((doc) => {
+      folderData = doc.data() as Folder;
+    });
+  }
 
   // 폴더에서 이미지 네 장 꺼내기
   const thumbnailIds = folderData.images.slice(0, 4);
@@ -92,9 +96,9 @@ export async function generateMetadata(
   }
 
   return {
-    title: `${folderName} - ${user.displayName}님의 폴더`,
+    title: `${folderName} - ${user?.displayName}님의 폴더`,
     description:
-      `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
+      `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
       "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
     keywords: [
       "SNS",
@@ -111,18 +115,18 @@ export async function generateMetadata(
     openGraph: {
       type: "website",
       url: `https://folio-jpeg.rarebeef.co.kr/${displayId}/${folderName}`,
-      title: `${folderName} - ${user.displayName}님의 폴더`,
+      title: `${folderName} - ${user?.displayName}님의 폴더`,
       description:
-        `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
+        `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
         "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
       siteName: "folio.JPEG",
       images: thumbnailURLs.map((url) => ({ url })),
     },
     twitter: {
       card: "summary_large_image",
-      title: `${folderName} - ${user.displayName}님의 폴더`,
+      title: `${folderName} - ${user?.displayName}님의 폴더`,
       description:
-        `${folderName}는 ${user.displayName}님이 생성한 폴더입니다. ${user.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
+        `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
         "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
       images: thumbnailURLs,
     },

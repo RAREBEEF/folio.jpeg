@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import Auth from "./Auth";
 import WebPush from "./WebPush";
 import ExtraUserDataListener from "./ExtraUserDataListener";
@@ -76,15 +76,11 @@ const Init = () => {
 
     document.body.style.overflow = "hidden";
 
-    const initLoadEnd = () => {
-      setInitLoading(false);
-      document.body.style.overflow = "auto";
-    };
-
     if (authStatus.status === "pending") {
       return;
     } else {
-      initLoadEnd();
+      document.body.style.overflow = "auto";
+      setInitLoading(false);
     }
   }, [authStatus.status, setInitLoading, initLoading]);
 

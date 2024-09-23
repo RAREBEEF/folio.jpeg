@@ -16,12 +16,12 @@ const useUploadValidCheck = () => {
     imageData,
     title,
     desc,
-    customCameraModel,
-    customLensModel,
-    customShutterSpeed,
-    customISO,
-    customFNumber,
-    customFocalLength,
+    cameraModel,
+    lensModel,
+    shutterSpeed,
+    ISO,
+    fNumber,
+    focalLength,
     id,
     size,
     byte,
@@ -36,12 +36,12 @@ const useUploadValidCheck = () => {
     imageData: ImageData | null;
     title: string;
     desc: string;
-    customCameraModel: string;
-    customLensModel: string;
-    customShutterSpeed: string;
-    customISO: string;
-    customFNumber: string;
-    customFocalLength: string;
+    cameraModel: string;
+    lensModel: string;
+    shutterSpeed: string;
+    ISO: string;
+    fNumber: string;
+    focalLength: string;
     id: string;
     size: {
       width: number;
@@ -61,6 +61,17 @@ const useUploadValidCheck = () => {
             {
               id: uniqueId(),
               text: "유효하지 않은 파일 형식입니다.",
+              createdAt: Date.now(),
+              type: "warning",
+              show: true,
+            },
+          ]);
+        case "fileSize":
+          setAlerts((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              text: "이미지의 최소 사이즈는 50*50 입니다.",
               createdAt: Date.now(),
               type: "warning",
               show: true,
@@ -144,12 +155,12 @@ const useUploadValidCheck = () => {
       } else if (
         title.trim() === imageData.title &&
         desc.trim() === imageData.description &&
-        customCameraModel === imageData.customMetadata.model &&
-        customLensModel === imageData.customMetadata.lensModel &&
-        customShutterSpeed === imageData.customMetadata.shutterSpeed &&
-        customISO === imageData.customMetadata.ISO?.toString() &&
-        customFNumber === imageData.customMetadata.fNumber?.toString() &&
-        customFocalLength === imageData.customMetadata.focalLength?.toString()
+        cameraModel === imageData.metadata.model &&
+        lensModel === imageData.metadata.lensModel &&
+        shutterSpeed === imageData.metadata.shutterSpeed &&
+        ISO === imageData.metadata.ISO?.toString() &&
+        fNumber === imageData.metadata.fNumber?.toString() &&
+        focalLength === imageData.metadata.focalLength?.toString()
       ) {
         setAlerts((prev) => [
           ...prev,
