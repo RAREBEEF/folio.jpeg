@@ -18,6 +18,7 @@ import useAnalyzingImage from "@/hooks/useAnalyzingImage";
 import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
 import useUploadValidCheck from "@/hooks/useUploadValidCheck";
 import CropImg from "./CropImg";
+import PenSvg from "@/icons/pen-solid.svg";
 
 const UploadForm = () => {
   // *********************************************
@@ -55,7 +56,7 @@ const UploadForm = () => {
     postImageFile,
     onFileSelect,
     error,
-    onReset,
+    onResetAllField,
     isInputUploading,
     data: inputImageData,
     onSelectImage,
@@ -82,6 +83,21 @@ const UploadForm = () => {
     size,
     imgMetaData,
   } = inputImageData;
+  const [cropData, setCropData] = useState<{
+    metadataOverlay: boolean;
+    filmStyleOverlay1: boolean;
+    filmStyleOverlay2: boolean;
+    resizerCoords: { x1: number; y1: number; x2: number; y2: number };
+    cropPos: [number, number];
+    cropSize: [number, number];
+  }>({
+    metadataOverlay: false,
+    filmStyleOverlay1: false,
+    filmStyleOverlay2: false,
+    resizerCoords: { x1: 0, y1: 0, x2: 1, y2: 1 },
+    cropPos: [0, 0],
+    cropSize: [0, 0],
+  });
 
   // *********************************************
   // ***            recoil 상태 초기화 훅          ***
@@ -484,7 +500,7 @@ const UploadForm = () => {
   // ***          모든 필드 리셋           ***
   // *********************************************
   const resetAllField = () => {
-    onReset();
+    onResetAllField();
     setTitle("");
     setDesc("");
     setCameraModel("");
@@ -494,6 +510,14 @@ const UploadForm = () => {
     setISO("");
     setFocalLength("");
     setCreateDate("");
+    setCropData({
+      metadataOverlay: false,
+      filmStyleOverlay1: false,
+      filmStyleOverlay2: false,
+      resizerCoords: { x1: 0, y1: 0, x2: 1, y2: 1 },
+      cropPos: [0, 0],
+      cropSize: [0, 0],
+    });
   };
 
   // *********************************************
@@ -513,6 +537,14 @@ const UploadForm = () => {
   const onResetImgClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     resetImg();
+    setCropData({
+      metadataOverlay: false,
+      filmStyleOverlay1: false,
+      filmStyleOverlay2: false,
+      resizerCoords: { x1: 0, y1: 0, x2: 1, y2: 1 },
+      cropPos: [0, 0],
+      cropSize: [0, 0],
+    });
   };
   const closeCropImgMode = () => {
     document.body.style.overflow = "auto";
@@ -540,6 +572,8 @@ const UploadForm = () => {
     e.stopPropagation();
   };
 
+  console.log(inputImageData);
+
   return (
     <div className="w-full bg-white px-12 py-12 py-24 xs:py-12">
       {init ? (
@@ -551,7 +585,7 @@ const UploadForm = () => {
             !isInputUploading ? (
               <div
                 style={{
-                  maxHeight: "calc(100vh - 156px)",
+                  maxHeight: "calc(100vh - 256px)",
                   aspectRatio: `${isEdit ? imageData?.size.width : size?.width || 0}/${isEdit ? imageData?.size.height : size?.height || 0}`,
                 }}
                 className={`group relative m-auto rounded-xl p-4 `}
@@ -564,8 +598,8 @@ const UploadForm = () => {
                   alt={fileName || ""}
                 />
                 {!isEdit && (
-                  <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 px-2 py-1 opacity-0 group-hover:opacity-80">
-                    이미지 변경
+                  <div className="absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 p-2 opacity-0 group-hover:opacity-80">
+                    <PenSvg className="h-8 w-8" />
                   </div>
                 )}
               </div>
@@ -586,7 +620,17 @@ const UploadForm = () => {
             )}
             {!isEdit && (
               <input
-                onChange={onFileSelect}
+                onChange={(e) => {
+                  setCropData({
+                    metadataOverlay: false,
+                    filmStyleOverlay1: false,
+                    filmStyleOverlay2: false,
+                    resizerCoords: { x1: 0, y1: 0, x2: 1, y2: 1 },
+                    cropPos: [0, 0],
+                    cropSize: [0, 0],
+                  });
+                  onFileSelect(e);
+                }}
                 id="image_input"
                 type="file"
                 disabled={isInputUploading}
@@ -607,11 +651,11 @@ const UploadForm = () => {
                 </Button>
                 <div className="mt-3 flex flex-col">
                   <button
-                    className="text-sm text-astronaut-500 underline"
+                    className={`text-sm text-astronaut-500 underline ${!inputImageData.previewURL && "invisible"}`}
                     disabled={!inputImageData.previewURL || isEdit}
                     onClick={onResetImgClick}
                   >
-                    초기화
+                    재설정
                   </button>
                 </div>
               </div>
@@ -804,7 +848,6 @@ const UploadForm = () => {
         </div>
       )}
       {cropImgMode && (
-        // {true && (
         <CropImg
           imgData={{
             ...inputImageData,
@@ -823,6 +866,8 @@ const UploadForm = () => {
           onSelectImage={onSelectImage}
           onToggleCropImgMode={onToggleCropImgMode}
           close={closeCropImgMode}
+          cropDataSetter={setCropData}
+          prevCropData={cropData}
         />
       )}
     </div>

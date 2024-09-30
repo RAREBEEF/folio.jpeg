@@ -16,10 +16,20 @@ export interface UserData extends User {
   follower?: Array<string>;
   allowPush?: boolean | undefined;
   currentPushToken?: string;
+  introduce?: string | undefined | null;
+  links?: [string, string, string, string, string];
+  bgPhotoURL?: string | undefined | null;
 }
 export type UserDataWithoutExtraData = Exclude<
   UserData,
-  "displayId" | "following" | "follower" | "allowPush"
+  | "displayId"
+  | "following"
+  | "follower"
+  | "allowPush"
+  | "introduce"
+  | "links"
+  | "bgPhotoURL"
+  | "currentPushToken"
 >;
 export interface ExtraUserData {
   displayId: string;
@@ -27,7 +37,10 @@ export interface ExtraUserData {
   following: Array<string>;
   follower: Array<string>;
   allowPush: boolean | undefined;
+  introduce?: string | undefined | null;
+  links?: [string, string, string, string, string];
   currentPushToken?: string;
+  bgPhotoURL?: string | undefined | null;
 }
 
 export type AuthStatus =

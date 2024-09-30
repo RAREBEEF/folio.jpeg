@@ -35,23 +35,23 @@ const Like = ({ author }: { author: UserData | null }) => {
 
   return (
     imageData && (
-      <div className="flex items-center justify-end gap-4 text-astronaut-700">
-        <button
-          onClick={onLikeListClick}
-          className="flex items-center gap-1 text-astronaut-300"
-        >
-          <FlashIcon className="aspect-square w-3 fill-[#FADF15]" />
-          {imageData.likes.length.toLocaleString()}
-        </button>
+      <div className="flex items-center gap-2">
         <button
           onClick={onLikeClick}
-          className="group flex items-center justify-center rounded-full border p-2"
+          className="group flex items-center justify-center rounded-full text-astronaut-700"
         >
           {alreadyLiked ? (
-            <FlashIcon className="aspect-square w-4 fill-[#FADF15] transition-all" />
+            <FlashIcon className="aspect-square w-6 fill-[#FADF15] transition-all" />
           ) : (
-            <FlashIcon className="aspect-square w-4 fill-astronaut-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
+            <FlashIcon className="aspect-square w-6 fill-astronaut-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
           )}
+        </button>
+        <button
+          onClick={onLikeListClick}
+          className="flex items-center gap-1 font-semibold text-astronaut-300"
+        >
+          {/* <FlashIcon className="aspect-square w-3 fill-[#FADF15]" /> */}
+          {imageData.likes.length.toLocaleString()}
         </button>
         {showModal && (
           <Modal close={onCloseModal} title="좋아요">

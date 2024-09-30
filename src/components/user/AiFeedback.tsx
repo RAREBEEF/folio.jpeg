@@ -126,7 +126,7 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
         </button>
       </h3>
       <div className="p-2">
-        <div className="pb-8 pt-4 leading-tight">
+        <div className="pb-8 pt-4 leading-snug">
           {feedback ? (
             <div className="flex flex-col gap-4">
               <div>

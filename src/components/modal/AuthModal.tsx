@@ -18,6 +18,7 @@ const AuthModal = () => {
       <Modal
         close={closeModal}
         title={loginModal.showInit ? "프로필 설정하기" : "로그인"}
+        allowOutsideClick={true}
       >
         {loginModal.showInit ? <ProfileForm /> : <SignInForm />}
       </Modal>

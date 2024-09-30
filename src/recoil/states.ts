@@ -31,9 +31,9 @@ export const usersDataState = atom({
 });
 
 // ui 상태
-export const loginModalState = atom({
+export const loginModalState = atom<{ show: boolean; showInit?: boolean }>({
   key: "loginModalState",
-  default: { show: false } as { show: boolean; showInit?: boolean },
+  default: { show: false },
 });
 export const saveModalState = atom({
   key: "saveModalState",

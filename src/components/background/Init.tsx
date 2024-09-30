@@ -28,6 +28,7 @@ const Init = () => {
   const [device, setDevice] = useRecoilState(deviceState);
   const [initLoading, setInitLoading] = useState<boolean>(true);
 
+  // 디바이스 구분
   useEffect(() => {
     const userAgent = navigator.userAgent;
     const isMobile = userAgent.match(
@@ -36,6 +37,7 @@ const Init = () => {
     setDevice(isMobile ? "mobile" : "pc");
   }, [setDevice]);
 
+  // 로컬스토리지에서 검색기록 불러오기
   useEffect(() => {
     const storedSearchHistory = localStorage.getItem(
       "sh-" + authStatus.data?.uid || "",
@@ -59,6 +61,7 @@ const Init = () => {
     authStatus.data?.uid,
   ]);
 
+  // 라우팅시 이전 경로 기록하기
   useEffect(() => {
     const routeChangeHandler = () => {
       sessionStorage.setItem("prevPath", pathname);
@@ -71,6 +74,7 @@ const Init = () => {
     };
   }, [pathname]);
 
+  // 초기화 화면
   useEffect(() => {
     if (!initLoading) return;
 
@@ -94,7 +98,9 @@ const Init = () => {
       <Alert />
       <AuthModal />
       {initLoading && (
-        <div className="fixed left-0 top-0 z-[50] flex h-dvh w-dvw flex-col items-center justify-center bg-white">
+        <div
+          className={`fixed left-0 top-0 z-[50] flex h-dvh w-dvw flex-col items-center justify-center bg-white `}
+        >
           <hgroup className="flex grow flex-col items-center justify-center">
             <Image src={logo} width={200} height={200} alt="folio.JPEG logo" />
             <h1 className="absolute left-0 right-0 m-auto text-center opacity-0">

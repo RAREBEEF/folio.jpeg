@@ -5,7 +5,7 @@ import RecoilProvider from "@/recoil/recoilProvider";
 import LayoutHeader from "@/components/layouts/LayoutHeader";
 import LayoutFooter from "@/components/layouts/LaytoutFooter";
 import LayoutBody from "@/components/layouts/LayoutBody";
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 import Init from "@/components/background/Init";
 import logo from "@/images/logo.png";
 
@@ -301,14 +301,16 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className + " flex min-h-lvh flex-col bg-white"}>
-        <RecoilProvider>
-          <Fragment>
-            <LayoutHeader />
-            <LayoutBody>{children}</LayoutBody>
-            <LayoutFooter />
-            <Init />
-          </Fragment>
-        </RecoilProvider>
+        <Suspense>
+          <RecoilProvider>
+            <Fragment>
+              <LayoutHeader />
+              <LayoutBody>{children}</LayoutBody>
+              <LayoutFooter />
+              <Init />
+            </Fragment>
+          </RecoilProvider>
+        </Suspense>
       </body>
     </html>
   );

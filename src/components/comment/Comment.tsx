@@ -21,6 +21,7 @@ import useDateDiffNow from "@/hooks/useDateDiffNow";
 import useGetUserByUid from "@/hooks/useGetUserByUid";
 import useImagePopularity from "@/hooks/useImagePopularity";
 import useDeleteComment from "@/hooks/useDeleteComment";
+import ProfileCard from "../user/ProfileCard";
 
 const Comment = ({
   imageData,
@@ -121,7 +122,7 @@ const Comment = ({
       className={`relative rounded-lg p-2 ${!parentId ? "shadow-lg" : "bg-white"}`}
     >
       <div className="flex items-start gap-2">
-        <Link
+        {/* <Link
           onClick={(e) => {
             if (!author) e.preventDefault();
           }}
@@ -129,9 +130,10 @@ const Comment = ({
           className="w-8 shrink-0"
         >
           <ProfileImage URL={author?.photoURL || null} />
-        </Link>
+        </Link> */}
+        <ProfileCard profileData={author} onlyImg={true} />
         <div className="pt-1 md:text-sm">
-          <Link
+          {/* <Link
             onClick={(e) => {
               if (!author) e.preventDefault();
             }}
@@ -139,8 +141,12 @@ const Comment = ({
             className="mr-2 font-semibold"
           >
             {author?.displayName}
-          </Link>
-          <span>{comment.content}</span>
+          </Link> */}
+          <div>
+            <ProfileCard profileData={author} onlyName={true} />
+            <span className="ml-1">{comment.content}</span>
+          </div>
+
           <div className="mt-1 text-xs text-astronaut-500">
             {dateDiffNow(comment.createdAt).diffSummary}
             {authStatus.data?.uid === comment.uid && (

@@ -6,6 +6,7 @@ import { auth, db } from "@/fb";
 import {
   ChangeEvent,
   FormEvent,
+  Fragment,
   MouseEvent,
   useEffect,
   useRef,
@@ -32,6 +33,10 @@ import useAnalyzingProfile from "@/hooks/useAnalyzingProfile";
 import ValidSvg from "@/icons/circle-check-solid.svg";
 import InvalidSvg from "@/icons/circle-exclamation-solid.svg";
 import useDevicePushToken from "@/hooks/useDevicePushToken";
+import ExternalLink from "../ExternalLink";
+import Image from "next/image";
+import PenSvg from "@/icons/pen-solid.svg";
+import ensureHttp from "@/tools/ensureHttp";
 
 const ProfileForm = () => {
   const { replace } = useRouter();
@@ -45,9 +50,10 @@ const ProfileForm = () => {
   const setAlerts = useSetRecoilState(alertsState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const profileImageFileInputRef = useRef<HTMLInputElement>(null);
+  const bgImageFileInputRef = useRef<HTMLInputElement>(null);
   const { getExtraUserDataByDisplayId } = useGetExtraUserDataByDisplayId();
   const {
-    onReset: resetProfileImage,
+    onResetAllField: resetProfileImage,
     postImageFile: postProfileImageFile,
     onFileSelect: onProfileImageFileSelect,
     data: {
@@ -57,14 +63,27 @@ const ProfileForm = () => {
     },
     isInputUploading: isProfileImageInputUploading,
   } = usePostImageFile();
+  const {
+    onResetAllField: resetBgImage,
+    postImageFile: postBgImageFile,
+    onFileSelect: onBgImageFileSelect,
+    data: { file: bgImageFile, previewURL: bgImagePreviewURL, id: bgImageId },
+    isInputUploading: isBgImageInputUploading,
+  } = usePostImageFile();
   const { value: displayName, onChange: onDisplayNameChange } = useInput(
     authStatus.data?.displayName || "",
   );
   const { value: displayId, onChange: onDisplayIdChange } = useInput(
     authStatus.data?.displayId || "",
   );
-  const [defaultMainImg, setDefaultMainImg] = useState<boolean>(
+  const { value: introduce, onChange: onIntroduceChange } = useInput(
+    authStatus.data?.introduce || "",
+  );
+  const [defaultProfileImg, setDefaultProfileImg] = useState<boolean>(
     authStatus.data?.photoURL ? false : true,
+  );
+  const [defaultBgImg, setDefaultBgImg] = useState<boolean>(
+    authStatus.data?.bgPhotoURL ? false : true,
   );
   const [isDisplayNameValid, setIsDisplayNameValid] = useState<boolean | null>(
     null,
@@ -84,6 +103,78 @@ const ProfileForm = () => {
   const [allowPush, setAllowPush] = useState<"true" | "false">(
     authStatus.data?.allowPush === false ? "false" : "true",
   );
+  const [links, setLinks] = useState<[string, string, string, string, string]>(
+    authStatus.data?.links ? authStatus.data.links : ["", "", "", "", ""],
+  );
+  const [linkValid, setLinkValid] = useState<
+    [boolean, boolean, boolean, boolean, boolean]
+  >([true, true, true, true, true]);
+  const [linkCount, setLinkCount] = useState<number>(
+    userData?.links?.filter((link) => !!link).length || 1,
+  );
+
+  const onLinksChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const regex =
+      /^(https?:\/\/)?(www\.)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+    const { value } = e.target;
+
+    switch (e.target.id) {
+      case "link-0":
+        setLinks((prev) => [value, prev[1], prev[2], prev[3], prev[4]]);
+        setLinkValid((prev) => [
+          value === "" || regex.test(value),
+          prev[1],
+          prev[2],
+          prev[3],
+          prev[4],
+        ]);
+        break;
+      case "link-1":
+        setLinks((prev) => [prev[0], value, prev[2], prev[3], prev[4]]);
+        setLinkValid((prev) => [
+          prev[0],
+          value === "" || regex.test(value),
+          prev[2],
+          prev[3],
+          prev[4],
+        ]);
+        break;
+      case "link-2":
+        setLinks((prev) => [prev[0], prev[1], value, prev[3], prev[4]]);
+        setLinkValid((prev) => [
+          prev[0],
+          prev[1],
+          value === "" || regex.test(value),
+          prev[3],
+          prev[4],
+        ]);
+        break;
+      case "link-3":
+        setLinks((prev) => [prev[0], prev[1], prev[2], value, prev[4]]);
+        setLinkValid((prev) => [
+          prev[0],
+          prev[1],
+          prev[2],
+          value === "" || regex.test(value),
+          prev[4],
+        ]);
+        break;
+      case "link-4":
+        setLinks((prev) => [prev[0], prev[1], prev[2], prev[3], value]);
+        setLinkValid((prev) => [
+          prev[0],
+          prev[1],
+          prev[2],
+          prev[3],
+          value === "" || regex.test(value),
+        ]);
+        break;
+      default:
+        break;
+    }
+  };
+
+  console.log(linkValid);
 
   const onAllowPushChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAllowPush(e.target.value as "true" | "false");
@@ -91,8 +182,9 @@ const ProfileForm = () => {
 
   useEffect(() => {
     setIsProfileImageValid(null);
-    if (profileImageFile) setDefaultMainImg(false);
-  }, [profileImageFile]);
+    if (profileImageFile) setDefaultProfileImg(false);
+    if (bgImageFile) setDefaultBgImg(false);
+  }, [profileImageFile, bgImageFile]);
 
   const displayNameSimpleCheck = (displayName: string) => {
     if (displayName === "") {
@@ -155,7 +247,7 @@ const ProfileForm = () => {
   }, [displayId]);
 
   // 기본 프로필 이미지
-  const onDefaultMainImgClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const onDefaultProfileImgClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -165,7 +257,20 @@ const ProfileForm = () => {
     if (!fileInput) return;
     fileInput.value = "";
     resetProfileImage();
-    setDefaultMainImg(true);
+    setDefaultProfileImg(true);
+  };
+
+  const onDefaultBgImgClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoading) return;
+
+    const fileInput = bgImageFileInputRef.current;
+    if (!fileInput) return;
+    fileInput.value = "";
+    resetBgImage();
+    setDefaultBgImg(true);
   };
 
   // 등록
@@ -185,7 +290,7 @@ const ProfileForm = () => {
       isProfileImageValid === false
     ) {
       return;
-    } else if (isProfileImageInputUploading) {
+    } else if (isProfileImageInputUploading || isBgImageInputUploading) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -203,9 +308,23 @@ const ProfileForm = () => {
     // 변경사항 체크
     const isDisplayIdChanged = authStatus.data?.displayId !== displayId;
     const isDisplayNameChanged = authStatus.data?.displayName !== displayName;
+    const isIntroduceChanged = authStatus.data?.introduce !== introduce;
+    const prevLinks = authStatus.data?.links
+      ? authStatus.data?.links
+      : ["", "", ""];
+    const isLinksChanged =
+      prevLinks[0] !== links[0] ||
+      prevLinks[1] !== links[1] ||
+      prevLinks[2] !== links[2] ||
+      prevLinks[3] !== links[3] ||
+      prevLinks[4] !== links[4];
     const isProfileImageChanged = !(
-      (authStatus.data?.photoURL && !profileImageFile && !defaultMainImg) ||
+      (authStatus.data?.photoURL && !profileImageFile && !defaultProfileImg) ||
       (!authStatus.data?.photoURL && !profileImageFile)
+    );
+    const isBgImageChanged = !(
+      (authStatus.data?.bgPhotoURL && !bgImageFile && !defaultBgImg) ||
+      (!authStatus.data?.bgPhotoURL && !bgImageFile)
     );
     const isAllowPushChanged =
       authStatus.data?.allowPush?.toString() !== allowPush;
@@ -215,8 +334,13 @@ const ProfileForm = () => {
           isDisplayIdChanged ||
           isDisplayNameChanged ||
           isProfileImageChanged ||
-          isAllowPushChanged
+          isBgImageChanged ||
+          isLinksChanged ||
+          isAllowPushChanged ||
+          isIntroduceChanged
         );
+
+    console.log(prevLinks, links, isLinksChanged);
 
     // 변경사항 없으면 리턴
     if (noChanged) {
@@ -277,53 +401,56 @@ const ProfileForm = () => {
         }
       }
 
-      // 닉네임, id, 프사에 변경사항이 있는 경우 ai 프로필 부적절성 검사
-      if (isDisplayIdChanged || isDisplayNameChanged || isProfileImageChanged) {
-        const result = await analyzingProfile({
-          displayId,
-          displayName,
-          // 이미지 분석은 리소스를 많이 먹으니 변경사항이 없거나 이미 검사를 한 경우에는 전달하지 않는다.
-          // 프로필 변경 과정이 너무 길어져 우선 비활성화.
-          // profileImage:
-          //   isProfileImageChanged &&
-          //   profileImageFile &&
-          //   isProfileImageValid !== true
-          //     ? profileImageFile
-          //     : null,
-        });
+      //
+      // 프로필 부적절성 검사 보류, 너무 오래걸림
+      //
+      // // 닉네임, id, 프사에 변경사항이 있는 경우 ai 프로필 부적절성 검사
+      // if (isDisplayIdChanged || isDisplayNameChanged || isProfileImageChanged) {
+      //   const result = await analyzingProfile({
+      //     displayId,
+      //     displayName,
+      //     // 이미지 분석은 리소스를 많이 먹으니 변경사항이 없거나 이미 검사를 한 경우에는 전달하지 않는다.
+      //     // 프로필 변경 과정이 너무 길어져 우선 비활성화.
+      //     // profileImage:
+      //     //   isProfileImageChanged &&
+      //     //   profileImageFile &&
+      //     //   isProfileImageValid !== true
+      //     //     ? profileImageFile
+      //     //     : null,
+      //   });
 
-        // 분석 결과를 받아오는데 실패한 경우
-        if (!result) {
-          setAlerts((prev) => [
-            ...prev,
-            {
-              id: uniqueId(),
-              show: true,
-              type: "warning",
-              createdAt: Date.now(),
-              text: "프로필 검사 중 문제가 발생하였습니다. 다시 시도해 주세요.",
-            },
-          ]);
-          return;
-        } else {
-          const { displayNameValid, displayIdValid, profileImageValid } =
-            result;
+      //   // 분석 결과를 받아오는데 실패한 경우
+      //   if (!result) {
+      //     setAlerts((prev) => [
+      //       ...prev,
+      //       {
+      //         id: uniqueId(),
+      //         show: true,
+      //         type: "warning",
+      //         createdAt: Date.now(),
+      //         text: "프로필 검사 중 문제가 발생하였습니다. 다시 시도해 주세요.",
+      //       },
+      //     ]);
+      //     return;
+      //   } else {
+      //     const { displayNameValid, displayIdValid, profileImageValid } =
+      //       result;
 
-          // 모두 문제 없으면 문제없음 업데이트 후 계속 진행
-          if (displayNameValid && displayIdValid && profileImageValid) {
-            setIsDisplayNameValid(true);
-            setIsDisplayIdValid(true);
-            setIsProfileImageValid(true);
-          } else {
-            // 하나라도 문제가 있으면 문제 업데이트 후 중단
-            setIsDisplayNameValid(displayNameValid);
-            setIsDisplayIdValid(displayIdValid);
-            setIsProfileImageValid(profileImageValid);
-            setIsLoading(false);
-            return;
-          }
-        }
-      }
+      //     // 모두 문제 없으면 문제없음 업데이트 후 계속 진행
+      //     if (displayNameValid && displayIdValid && profileImageValid) {
+      //       setIsDisplayNameValid(true);
+      //       setIsDisplayIdValid(true);
+      //       setIsProfileImageValid(true);
+      //     } else {
+      //       // 하나라도 문제가 있으면 문제 업데이트 후 중단
+      //       setIsDisplayNameValid(displayNameValid);
+      //       setIsDisplayIdValid(displayIdValid);
+      //       setIsProfileImageValid(profileImageValid);
+      //       setIsLoading(false);
+      //       return;
+      //     }
+      //   }
+      // }
 
       //
       // 이미지 업로드 / 삭제
@@ -337,7 +464,8 @@ const ProfileForm = () => {
         ? authStatus.data?.photoURL
         : "";
       const deletePrevProfileImage =
-        !!authStatus.data.photoURL && (!!defaultMainImg || !!profileImageFile);
+        !!authStatus.data.photoURL &&
+        (!!defaultProfileImg || !!profileImageFile);
       const uploadNewProfileImage = profileImageFile && profileImageId;
 
       // 이전 이미지 삭제
@@ -367,6 +495,41 @@ const ProfileForm = () => {
         );
       }
 
+      // 배경 이미지
+      let bgImageURL: string | null = authStatus.data?.bgPhotoURL
+        ? authStatus.data?.bgPhotoURL
+        : "";
+      const deletePrevBgImage =
+        !!authStatus.data.bgPhotoURL && (!!defaultBgImg || !!bgImageFile);
+      const uploadNewBgImage = bgImageFile && bgImageId;
+
+      // 이전 이미지 삭제
+      if (deletePrevBgImage) {
+        const regex = /images%2F([^?]+)/;
+        const prevImgPathMatch = authStatus.data.bgPhotoURL?.match(regex);
+
+        if (prevImgPathMatch) {
+          bgImageURL = "";
+          const prevImgPath = prevImgPathMatch[1].replaceAll("%2F", "/");
+          const storage = getStorage();
+          const storageRef = ref(storage, `images/${prevImgPath}`);
+          imagePromises.push(deleteObject(storageRef));
+        }
+      }
+
+      // 새 이미지 업로드
+      if (uploadNewBgImage) {
+        imagePromises.push(
+          postBgImageFile({
+            uid: user.uid,
+            fileName: bgImageId,
+            img: bgImageFile,
+          }).then((URL) => {
+            bgImageURL = URL || "";
+          }),
+        );
+      }
+
       // 이미지 업로드/삭제 작업 일괄 실행
       await Promise.all(imagePromises);
 
@@ -383,6 +546,9 @@ const ProfileForm = () => {
             displayName,
             displayId: lowercaseDisplayId,
             photoURL: profileImageURL,
+            bgPhotoURL: bgImageURL,
+            introduce,
+            links,
             allowPush: allowPush === "true",
           },
         };
@@ -395,6 +561,9 @@ const ProfileForm = () => {
           displayName,
           displayId: lowercaseDisplayId,
           photoURL: profileImageURL,
+          bgPhotoURL: bgImageURL,
+          introduce,
+          links,
           allowPush: allowPush === "true",
         };
       });
@@ -408,27 +577,35 @@ const ProfileForm = () => {
             displayName,
             displayId: lowercaseDisplayId,
             photoURL: profileImageURL,
+            bgPhotoURL: bgImageURL,
+            introduce,
+            links,
             allowPush: allowPush === "true",
           },
         };
       });
 
       // 유저 데이터 업데이트
-
       const docRef = doc(db, "users", user.uid);
       const updatePromises = [
         authStatus.data?.displayId
           ? updateDoc(docRef, {
               displayId: lowercaseDisplayId,
               photoURL: profileImageURL,
+              bgPhotoURL: bgImageURL,
               allowPush: allowPush === "true",
+              introduce,
+              links,
             })
           : setDoc(docRef, {
               displayId: lowercaseDisplayId,
               photoURL: profileImageURL,
+              bgPhotoURL: bgImageURL,
               follower: [],
               following: [],
               allowPush: allowPush === "true",
+              introduce,
+              links,
             }),
         updateProfile(user, {
           displayName,
@@ -473,36 +650,146 @@ const ProfileForm = () => {
     }
   };
 
+  const linkInputs = (linkCount: number) => {
+    const linkInputEls: Array<JSX.Element> = [];
+
+    for (let i = 0; i < linkCount; i++) {
+      console.log(linkValid[i], i);
+      linkInputEls.push(
+        <div className="flex w-full gap-1">
+          <input
+            id={`link-${i}`}
+            type="text"
+            value={links[i]}
+            onChange={onLinksChange}
+            placeholder={`링크 ${i + 1}`}
+            className={`grow rounded-lg border bg-white py-1 pl-2 outline-none ${!linkValid[i] ? "border-[firebrick]" : "border-astronaut-200"}`}
+            disabled={isLoading}
+          />
+          <button
+            onClick={() => {
+              onAdjustLink(-1);
+              setLinks((prev) => {
+                const newLinks = _.cloneDeep(prev);
+                newLinks.splice(i, 1);
+                newLinks.push("");
+                return newLinks;
+              });
+              setLinkValid((prev) => {
+                const newLinkValid = _.cloneDeep(prev);
+                newLinkValid[i] = true;
+                return newLinkValid;
+              });
+            }}
+            className="m-auto aspect-square h-fit rounded-full bg-astronaut-200 px-2 font-bold text-white hover:bg-astronaut-100"
+          >
+            -
+          </button>
+        </div>,
+      );
+    }
+
+    return linkInputEls;
+  };
+
+  const onAdjustLink = (amount: -1 | 1) => {
+    setLinkCount((prev) => Math.max(Math.min(prev + amount, 5), 1) as number);
+  };
+
   return (
     <div className="m-auto flex h-full w-fit flex-col px-4 pb-12 pt-8">
       <div className="flex grow flex-col justify-between gap-12">
-        <div className="flex w-[50vw] min-w-52 max-w-72 flex-col gap-y-4">
+        <div className="flex w-[50vw] min-w-52 max-w-72 flex-col gap-y-8">
+          <div>
+            <label
+              className="group relative h-24 w-full cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <h4 className="mb-2 flex items-center gap-2 pl-1 text-sm text-astronaut-700">
+                배너 이미지
+              </h4>
+              <input
+                ref={bgImageFileInputRef}
+                onChange={onBgImageFileSelect}
+                type="file"
+                accept="image/jpg, image/jpeg, image/gif, image/webp, image/png"
+                className="hidden"
+              ></input>
+              <div className="relative h-24 w-full overflow-hidden rounded-xl">
+                {bgImagePreviewURL ||
+                (!defaultBgImg && userData?.bgPhotoURL) ? (
+                  <Fragment>
+                    <Image
+                      layout="fill"
+                      objectFit="cover"
+                      src={
+                        bgImagePreviewURL
+                          ? bgImagePreviewURL
+                          : defaultBgImg
+                            ? ""
+                            : authStatus.data?.bgPhotoURL || ""
+                      }
+                      alt="background image preview"
+                    />
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 px-2 py-1 opacity-0 ${!isLoading && "group-hover:opacity-80"}`}
+                    >
+                      이미지 변경
+                    </div>
+                  </Fragment>
+                ) : (
+                  <div className="flex h-24 w-full items-center justify-center rounded-xl bg-astronaut-100 text-xl font-semibold text-astronaut-300">
+                    이미지 추가
+                  </div>
+                )}
+              </div>
+            </label>
+
+            <div className="mb-2 mt-2 flex justify-center gap-6">
+              <button
+                onClick={onDefaultBgImgClick}
+                className="text-xs text-astronaut-500 underline"
+              >
+                기본 배너 이미지
+              </button>
+            </div>
+          </div>
+
           <label
             onClick={(e) => {
               e.stopPropagation();
             }}
-            className={`group relative m-auto w-[60%] cursor-pointer rounded-full xs:w-[80%]`}
+            className={`group relative m-auto w-full cursor-pointer rounded-full`}
           >
+            <h4 className="mb-2 flex items-center gap-2 pl-1 text-sm text-astronaut-700">
+              프로필 이미지
+            </h4>
+
             {isProfileImageInputUploading ? (
               <div className="flex aspect-square flex-col items-center justify-center rounded-full bg-astronaut-50">
                 <Loading />
               </div>
             ) : (
-              <ProfileImage
-                URL={
-                  profileImagePreviewURL
-                    ? profileImagePreviewURL
-                    : defaultMainImg
-                      ? ""
-                      : authStatus.data?.photoURL || ""
-                }
-              />
+              <div className="relative m-auto w-[60%] xs:w-[80%]">
+                <ProfileImage
+                  URL={
+                    profileImagePreviewURL
+                      ? profileImagePreviewURL
+                      : defaultProfileImg
+                        ? ""
+                        : authStatus.data?.photoURL || ""
+                  }
+                />
+                <div
+                  className={`absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 px-2 py-1 opacity-0 ${!isLoading && "group-hover:opacity-80"}`}
+                >
+                  이미지 변경
+                </div>
+              </div>
             )}
-            <div
-              className={`absolute bottom-0 left-0 right-0 top-0 m-auto h-fit w-fit rounded-xl bg-astronaut-100 px-2 py-1 opacity-0 ${!isLoading && "group-hover:opacity-80"}`}
-            >
-              이미지 변경
-            </div>
+
             <input
               ref={profileImageFileInputRef}
               onChange={onProfileImageFileSelect}
@@ -522,7 +809,7 @@ const ProfileForm = () => {
 
           <div className="mb-2 flex justify-center gap-6">
             <button
-              onClick={onDefaultMainImgClick}
+              onClick={onDefaultProfileImgClick}
               className="text-xs text-astronaut-500 underline"
             >
               기본 프로필 이미지
@@ -588,6 +875,55 @@ const ProfileForm = () => {
               {displayId.toLowerCase() || "식별 아이디"}
             </p>
           </label>
+          <label className="flex flex-col">
+            <h4 className="flex items-center gap-2 pl-1 text-sm text-astronaut-700">
+              소개글{" "}
+            </h4>
+            <p className="break-keep pb-1 pl-1 text-xs text-astronaut-400">
+              프로필 페이지에 표시할 짧은 소개글입니다.
+            </p>
+            <textarea
+              value={introduce}
+              placeholder="최대 150자"
+              onChange={onIntroduceChange}
+              className="max-h-[200px] min-h-[50px] rounded-lg border border-astronaut-200 bg-white py-1 pl-2 outline-none"
+              maxLength={150}
+              disabled={isLoading}
+            />
+          </label>
+          <div className="flex flex-col">
+            <h4 className="flex items-center gap-2 pl-1 text-sm text-astronaut-700">
+              링크{" "}
+            </h4>
+            <p className="break-keep pb-1 pl-1 text-xs text-astronaut-400">
+              프로필에 최대 5개까지 링크를 추가합니다.
+            </p>
+            <div className="flex flex-col gap-y-2">
+              {...linkInputs(linkCount)}
+              {linkCount < 5 && (
+                <button
+                  className={`grow rounded-lg border border-astronaut-200 bg-astronaut-200 py-1 pl-2 font-semibold text-white hover:border-astronaut-100 hover:bg-astronaut-100`}
+                  onClick={() => onAdjustLink(1)}
+                >
+                  링크 추가
+                </button>
+              )}
+            </div>
+            <div className="ml-2 mt-2 flex flex-col gap-1">
+              {links.map((link, i) =>
+                link ? (
+                  <a
+                    href={ensureHttp(link)}
+                    key={link + i}
+                    target="_blank"
+                    className="w-full fill-astronaut-500 text-xs text-astronaut-500"
+                  >
+                    <ExternalLink href={link} />
+                  </a>
+                ) : null,
+              )}
+            </div>
+          </div>
           <div className="flex flex-col">
             <h4 className="flex items-center gap-2 pl-1 text-sm text-astronaut-700">
               푸시 알림
@@ -630,7 +966,8 @@ const ProfileForm = () => {
                   isLoading ||
                   isDisplayIdValid === false ||
                   isDisplayNameValid === false ||
-                  isProfileImageValid === false
+                  isProfileImageValid === false ||
+                  linkValid.some((valid) => !valid)
                 }
               >
                 <div>프로필 설정 완료</div>

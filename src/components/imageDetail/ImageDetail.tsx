@@ -345,12 +345,16 @@ const ImageDetail = () => {
 
                   <div
                     id="image-detail__sticky-comment-form"
-                    className="sticky bottom-0 z-10 mt-4 border-t bg-white px-4 pb-8 pt-4"
+                    className="sticky bottom-0 z-10 mt-4 border-t bg-white px-2 pb-8 pt-4"
                   >
-                    <div className="mb-4 flex justify-end gap-4">
+                    <div className="mb-4 flex justify-between gap-4 px-2">
                       <Like author={author} />
                       <div className="w-6 items-center">
-                        <SaveButton color="gray" imageData={imageData} />
+                        <SaveButton
+                          tooltip={true}
+                          color="gray"
+                          imageData={imageData}
+                        />
                       </div>
                     </div>
                     <CommentForm

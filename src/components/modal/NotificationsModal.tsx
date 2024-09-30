@@ -8,6 +8,7 @@ import _ from "lodash";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { InAppNotification } from "@/types";
+import ProfileImage from "../user/ProfileImage";
 
 const NotificationsModal = ({ close }: { close: Function }) => {
   const dateDiffNow = useDateDiffNow();
@@ -141,12 +142,13 @@ const NotificationsModal = ({ close }: { close: Function }) => {
               }
               className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-astronaut-50 xs:h-8 xs:w-8"
             >
-              <Image
+              {/* <Image
                 src={notification.profileImage}
                 layout="fill"
                 objectFit="cover"
                 alt={title}
-              />
+              /> */}
+              <ProfileImage URL={notification.profileImage} />
             </Link>
             <div className="flex flex-col gap-0 leading-tight">
               <div className="text-sm font-bold leading-tight text-astronaut-800">

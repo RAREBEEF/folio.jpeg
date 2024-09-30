@@ -25,7 +25,7 @@ const calcShutterSpeed = (shutterSpeedValue: number) => {
 };
 
 /**
- * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
+ * 이미지를 스토리지에 업로드하고 다운로드 URL을 포함한 이미지 데이터를 반환하는 비동기 함수 (를 반환하는 커스텀훅)
  */
 const usePostImageFile = () => {
   const setAlert = useSetRecoilState(alertsState);
@@ -67,15 +67,30 @@ const usePostImageFile = () => {
   });
 
   // 첨부파일 리셋 함수
-  const onReset = () => {
+  const onResetAllField = () => {
     setFile(null);
+    setOriginFile(null);
     setPreviewURL("");
+    setOriginPreviewURL("");
     setId("");
     setFileName("");
     setOriginalName("");
     setByte(0);
+    setOriginByte(0);
     setSize({ width: 0, height: 0 });
+    setOriginSize({ width: 0, height: 0 });
     setError(null);
+    setImgMetaData({
+      make: null,
+      model: null,
+      lensMake: null,
+      lensModel: null,
+      shutterSpeed: null,
+      fNumber: null,
+      ISO: null,
+      focalLength: null,
+      createDate: null,
+    });
   };
 
   // 첨부파일 선택
@@ -83,6 +98,59 @@ const usePostImageFile = () => {
     const fileList = e.target.files;
 
     if (!fileList || fileList.length === 0) return;
+    setIsInputUploading(true);
+
+    onResetAllField();
+
+    // 원본 이미지 데이터 저장
+    setOriginFile(fileList[0]);
+    setOriginByte(fileList[0].size);
+    setOriginalName(fileList[0].name);
+
+    // 메타데이터
+    const exifData = await exifr.parse(fileList[0]);
+    setImgMetaData({
+      make: exifData?.Make || null,
+      model: exifData?.Model || null,
+      lensMake: exifData?.LensMake || null,
+      lensModel: exifData?.LensModel || null,
+      shutterSpeed: exifData?.ShutterSpeedValue
+        ? `${calcShutterSpeed(exifData?.ShutterSpeedValue)}s`
+        : null,
+      fNumber: `f/${exifData?.FNumber}` || null,
+      ISO: exifData?.ISO || null,
+      focalLength: `${exifData?.FocalLength}mm` || null,
+      createDate:
+        `${new Date(exifData.CreateDate).toLocaleString("en-US")}` || null,
+    });
+
+    // 미리보기 이미지 경로
+    const previewImg = new Image();
+    const _URL = window.URL || window.webkitURL;
+    const objectURL = _URL.createObjectURL(fileList[0]);
+
+    // 미리보기 이미지 로드
+    previewImg.onload = () => {
+      // 최소 사이즈 미달
+      if (previewImg.width < 50 || previewImg.height < 50) {
+        onResetAllField();
+        setError("fileSize");
+        setAlert((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            type: "warning",
+            text: "이미지의 최소 사이즈는 50*50 입니다.",
+            show: true,
+            createdAt: Date.now(),
+          },
+        ]);
+      } else {
+        setOriginSize({ width: previewImg.width, height: previewImg.height });
+        setOriginPreviewURL(objectURL);
+      }
+    };
+    previewImg.src = objectURL;
 
     onSelectImage(fileList[0]);
   };
@@ -107,25 +175,14 @@ const usePostImageFile = () => {
 
   /**
    * 이미지가 변경될 때(input될 때 혹은 크롭될 때) 처리할 내용
-   * @param keepData 크롭모드에서 이미지 가공 후 편집 완료시에는 기존 메타데이터가 싹 날아감. 날아갈 데이터를 유지시킬지 여부
    * */
-  const onSelectImage = async (file: File, keepData: boolean = false) => {
+  const onSelectImage = async (file: File) => {
     if (!file) return;
-
-    if (!keepData) {
-      onReset();
-    }
-
-    // 원본 상태가 비어있는 경우 현재 파일을 원본 상태에 저장
-    if (!originFile) {
-      setOriginFile(file);
-    }
-    setFile(file);
 
     // 파일 형식 체크
     const fileType = file.type.replace("image/", "");
     if (!["jpg", "jpeg", "gif", "webp", "png"].includes(fileType)) {
-      onReset();
+      onResetAllField();
       setError("fileType");
       setIsInputUploading(false);
       setAlert((prev) => [
@@ -141,15 +198,22 @@ const usePostImageFile = () => {
       return;
     }
 
+    // 스토리지에 중복된 파일명을 방지하기 위해 해시 id를 생성하고 id를 파일명으로 사용
+    const id = uuidv4();
+    setId(id);
+    setFileName(id + "." + fileType);
+    // }
+
     // 미리보기 이미지 경로
     const previewImg = new Image();
     const _URL = window.URL || window.webkitURL;
     const objectURL = _URL.createObjectURL(file);
 
+    // 미리보기 이미지 로드
     previewImg.onload = () => {
       // 최소 사이즈 미달
       if (previewImg.width < 50 || previewImg.height < 50) {
-        onReset();
+        onResetAllField();
         setError("fileSize");
         setIsInputUploading(false);
         setAlert((prev) => [
@@ -163,73 +227,15 @@ const usePostImageFile = () => {
           },
         ]);
       }
+
       setSize({ width: previewImg.width, height: previewImg.height });
       setPreviewURL(objectURL);
+      setFile(file);
+      setByte(file.size);
+      setIsInputUploading(false);
     };
     previewImg.src = objectURL;
-
-    setByte(file.size);
-
-    if (!keepData) {
-      const exifData = await exifr.parse(file);
-
-      setImgMetaData({
-        make: exifData?.Make || null,
-        model: exifData?.Model || null,
-        lensMake: exifData?.LensMake || null,
-        lensModel: exifData?.LensModel || null,
-        shutterSpeed: exifData?.ShutterSpeedValue
-          ? `${calcShutterSpeed(exifData?.ShutterSpeedValue)}s`
-          : null,
-        fNumber: `f/${exifData?.FNumber}` || null,
-        ISO: exifData?.ISO || null,
-        focalLength: `${exifData?.FocalLength}mm` || null,
-        createDate:
-          `${new Date(exifData.CreateDate).toLocaleString("en-US")}` || null,
-      });
-
-      // 스토리지에 중복된 파일명을 방지하기 위해 해시 id를 생성하고 id를 파일명으로 사용
-      const id = uuidv4();
-      setId(id);
-      setOriginalName(file.name);
-      setFileName(id + "." + fileType);
-    }
   };
-
-  // 원본 이미지의 데이터
-  useEffect(() => {
-    if (!originFile) {
-      return;
-    }
-
-    const previewImg = new Image();
-    const _URL = window.URL || window.webkitURL;
-    const objectURL = _URL.createObjectURL(originFile);
-
-    previewImg.onload = () => {
-      // 최소 사이즈 미달
-      if (previewImg.width < 50 || previewImg.height < 50) {
-        onReset();
-        setError("fileSize");
-        setIsInputUploading(false);
-        setAlert((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            type: "warning",
-            text: "이미지의 최소 사이즈는 50*50 입니다.",
-            show: true,
-            createdAt: Date.now(),
-          },
-        ]);
-      }
-      setOriginSize({ width: previewImg.width, height: previewImg.height });
-      setOriginPreviewURL(objectURL);
-    };
-    previewImg.src = objectURL;
-
-    setOriginByte(originFile.size);
-  }, [originFile, setAlert]);
 
   /**
    * 이미지를 스토리지에 업로드하고 다운로드URL을 포함한 이미지 데이터를 반환하는 비동기 함수
@@ -288,7 +294,7 @@ const usePostImageFile = () => {
     isLoading,
     postImageFile,
     onFileSelect,
-    onReset,
+    onResetAllField,
     error,
     onSelectImage,
     resetImg,

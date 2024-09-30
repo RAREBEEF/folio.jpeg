@@ -66,7 +66,7 @@ main:not(#home, #search-result, #image-detail, #user-detail, #folder-detail) {
 
 * {
   box-sizing: border-box;
-  letter-spacing: -0.025rem;
+  /* letter-spacing: -0.025rem; */
 }
 
 summary::-webkit-details-marker {

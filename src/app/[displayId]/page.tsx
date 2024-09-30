@@ -56,7 +56,7 @@ export async function generateMetadata(
     const user = await admin.auth().getUser(uid);
 
     return {
-      title: `${user.displayName}.JPEG`,
+      title: `${user.displayName}`,
       description:
         `${user.displayName}님의 프로필입니다. ${user.displayName}님이 업로드하고 저장한 이미지들을 확인해 보세요. ` +
         "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",

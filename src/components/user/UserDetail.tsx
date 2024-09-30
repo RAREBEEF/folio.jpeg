@@ -23,6 +23,8 @@ import Share from "../Share";
 import PenIcon from "@/icons/pen-solid.svg";
 import Image from "next/image";
 import IconWithTooltip from "../IconWithTooltip";
+import ExternalLink from "../ExternalLink";
+import ensureHttp from "@/tools/ensureHttp";
 
 const UserDetail = () => {
   const { getUserByDisplayId, isLoading } = useGetUserByDisplayId();
@@ -106,12 +108,25 @@ const UserDetail = () => {
     <div className="h-full bg-white">
       {!isLoading && userData ? (
         <div className="flex flex-col gap-4 pb-12">
-          <div className="relative flex flex-col items-center gap-5 pb-4">
-            <div className="relative w-full">
-              <div className="relative m-auto w-[50%] max-w-72 pb-6 pt-12">
+          <div className="relative flex flex-col items-center gap-5 pb-4 pt-8">
+            <div className="relative h-[336px] w-[80%]">
+              {userData.bgPhotoURL && (
+                <div className="w-full">
+                  <div className="relative m-auto h-[336px] w-full overflow-hidden rounded-lg">
+                    <Image
+                      src={userData.bgPhotoURL}
+                      alt={"banner image"}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="absolute bottom-0 left-0 right-0 z-10 m-auto w-[40%] max-w-64 pb-6 pt-12">
                 <ProfileImage URL={userData.photoURL} />
               </div>
             </div>
+
             <h3 className="relative flex w-full flex-col items-center">
               <span className="text-2xl font-bold ">
                 {userData.displayName}
@@ -119,6 +134,7 @@ const UserDetail = () => {
               <span className="text-base text-astronaut-500">
                 @{userData.displayId}
               </span>
+
               <div className="absolute right-5 top-0 flex gap-2 text-xs">
                 <Share />
                 {authStatus.data?.uid === userData.uid && (
@@ -132,13 +148,36 @@ const UserDetail = () => {
             </h3>
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-4 pb-8">
+          <div className="flex flex-col items-center justify-center gap-4 ">
             {authStatus.data && authStatus.data?.uid !== userData.uid && (
               <div className="text-sm">
                 <FollowBtn userData={userData} />
               </div>
             )}
             <Follow displayId={displayId} />
+          </div>
+
+          {userData.introduce && (
+            <div className="m-auto mt-5 w-fit whitespace-pre text-sm text-astronaut-400">
+              {userData.introduce}
+            </div>
+          )}
+
+          <div className="flex w-full justify-center gap-x-24 pb-8">
+            {userData.links?.some((link) => link !== "") && (
+              <div className="mt-5 flex flex-col gap-1">
+                {userData.links.map((link, i) => (
+                  <a
+                    key={link + i}
+                    href={ensureHttp(link)}
+                    target="_blank"
+                    className="fill-astronaut-500 text-sm text-astronaut-500"
+                  >
+                    <ExternalLink href={link} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <AiFeedback userData={userData} />

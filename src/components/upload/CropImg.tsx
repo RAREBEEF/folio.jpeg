@@ -1,7 +1,9 @@
 import { ImageMetadata } from "@/types";
 import {
   ChangeEvent,
+  Dispatch,
   MouseEventHandler,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -12,11 +14,19 @@ import loadImage from "@/tools/loadImage";
 import CloseSvg from "@/icons/xmark-solid.svg";
 
 const CropImg = ({
-  // imgData: productImgData,
   imgData,
   onToggleCropImgMode,
   onSelectImage,
   close,
+  cropDataSetter,
+  prevCropData = {
+    metadataOverlay: false,
+    filmStyleOverlay1: false,
+    filmStyleOverlay2: false,
+    resizerCoords: { x1: 0, y1: 0, x2: 1, y2: 1 },
+    cropPos: [0, 0],
+    cropSize: [0, 0],
+  },
 }: {
   imgData: {
     originFile: File | null;
@@ -39,12 +49,36 @@ const CropImg = ({
     imgMetaData: ImageMetadata;
   };
   onToggleCropImgMode: MouseEventHandler<HTMLButtonElement>;
-  onSelectImage: (file: File, keepData?: boolean) => Promise<void>;
+  onSelectImage: (file: File) => Promise<void>;
   close: Function;
+  cropDataSetter: Dispatch<
+    SetStateAction<{
+      metadataOverlay: boolean;
+      filmStyleOverlay1: boolean;
+      filmStyleOverlay2: boolean;
+      resizerCoords: { x1: number; y1: number; x2: number; y2: number };
+      cropPos: [number, number];
+      cropSize: [number, number];
+    }>
+  >;
+  prevCropData?: {
+    metadataOverlay: boolean;
+    filmStyleOverlay1: boolean;
+    filmStyleOverlay2: boolean;
+    resizerCoords: { x1: number; y1: number; x2: number; y2: number };
+    cropPos: [number, number];
+    cropSize: [number, number];
+  };
 }) => {
-  const [metadataOverlay, setMetadataOverlay] = useState<boolean>(false);
-  const [filmStyleOverlay1, setFilmStyleOverlay1] = useState<boolean>(false);
-  const [filmStyleOverlay2, setFilmStyleOverlay2] = useState<boolean>(false);
+  const [metadataOverlay, setMetadataOverlay] = useState<boolean>(
+    prevCropData.metadataOverlay,
+  );
+  const [filmStyleOverlay1, setFilmStyleOverlay1] = useState<boolean>(
+    prevCropData.filmStyleOverlay1,
+  );
+  const [filmStyleOverlay2, setFilmStyleOverlay2] = useState<boolean>(
+    prevCropData.filmStyleOverlay2,
+  );
   // 캔버스 및 콘텍스트
   const cvsRef = useRef<HTMLCanvasElement>(null);
   const [cvs, setCvs] = useState<HTMLCanvasElement | null>(null);
@@ -62,16 +96,17 @@ const CropImg = ({
   ]);
   // 이미지 상에서 리사이저의 좌상단과 우하단의 좌표.
   // 캔버스 크기가 변경되어도 같은 크롭 위치를 유지하기 위해 리사이즈의 크기와 위치를 이미지상의 좌표로 계산한다.
-  const [resizerCoords, setResizerCoords] = useState({
-    x1: 0,
-    y1: 0,
-    x2: 1,
-    y2: 1,
-  });
+  const [resizerCoords, setResizerCoords] = useState(
+    prevCropData.resizerCoords,
+  );
 
-  const [cropPos, setCropPos] = useState<[number, number]>([0, 0]);
-  const [cropSize, setCropSize] = useState<[number, number]>([0, 0]);
-
+  const [cropPos, setCropPos] = useState<[number, number]>(
+    prevCropData.cropPos,
+  );
+  const [cropSize, setCropSize] = useState<[number, number]>(
+    prevCropData.cropSize,
+  );
+  console.log(imgData);
   // 캔버스와 콘텍스트 초기화
   useEffect(() => {
     if (!cvsRef.current) {
@@ -673,7 +708,16 @@ const CropImg = ({
       }
 
       const file = new File([blob], imgData.fileName, { type: "image/webp" });
-      onSelectImage(file, true);
+      onSelectImage(file);
+    });
+
+    cropDataSetter({
+      metadataOverlay,
+      filmStyleOverlay1,
+      filmStyleOverlay2,
+      resizerCoords,
+      cropPos,
+      cropSize,
     });
 
     close();

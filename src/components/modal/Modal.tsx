@@ -1,4 +1,4 @@
-import { MouseEvent, ReactElement, useEffect } from "react";
+import { MouseEvent, ReactElement, useEffect, useState } from "react";
 import XSvg from "@/icons/xmark-solid.svg";
 import { useSetRecoilState } from "recoil";
 import { modalState } from "@/recoil/states";
@@ -7,10 +7,12 @@ const Modal = ({
   children,
   title,
   close = () => {},
+  allowOutsideClick = false,
 }: {
   children: ReactElement;
   title: string;
   close: Function;
+  allowOutsideClick?: boolean;
 }) => {
   const setModalState = useSetRecoilState(modalState);
 
@@ -26,6 +28,9 @@ const Modal = ({
 
   // 모달 외부 클릭시 창이 닫히도록
   const onModalOutsideClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (allowOutsideClick) {
+      return;
+    }
     const target = e.nativeEvent.target as HTMLElement;
     if (!target) return;
 
