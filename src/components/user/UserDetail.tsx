@@ -20,7 +20,7 @@ import Follow from "./Follow";
 import useGetUserByDisplayId from "@/hooks/useGetUserByDisplayId";
 import AiFeedback from "./AiFeedback";
 import Share from "../Share";
-import PenIcon from "@/icons/pen-solid.svg";
+import PenSvg from "@/icons/pen-solid.svg";
 import Image from "next/image";
 import IconWithTooltip from "../IconWithTooltip";
 import ExternalLink from "../ExternalLink";
@@ -127,7 +127,7 @@ const UserDetail = () => {
               </div>
             </div>
 
-            <h3 className="relative flex w-full flex-col items-center">
+            <h3 className="relative flex w-[80%] flex-col items-center">
               <span className="text-2xl font-bold ">
                 {userData.displayName}
               </span>
@@ -140,7 +140,7 @@ const UserDetail = () => {
                 {authStatus.data?.uid === userData.uid && (
                   <button onClick={onProfileEditClick}>
                     <IconWithTooltip text="수정" tooltipDirection="top">
-                      <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                      <PenSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
                     </IconWithTooltip>
                   </button>
                 )}

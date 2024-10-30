@@ -301,16 +301,16 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className + " flex min-h-lvh flex-col bg-white"}>
-        <Suspense>
-          <RecoilProvider>
+        <RecoilProvider>
+          <Suspense>
             <Fragment>
               <LayoutHeader />
               <LayoutBody>{children}</LayoutBody>
               <LayoutFooter />
               <Init />
             </Fragment>
-          </RecoilProvider>
-        </Suspense>
+          </Suspense>
+        </RecoilProvider>
       </body>
     </html>
   );

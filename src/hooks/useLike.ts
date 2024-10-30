@@ -35,6 +35,8 @@ const useLike = ({ imageId }: { imageId: string }) => {
   useEffect(() => {
     if (authStatus.data && imageData) {
       checkAlreadyLiked(imageData, authStatus.data.uid);
+    } else {
+      setAlreadyLiked(false);
     }
   }, [checkAlreadyLiked, imageData, authStatus]);
 

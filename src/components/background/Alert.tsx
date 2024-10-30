@@ -2,14 +2,14 @@
 import { alertsState, modalState, uploadStatusState } from "@/recoil/states";
 import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import CircleCheckIcon from "@/icons/circle-check-solid.svg";
-import CircleExclamationIcon from "@/icons/circle-exclamation-solid.svg";
-import _ from "lodash";
-import { AnalysisResult, UploadStatus } from "@/types";
-import Image from "next/image";
+import CircleCheckSvg from "@/icons/circle-check-solid.svg";
+import CircleExclamationSvg from "@/icons/circle-exclamation-solid.svg";
+import DeleteSvg from "@/icons/xmark-solid.svg";
 import ArrowSvg from "@/icons/chevron-left-solid.svg";
+import _ from "lodash";
+import { AnalysisResult } from "@/types";
+import Image from "next/image";
 import useUpdateUploadStatus from "@/hooks/useUpdateUploadStatus";
-import DeleteIcon from "@/icons/xmark-solid.svg";
 import Modal from "../modal/Modal";
 import AnalysisResultModal from "../modal/AnalysisResultModal";
 
@@ -124,9 +124,9 @@ const Alert = () => {
                 className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-50 px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
               >
                 {alert.type === "success" ? (
-                  <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
+                  <CircleCheckSvg className="aspect-square h-8 fill-astronaut-500" />
                 ) : alert.type === "warning" ? (
-                  <CircleExclamationIcon className="aspect-square h-8 fill-astronaut-500" />
+                  <CircleExclamationSvg className="aspect-square h-8 fill-astronaut-500" />
                 ) : null}
                 <div className="my-4 whitespace-pre-line leading-tight">
                   {alert.text}
@@ -142,9 +142,9 @@ const Alert = () => {
                 className={`mt-4 flex w-fit max-w-[90vw] animate-alert select-none items-center gap-4 overflow-hidden break-keep rounded-xl bg-astronaut-50  px-8 text-lg font-semibold text-astronaut-800 shadow-lg`}
               >
                 {alert.type === "success" ? (
-                  <CircleCheckIcon className="aspect-square h-8 fill-astronaut-500" />
+                  <CircleCheckSvg className="aspect-square h-8 fill-astronaut-500" />
                 ) : alert.type === "warning" ? (
-                  <CircleExclamationIcon className="aspect-square h-8 fill-astronaut-500" />
+                  <CircleExclamationSvg className="aspect-square h-8 fill-astronaut-500" />
                 ) : null}
                 <div className="my-4 whitespace-pre-line leading-tight">
                   {alert.text}
@@ -201,7 +201,7 @@ const Alert = () => {
                         onClick={(e) => uploadCleanUpSelf(e, upload.id)}
                         className="absolute right-0 top-1 h-3 w-3 fill-astronaut-500 hover:fill-astronaut-600 active:fill-astronaut-700"
                       >
-                        <DeleteIcon />
+                        <DeleteSvg />
                       </button>
                     )}
                     <div className="relative h-10 w-10 shrink-0 self-start">

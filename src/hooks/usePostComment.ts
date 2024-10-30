@@ -49,7 +49,7 @@ const usePostComment = ({
         sendFcm({
           data: {
             title: `${authStatus.data.displayName}님이 사진에 댓글을 남겼습니다.`,
-            body: `${authStatus.data.displayName}님: ${comment.content}`,
+            body: `${comment.content}`,
             profileImage: authStatus.data.photoURL,
             targetImage: imageData.URL,
             click_action: `/image/${imageData.id}`,
@@ -73,7 +73,7 @@ const usePostComment = ({
       await sendFcm({
         data: {
           title: `${authStatus.data.displayName}님이 답글을 남겼습니다.`,
-          body: `${authStatus.data.displayName}님: ${comment.content}`,
+          body: `${comment.content}`,
           profileImage: authStatus.data.photoURL,
           targetImage: imageData.URL,
           click_action: `/image/${imageData.id}`,

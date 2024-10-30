@@ -15,7 +15,7 @@ import Like from "./Like";
 import useGetImage from "@/hooks/useGetImage";
 import Loading from "@/components/loading/Loading";
 import RecommendImageList from "../imageList/RecommendImageList";
-import ArrowIcon from "@/icons/arrow-left-solid.svg";
+import ArrowSvg from "@/icons/arrow-left-solid.svg";
 import CommentForm from "@/components/comment/CommentForm";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/fb";
@@ -260,7 +260,7 @@ const ImageDetail = () => {
                 back();
               }}
             >
-              <ArrowIcon className="h-5 fill-astronaut-700 transition-all hover:fill-astronaut-500" />
+              <ArrowSvg className="h-5 fill-astronaut-700 transition-all hover:fill-astronaut-500" />
             </button>
           </nav>
 

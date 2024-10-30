@@ -44,7 +44,8 @@ const UserImageList = ({ userData }: { userData: UserData }) => {
           filter={{
             orderBy: [orderBy, "desc"],
             where: where("uid", "==", userData.uid),
-            limit: Math.min(grid.colCount * 2, 1),
+            limit:
+              process.env.NODE_ENV === "development" ? 1 : grid.colCount * 2,
           }}
         />
       )}

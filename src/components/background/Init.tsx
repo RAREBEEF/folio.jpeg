@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Auth from "./Auth";
 import WebPush from "./WebPush";
 import ExtraUserDataListener from "./ExtraUserDataListener";
@@ -19,6 +19,7 @@ import { usePathname } from "next/navigation";
 import useTypeGuards from "@/hooks/useTypeGuards";
 import logo from "@/images/logo.png";
 import Image from "next/image";
+import { appCheck } from "firebase-admin";
 
 const Init = () => {
   const authStatus = useRecoilValue(authStatusState);
@@ -87,6 +88,8 @@ const Init = () => {
       setInitLoading(false);
     }
   }, [authStatus.status, setInitLoading, initLoading]);
+
+  console.log(initLoading, authStatus);
 
   return (
     <Fragment>

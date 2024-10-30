@@ -47,7 +47,7 @@ const Modal = ({
     <div
       id="modal-bg"
       onClick={onModalOutsideClick}
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      style={{ backgroundColor: "rgba(0,0,0,0.9)" }}
       className={`pointer-events-all fixed bottom-0 left-0 right-0 top-0 z-50 m-auto flex min-w-[300px] items-center justify-center opacity-100`}
     >
       <div className="relative z-50 flex h-fit max-h-[80vh] w-[400px] flex-col overflow-hidden rounded-xl bg-white xs:min-w-[250px] xs:max-w-[80vw]">

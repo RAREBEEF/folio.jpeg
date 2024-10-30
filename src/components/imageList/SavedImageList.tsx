@@ -27,7 +27,10 @@ const SavedImageList = ({ type, folder }: { type: string; folder: Folder }) => {
               filter={{
                 orderBy: ["createdAt", "desc"],
                 where: where("id", "in", folder.images),
-                limit: Math.min(grid.colCount * 2, 1),
+                limit:
+                  process.env.NODE_ENV === "development"
+                    ? 1
+                    : grid.colCount * 2,
               }}
               folder={folder}
             />

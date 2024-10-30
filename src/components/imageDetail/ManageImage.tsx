@@ -10,10 +10,10 @@ import {
 import { useRouter } from "next/navigation";
 import _, { uniqueId } from "lodash";
 import useResetGrid from "@/hooks/useResetGrid";
-import TrashIcon from "@/icons/trash-solid.svg";
-import PenIcon from "@/icons/pen-solid.svg";
+import TrashSVg from "@/icons/trash-solid.svg";
+import PenSvg from "@/icons/pen-solid.svg";
 import Link from "next/link";
-import RefreshIcon from "@/icons/rotate-right-solid.svg";
+import RefreshSvg from "@/icons/rotate-right-solid.svg";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 import Share from "../Share";
 import IconWithTooltip from "../IconWithTooltip";
@@ -119,7 +119,7 @@ const ManageImage = ({ imageId }: { imageId: string }) => {
     <div className="flex gap-2 rounded-l bg-white p-2 pr-2 text-xs">
       <button className="group relative" onClick={refreshImage}>
         <IconWithTooltip text="새로고침" tooltipDirection="top">
-          <RefreshIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+          <RefreshSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
         </IconWithTooltip>
       </button>
       <Share />
@@ -129,7 +129,7 @@ const ManageImage = ({ imageId }: { imageId: string }) => {
           <Fragment>
             <Link className="group relative" href={`/edit/${imageData.id}`}>
               <IconWithTooltip text="수정" tooltipDirection="top">
-                <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                <PenSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
               </IconWithTooltip>
             </Link>
             <button
@@ -138,7 +138,7 @@ const ManageImage = ({ imageId }: { imageId: string }) => {
               disabled={isLoading}
             >
               <IconWithTooltip text="삭제" tooltipDirection="top">
-                <TrashIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                <TrashSVg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
               </IconWithTooltip>
             </button>
           </Fragment>

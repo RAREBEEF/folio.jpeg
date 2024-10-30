@@ -90,11 +90,17 @@ const HomeImageList = () => {
                       ? authStatus.data.following
                       : [""],
                   ),
-                  limit: Math.min(grid.colCount * 2, 1),
+                  limit:
+                    process.env.NODE_ENV === "development"
+                      ? 1
+                      : grid.colCount * 2,
                 }
               : {
                   orderBy: [orderBy, "desc"],
-                  limit: Math.min(grid.colCount * 2, 1),
+                  limit:
+                    process.env.NODE_ENV === "development"
+                      ? 1
+                      : grid.colCount * 2,
                 }
           }
         />

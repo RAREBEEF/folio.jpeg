@@ -1,6 +1,10 @@
 import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { authStatusState, inAppNotificationState } from "@/recoil/states";
+import {
+  authStatusState,
+  inAppNotificationState,
+  usersDataState,
+} from "@/recoil/states";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +13,8 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/fb";
 import { InAppNotification } from "@/types";
 import ProfileImage from "../user/ProfileImage";
+import ProfileCard from "../user/ProfileCard";
+import useGetUserByUid from "@/hooks/useGetUserByUid";
 
 const NotificationsModal = ({ close }: { close: Function }) => {
   const dateDiffNow = useDateDiffNow();
@@ -60,66 +66,132 @@ const NotificationsModal = ({ close }: { close: Function }) => {
     } else if (["comment", "reply"].includes(type)) {
       titleContent = (
         <span>
-          <Link
+          {/* <Link
             className="font-semibold text-astronaut-950"
             href={`/${senders[0]?.displayId}`}
           >
             {senders[0]?.displayName}
             {" 님"}
-          </Link>
+          </Link> */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[0],
+            }}
+            onlyName={true}
+          />
+          {" 님"}
           {sentenceMap[type]}
         </span>
       );
       bodyContent = (
         <span>
-          <Link
+          {/* <Link
             className="font-semibold text-astronaut-950"
             href={`/${senders[0]?.displayId}`}
           >
             {senders[0]?.displayName}
             {" 님"}
-          </Link>
-          {body?.replace(`${senders[0]?.displayName}님`, "")}
+          </Link> */}
+          {/* <ProfileCard profileData={senders[0]} onlyName={true} />
+          {" 님"} */}
+          {/* {body?.replace(`${senders[0]?.displayName}님`, "")} */}&quot;
+          {body}&quot;
         </span>
       );
     } else if (senders.length === 1) {
       bodyContent = (
         <span>
-          <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
+          {/* <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
             {senders[0]?.displayName}
             {" 님"}
-          </Link>
+          </Link> */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[1],
+            }}
+            onlyName={true}
+          />
+          {" 님"}
           {sentenceMap[type]}
         </span>
       );
     } else if (senders.length === 2) {
       bodyContent = (
         <span>
-          <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
+          {/* <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
             {senders[0]?.displayName}
             {" 님"}
-          </Link>
-          ,{" "}
-          <Link className="font-semibold" href={`/${senders[1]?.displayId}`}>
+          </Link> */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[0],
+            }}
+            onlyName={true}
+          />
+          {" 님"},{" "}
+          {/* <Link className="font-semibold" href={`/${senders[1]?.displayId}`}>
             {senders[1]?.displayName}
             {" 님"}
-          </Link>
+          </Link> */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[1],
+            }}
+            onlyName={true}
+          />
+          {" 님"}
           {sentenceMap[type]}
         </span>
       );
     } else {
       bodyContent = (
         <span>
-          <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
+          {/* <Link className="font-semibold" href={`/${senders[0]?.displayId}`}>
             {senders[0]?.displayName}
             {" 님"}
-          </Link>
-          ,{" "}
-          <Link className="font-semibold" href={`/${senders[1]?.displayId}`}>
+          </Link> */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[0],
+            }}
+            onlyName={true}
+          />
+          {" 님"},{" "}
+          {/* <Link className="font-semibold" href={`/${senders[1]?.displayId}`}>
             {senders[1]?.displayName}
             {" 님 외"}
-          </Link>{" "}
-          {(senders.length - 2).toLocaleString("ko-KR")}명의 사람들
+          </Link>{" "} */}
+          <ProfileCard
+            profileData={{
+              uid: null,
+              displayName: null,
+              displayId: null,
+              photoURL: notification.profileImage,
+              ...senders[1],
+            }}
+            onlyName={true}
+          />
+          {" 님 외"} {(senders.length - 2).toLocaleString("ko-KR")}명의 사람들
           {sentenceMap[type]}
         </span>
       );
@@ -135,23 +207,18 @@ const NotificationsModal = ({ close }: { close: Function }) => {
           }}
         >
           <div className="flex gap-4 xs:gap-2">
-            <Link
-              href={
-                `/${Array.isArray(notification.sender) ? notification.sender[0].displayId : notification.sender?.displayId}` ||
-                notification.URL
-              }
-              className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-full bg-astronaut-50 xs:h-8 xs:w-8"
-            >
-              {/* <Image
-                src={notification.profileImage}
-                layout="fill"
-                objectFit="cover"
-                alt={title}
-              /> */}
-              <ProfileImage URL={notification.profileImage} />
-            </Link>
+            <ProfileCard
+              profileData={{
+                uid: null,
+                displayName: null,
+                displayId: null,
+                ...senders[0],
+                photoURL: notification.profileImage,
+              }}
+              onlyImg={true}
+            />
             <div className="flex flex-col gap-0 leading-tight">
-              <div className="text-sm font-bold leading-tight text-astronaut-800">
+              <div className="text-sm font-semibold leading-tight">
                 {titleContent}
                 {!bodyContent && (
                   <span className="pl-2 text-sm text-xs font-normal text-astronaut-600">

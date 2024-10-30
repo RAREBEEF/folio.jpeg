@@ -3,7 +3,7 @@ import { imageDataState } from "@/recoil/states";
 import { useParams } from "next/navigation";
 import { MouseEvent, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
-import FlashIcon from "@/icons/bolt-lightning-solid.svg";
+import FlashSvg from "@/icons/bolt-lightning-solid.svg";
 import Modal from "@/components/modal/Modal";
 import UserListModal from "@/components/modal/UserListModal";
 import { UserData } from "@/types";
@@ -41,16 +41,15 @@ const Like = ({ author }: { author: UserData | null }) => {
           className="group flex items-center justify-center rounded-full text-astronaut-700"
         >
           {alreadyLiked ? (
-            <FlashIcon className="aspect-square w-6 fill-[#FADF15] transition-all" />
+            <FlashSvg className="aspect-square w-6 fill-[#FADF15] transition-all" />
           ) : (
-            <FlashIcon className="aspect-square w-6 fill-astronaut-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
+            <FlashSvg className="aspect-square w-6 fill-astronaut-500 transition-all group-hover:fill-[#EAC608] group-active:fill-[#FADF15]" />
           )}
         </button>
         <button
           onClick={onLikeListClick}
           className="flex items-center gap-1 font-semibold text-astronaut-300"
         >
-          {/* <FlashIcon className="aspect-square w-3 fill-[#FADF15]" /> */}
           {imageData.likes.length.toLocaleString()}
         </button>
         {showModal && (

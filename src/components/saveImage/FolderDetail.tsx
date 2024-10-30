@@ -26,8 +26,8 @@ import EditFolderModal from "@/components/modal/EditFolderModal";
 import useGetFolders from "@/hooks/useGetFolders";
 import useGetExtraUserDataByDisplayId from "@/hooks/useGetExtraUserDataByDisplayId";
 import Share from "../Share";
-import TrashIcon from "@/icons/trash-solid.svg";
-import PenIcon from "@/icons/pen-solid.svg";
+import TrashSvg from "@/icons/trash-solid.svg";
+import PenSvg from "@/icons/pen-solid.svg";
 import IconWithTooltip from "../IconWithTooltip";
 
 const FolderDetail = ({}: {}) => {
@@ -255,12 +255,12 @@ const FolderDetail = ({}: {}) => {
                 <Fragment>
                   <button onClick={onFolderEditClick}>
                     <IconWithTooltip text="수정" tooltipDirection="bottom">
-                      <PenIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                      <PenSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
                     </IconWithTooltip>
                   </button>
                   <button onClick={onDeleteFolderClick}>
                     <IconWithTooltip text="삭제" tooltipDirection="bottom">
-                      <TrashIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+                      <TrashSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
                     </IconWithTooltip>
                   </button>
                 </Fragment>

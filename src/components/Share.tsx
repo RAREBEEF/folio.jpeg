@@ -1,8 +1,7 @@
-import ShareIcon from "@/icons/share-nodes-solid.svg";
+import ShareSvg from "@/icons/share-nodes-solid.svg";
 import { useSetRecoilState } from "recoil";
 import { alertsState } from "@/recoil/states";
 import { uniqueId } from "lodash";
-import Tooltip from "./Tooltip";
 import IconWithTooltip from "./IconWithTooltip";
 
 const Share = ({
@@ -55,7 +54,7 @@ const Share = ({
   return (
     <button onClick={onShareClick} className="group relative">
       <IconWithTooltip text="공유" tooltipDirection={tooltipDirection}>
-        <ShareIcon className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
+        <ShareSvg className="h-7 fill-astronaut-700 p-1 transition-all hover:fill-astronaut-500" />
       </IconWithTooltip>
     </button>
   );

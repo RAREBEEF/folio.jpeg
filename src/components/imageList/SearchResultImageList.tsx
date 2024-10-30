@@ -74,7 +74,8 @@ const SearchResultImageList = () => {
           filter={{
             where: where("tags", "array-contains-any", queries),
             orderBy: [orderBy, "desc"],
-            limit: Math.min(grid.colCount * 2, 1),
+            limit:
+              process.env.NODE_ENV === "development" ? 1 : grid.colCount * 2,
           }}
         />
       )}

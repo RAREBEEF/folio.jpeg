@@ -77,7 +77,7 @@ const CommentForm = ({
       // 댓글 상태 업데이트
       setComments((prev) => {
         prevComments = prev;
-        return { [commentId]: comment, ...prev };
+        return { ...prev, [commentId]: comment };
       });
 
       // db에 댓글 등록

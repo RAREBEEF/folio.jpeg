@@ -1,5 +1,4 @@
 /** @type {import('next').NextConfig} */
-import createProxyMiddleware from "http-proxy-middleware";
 import withPwa from "next-pwa";
 import runtimeCaching from "next-pwa/cache.js";
 
@@ -35,7 +34,6 @@ const nextConfig = {
       },
     ],
   },
-  // reactStrictMode: false,
   swcMinify: true,
   experimental: {
     scrollRestoration: true,
