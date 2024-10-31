@@ -114,7 +114,7 @@ export async function generateMetadata(
     ],
     openGraph: {
       type: "website",
-      url: `https://folio-jpeg.rarebeef.co.kr/${displayId}/${folderName}`,
+      url: `https://folio-jpeg.com/${displayId}/${folderName}`,
       title: `${folderName} - ${user?.displayName}님의 폴더`,
       description:
         `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +

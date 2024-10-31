@@ -74,7 +74,7 @@ export async function generateMetadata(
       ],
       openGraph: {
         type: "website",
-        url: `https://folio-jpeg.rarebeef.co.kr/${displayId}`,
+        url: `https://folio-jpeg.com/${displayId}`,
         title: `${user.displayName}.JPEG`,
         description:
           `${user.displayName}님이 업로드한 이미지들을 확인해 보세요. ` +

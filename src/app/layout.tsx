@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://folio-jpeg.rarebeef.co.kr",
+      : "https://folio-jpeg.com",
   ),
   title: "folio.JPEG",
   applicationName: "folio.JPEG",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
   openGraph: {
     type: "website",
-    url: "https://folio-jpeg.rarebeef.co.kr",
+    url: "https://folio-jpeg.com",
     title: "folio.JPEG",
     description:
       "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",

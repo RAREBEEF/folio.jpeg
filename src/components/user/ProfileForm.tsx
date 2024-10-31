@@ -871,7 +871,7 @@ const ProfileForm = () => {
               disabled={isLoading}
             />
             <p className="ml-2 mt-1 text-xs text-astronaut-500">
-              folio-jpeg.rarebeef.co.kr/
+              folio-jpeg.com/
               {displayId.toLowerCase() || "식별 아이디"}
             </p>
           </label>

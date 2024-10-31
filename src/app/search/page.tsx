@@ -67,7 +67,7 @@ export async function generateMetadata(
     ],
     openGraph: {
       type: "website",
-      url: `https://folio-jpeg.rarebeef.co.kr/${"search?query=" + queries.join("&query=")}`,
+      url: `https://folio-jpeg.com/${"search?query=" + queries.join("&query=")}`,
       title: `folio.jpeg - "${queries.join(" ")}" 검색 결과`,
       description:
         `"${queries.join(" ")}"와 관련된 이미지들을 확인해 보세요. ` +
