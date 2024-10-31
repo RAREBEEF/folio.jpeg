@@ -104,7 +104,7 @@ const Auth = () => {
                 createdAt: now,
                 id: "_DEFAULT",
                 images: [],
-                isPrivate: true,
+                isPrivate: false,
                 name: "_DEFAULT",
                 uid,
                 updatedAt: now,

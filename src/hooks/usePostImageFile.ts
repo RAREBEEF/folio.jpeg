@@ -109,20 +109,23 @@ const usePostImageFile = () => {
 
     // 메타데이터
     const exifData = await exifr.parse(fileList[0]);
-    setImgMetaData({
-      make: exifData?.Make || null,
-      model: exifData?.Model || null,
-      lensMake: exifData?.LensMake || null,
-      lensModel: exifData?.LensModel || null,
-      shutterSpeed: exifData?.ShutterSpeedValue
-        ? `${calcShutterSpeed(exifData?.ShutterSpeedValue)}s`
-        : null,
-      fNumber: `f/${exifData?.FNumber}` || null,
-      ISO: exifData?.ISO || null,
-      focalLength: `${exifData?.FocalLength}mm` || null,
-      createDate:
-        `${new Date(exifData.CreateDate).toLocaleString("en-US")}` || null,
-    });
+    if (exifData) {
+      setImgMetaData({
+        make: exifData.Make || null,
+        model: exifData.Model || null,
+        lensMake: exifData.LensMake || null,
+        lensModel: exifData.LensModel || null,
+        shutterSpeed: exifData.ShutterSpeedValue
+          ? `${calcShutterSpeed(exifData?.ShutterSpeedValue)}s`
+          : null,
+        fNumber: exifData.FNumber ? `f/${exifData.FNumber}` : null,
+        ISO: exifData.ISO || null,
+        focalLength: exifData.FocalLength ? `${exifData.FocalLength}mm` : null,
+        createDate: exifData.CreateDate
+          ? `${new Date(exifData.CreateDate).toLocaleString("en-US")}`
+          : null,
+      });
+    }
 
     // 미리보기 이미지 경로
     const previewImg = new Image();

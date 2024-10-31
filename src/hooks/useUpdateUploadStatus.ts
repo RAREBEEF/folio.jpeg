@@ -46,4 +46,5 @@ const useUpdateUploadStatus = () => {
 
   return { updateUploadStatus };
 };
+
 export default useUpdateUploadStatus;

@@ -79,7 +79,7 @@ const SavedTab = ({ userData }: { userData: UserData }) => {
           <Loading />
         ) : customFolders.length <= 0 ? (
           <div className="m-auto flex gap-12 overflow-scroll px-8 py-4">
-            <div className="text-astronaut-500 flex min-h-[150px] w-full items-center justify-center text-sm">
+            <div className="flex min-h-[150px] w-full items-center justify-center text-sm text-astronaut-500">
               생성된 폴더가 없습니다.
             </div>
           </div>
