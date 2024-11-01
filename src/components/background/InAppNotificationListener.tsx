@@ -73,6 +73,7 @@ const mergeNotification = ({
     );
 
     return likeTypeNotifications;
+    // 팔로우 타입의 알림들 합치기
   } else if (type === "follow") {
     const followTypeNotifications = Object.entries(subjects).reduce(
       (acc, cur) => {

@@ -138,9 +138,8 @@ const CropImg = ({
       const cvsAspectRatio = cvsWidth / cvsHeight;
       const imgAspectRatio = originImgWidth / originImgHeight;
 
+      // 장치의 픽셀 밀도에 맞춰 캔버스의 크기와 해상도를 조절
       const dpr = window.devicePixelRatio || 1;
-
-      // 실제 캔버스의 크기
       cvs.width = originImgWidth * dpr;
       cvs.height = originImgHeight * dpr;
       ctx.scale(dpr, dpr);
@@ -275,10 +274,6 @@ const CropImg = ({
               y2: y2Pos / frontCvsSize[1],
             };
           });
-
-          // 리사이즈로 이벤트로 인라인 속성이 최대값을 넘어 업데이트되는 것을 방지
-          // resizer.style.width = `${width}px`;
-          // resizer.style.height = `${height}px`;
         }
       }, 200),
     );
@@ -659,12 +654,9 @@ const CropImg = ({
     const captureCtx = captureCvs.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
 
+    // 편집을 완료하거나 이미지를 다운받을 때는 이미지를 자른 부분만 그린다.
     captureCvs.width = cropSize[0];
     captureCvs.height = cropSize[1];
-
-    // captureCvs.width = cropSize[0] * dpr;
-    // captureCvs.height = cropSize[1] * dpr;
-    // captureCtx?.scale(dpr, dpr);
 
     captureCtx?.drawImage(
       sourceCvs,
@@ -794,9 +786,6 @@ const CropImg = ({
           <Button onClick={downloadImg}>
             <div className="text-xs">이미지 다운로드</div>
           </Button>
-          {/* <Button onClick={onToggleCropImgMode}>
-            <div className="text-xs">닫기</div>
-          </Button> */}
         </div>
       </div>
     </div>
@@ -804,43 +793,3 @@ const CropImg = ({
 };
 
 export default CropImg;
-
-{
-  /*
-   <div
-   style={{
-     top: resizerPos[0],
-     left: resizerPos[1],
-     width: `${resizerSize[0]}px`,
-     height: `${resizerSize[1]}px`,
-   }}
-   className="pointer-events-none absolute border border-dashed border-[red]"
- >
-   <div
-     onMouseDown={(e) => onResizeStart(e, "move", "mouse")}
-     onTouchStart={(e) => onResizeStart(e, "move", "touch")}
-     className="pointer-events-auto absolute bottom-0 left-0 right-0 top-0 m-auto h-full w-full cursor-move p-1"
-   ></div>
-   <div
-     onMouseDown={(e) => onResizeStart(e, "left", "mouse")}
-     onTouchStart={(e) => onResizeStart(e, "left", "touch")}
-     className="pointer-events-auto absolute left-[-4px] h-full w-2 cursor-ew-resize"
-   ></div>
-   <div
-     onMouseDown={(e) => onResizeStart(e, "right", "mouse")}
-     onTouchStart={(e) => onResizeStart(e, "right", "touch")}
-     className="pointer-events-auto absolute right-[-4px] h-full w-2 cursor-ew-resize"
-   ></div>
-   <div
-     onMouseDown={(e) => onResizeStart(e, "top", "mouse")}
-     onTouchStart={(e) => onResizeStart(e, "top", "touch")}
-     className="pointer-events-auto absolute top-[-4px] h-2 w-full cursor-ns-resize"
-   ></div>
-   <div
-     onMouseDown={(e) => onResizeStart(e, "bottom", "mouse")}
-     onTouchStart={(e) => onResizeStart(e, "bottom", "touch")}
-     className="pointer-events-auto absolute bottom-[-4px] h-2 w-full cursor-ns-resize"
-   ></div>
- </div>
-  */
-}

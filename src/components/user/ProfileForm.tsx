@@ -902,7 +902,7 @@ const ProfileForm = () => {
               {...linkInputs(linkCount)}
               {linkCount < 5 && (
                 <button
-                  className={`grow rounded-lg border border-astronaut-200 bg-astronaut-200 py-1 pl-2 font-semibold text-white hover:border-astronaut-100 hover:bg-astronaut-100`}
+                  className={`grow rounded-lg border border-astronaut-400 bg-astronaut-400 py-1 pl-2 font-semibold text-white hover:border-astronaut-300 hover:bg-astronaut-300`}
                   onClick={() => onAdjustLink(1)}
                 >
                   링크 추가

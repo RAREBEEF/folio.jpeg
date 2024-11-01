@@ -59,7 +59,7 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
     const { days: diffDays } = dateDiffNow(prevFeedback.createdAt);
 
     // 하루가 지나지 않았다면
-    if (diffDays <= 0) {
+    if (prevFeedback.createdAt && diffDays <= 0) {
       setAlerts((prev) => [
         ...prev,
         {
@@ -87,6 +87,10 @@ const AiFeedback = ({ userData }: { userData: UserData }) => {
           },
         ]);
       } else {
+        setPrevFeedback((prev) => {
+          if (!prev) return null;
+          return { ...prev, createdAt: Date.now() };
+        });
         setFeedback(result);
       }
     }
