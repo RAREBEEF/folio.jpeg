@@ -208,7 +208,7 @@ const LayoutNav = () => {
           >
             <Link
               onClick={checkAuthBeforeNavigate}
-              href={`/${authStatus.data?.displayId}`}
+              href={authStatus.data ? `/${authStatus.data?.displayId}` : ""}
               className="m-auto flex h-full w-full items-center justify-center "
             >
               {nav.show ? (

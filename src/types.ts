@@ -76,6 +76,8 @@ export interface ImageDocData {
 
 export interface ImageData extends ImageDocData {
   id: string;
+  ad?: boolean;
+  adURL?: string;
 }
 
 export type ImageDataPages = Array<Array<ImageData>>;

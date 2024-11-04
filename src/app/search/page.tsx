@@ -51,7 +51,7 @@ export async function generateMetadata(
     title: `folio.jpeg - "${queries.join(" ")}" 검색 결과`,
     description:
       `"${queries.join(" ")}"와 관련된 이미지들을 확인해 보세요. ` +
-      "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+      "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
     keywords: [
       ...queries,
       "SNS",
@@ -71,7 +71,7 @@ export async function generateMetadata(
       title: `folio.jpeg - "${queries.join(" ")}" 검색 결과`,
       description:
         `"${queries.join(" ")}"와 관련된 이미지들을 확인해 보세요. ` +
-        "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+        "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
       siteName: "folio.JPEG",
       images: imgURLs.map((url) => ({ url })),
     },
@@ -80,7 +80,7 @@ export async function generateMetadata(
       title: `folio.jpeg - "${queries.join(" ")}" 검색 결과`,
       description:
         `"${queries.join(" ")}"와 관련된 이미지들을 확인해 보세요. ` +
-        "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+        "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
       images: imgURLs,
     },
   };
@@ -88,10 +88,10 @@ export async function generateMetadata(
 
 export default function Home() {
   return (
-    <Suspense>
-      <main id="search-result">
+    <main id="search-result">
+      <Suspense>
         <SearchResultImageList />
-      </main>
-    </Suspense>
+      </Suspense>
+    </main>
   );
 }

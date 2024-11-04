@@ -2,7 +2,7 @@ import { useRecoilState } from "recoil";
 import Modal from "./Modal";
 import { loginModalState } from "@/recoil/states";
 import ProfileForm from "../user/ProfileForm";
-import SignInForm from "../user/SignInForm";
+import SignInFormModal from "../user/SignInFormModal";
 
 const AuthModal = () => {
   // 로그인 모달창 state
@@ -20,7 +20,7 @@ const AuthModal = () => {
         title={loginModal.showInit ? "프로필 설정하기" : "로그인"}
         allowOutsideClick={true}
       >
-        {loginModal.showInit ? <ProfileForm /> : <SignInForm />}
+        {loginModal.showInit ? <ProfileForm /> : <SignInFormModal />}
       </Modal>
     )
   );

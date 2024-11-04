@@ -2,12 +2,14 @@
 
 import { uploadStatusState } from "@/recoil/states";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRecoilValue } from "recoil";
 
 const LayoutFooter = () => {
+  const pathname = usePathname();
   const uploadStatus = useRecoilValue(uploadStatusState);
 
-  return (
+  return pathname !== "/" ? (
     <div
       id="footer"
       className={`ml-[50px] border-t bg-white px-10 py-4 text-astronaut-950 transition-all xs:ml-0 ${uploadStatus.length > 0 && "xs:pb-36"}`}
@@ -49,7 +51,7 @@ const LayoutFooter = () => {
         © 2024. RAREBEEF All Rights Reserved.
       </footer>
     </div>
-  );
+  ) : null;
 };
 
 export default LayoutFooter;

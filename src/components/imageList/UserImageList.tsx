@@ -14,9 +14,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 const UserImageList = ({ userData }: { userData: UserData }) => {
   const { replace } = useRouter();
   const params = useSearchParams();
-  const grid = useRecoilValue(gridState);
   const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
     (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
+  );
+  const grid = useRecoilValue(
+    gridState("user-" + userData.uid + "-" + orderBy),
   );
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {

@@ -369,7 +369,10 @@ const ImageDetail = () => {
           </div>
           <div className="mt-12">
             <h3 className="text-center text-lg font-semibold ">추천 이미지</h3>
-            <RecommendImageList imageData={imageData} />
+            <RecommendImageList
+              imageData={imageData}
+              type={`recommend-${id}`}
+            />
           </div>
         </div>
       ) : (

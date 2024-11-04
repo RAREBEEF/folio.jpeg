@@ -11,14 +11,16 @@ import BrokenSvg from "@/icons/link-slash-solid.svg";
 const ImageGridColsItem = ({
   gridItem,
   imageDataPages,
+  type,
 }: {
   gridItem: GridItem;
   imageDataPages: ImageDataPages;
+  type: string;
 }) => {
   const device = useRecoilValue(deviceState);
   const pathname = usePathname();
   const [imageData, setImageData] = useRecoilState(imageDataState(gridItem.id));
-  const grid = useRecoilValue(gridState);
+  const grid = useRecoilValue(gridState(type));
   const [isImageBroken, setIsImageBroken] = useState<boolean>(false);
 
   useEffect(() => {
@@ -70,7 +72,8 @@ const ImageGridColsItem = ({
         <Link
           onClick={onBeforeRouting}
           className="relative"
-          href={`/image/${imageData.id}`}
+          href={imageData.ad ? imageData.adURL || "" : `/image/${imageData.id}`}
+          target={imageData.ad ? "_blank" : "_self"}
         >
           {isImageBroken ? (
             <BrokenSvg
@@ -82,6 +85,7 @@ const ImageGridColsItem = ({
             />
           ) : (
             <Image
+              unoptimized={true}
               style={{
                 background: imageData.themeColor,
               }}
@@ -108,19 +112,33 @@ const ImageGridColsItem = ({
           }}
         />
       )}
-      {device !== "mobile" && imageData && (
-        <div
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0))",
-          }}
-          className="pointer-events-none absolute right-0 top-0 hidden h-full w-full justify-end rounded-t-xl pr-2 pt-2 group-hover:flex"
-        >
-          <div className="h-8 w-8 origin-top-right transition-all hover:scale-105">
-            <SaveButton imageData={imageData} />
+      {device !== "mobile" &&
+        imageData &&
+        (!imageData.ad ? (
+          <div
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0))",
+            }}
+            className="pointer-events-none absolute right-0 top-0 hidden h-full w-full justify-end rounded-t-xl pr-2 pt-2 group-hover:flex"
+          >
+            <div className="h-8 w-8 origin-top-right transition-all hover:scale-105">
+              <SaveButton imageData={imageData} />
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0))",
+            }}
+            className="pointer-events-none absolute right-0 top-0 hidden h-full w-full justify-end rounded-t-xl pr-2 pt-1 group-hover:flex"
+          >
+            <div className="h-fit w-fit origin-top-right text-sm font-semibold text-white transition-all hover:scale-105">
+              AD
+            </div>
+          </div>
+        ))}
     </li>
   );
 };

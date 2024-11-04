@@ -15,11 +15,13 @@ import Share from "../Share";
 
 const SearchResultImageList = () => {
   const { replace } = useRouter();
-  const grid = useRecoilValue(gridState);
   const params = useSearchParams();
   const queries = useMemo(() => params.getAll("query"), [params]);
   const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
     (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
+  );
+  const grid = useRecoilValue(
+    gridState("search-" + queries.join(" ") + "-" + orderBy),
   );
   const resetSearchCreatedAtGrid = useResetGrid({
     gridType: "search-" + queries.join(" ") + "-createdAt",

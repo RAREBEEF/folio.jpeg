@@ -10,7 +10,7 @@ import { Folder } from "@/types";
 import { Fragment } from "react";
 
 const SavedImageList = ({ type, folder }: { type: string; folder: Folder }) => {
-  const grid = useRecoilValue(gridState);
+  const grid = useRecoilValue(gridState(type));
 
   return (
     <div className="relative h-full bg-white">

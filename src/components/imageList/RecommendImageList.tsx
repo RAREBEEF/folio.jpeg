@@ -9,9 +9,15 @@ import { useParams } from "next/navigation";
 import { and, or, where } from "firebase/firestore";
 import { ImageData } from "@/types";
 
-const RecommendImageList = ({ imageData }: { imageData: ImageData }) => {
+const RecommendImageList = ({
+  imageData,
+  type,
+}: {
+  imageData: ImageData;
+  type: string;
+}) => {
   const { id } = useParams();
-  const grid = useRecoilValue(gridState);
+  const grid = useRecoilValue(gridState(type));
 
   return (
     <div className="relative h-full bg-white">

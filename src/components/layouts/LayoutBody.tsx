@@ -1,11 +1,12 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, Suspense, useEffect, useState } from "react";
 import LayoutNav from "./LayoutNav";
+
+// LayoutHeader의 높이만큼 LayoutContent의 mt 조절하기
 
 const LayoutBody: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    // LayoutHeader의 높이만큼 LayoutContent의 mt 조절하기
     <div id="body-nav-wrapper" className="mt-16 flex grow">
       <LayoutNav />
       <div

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { Column, GridItem } from "@/types";
 import ImageGridCols from "./ImageGridCols";
@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 const ImageGrid = ({ type }: { type: string }) => {
   const pathname = usePathname();
   const [gridInit, setGridInit] = useState<boolean>(false);
-  const [grid, setGrid] = useRecoilState(gridState);
+  const [grid, setGrid] = useRecoilState(gridState(type));
   const imageDataPages = useRecoilValue(imageDataPagesState(type));
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ const ImageGrid = ({ type }: { type: string }) => {
       // 이전 페이지들은 그대로 유지하고 새롭게 추가된 페이지부터 시작 (prevGrid.page)
       for (let i = newGrid.page || 0; i < imageDataPages.length; i++) {
         // 현재 처리할 페이지
-        const currentPage = imageDataPages[i];
+        const currentPage = _.cloneDeep(imageDataPages[i]);
 
         // 현재 페이지에 존재하는 이미지 꺼내기
         for (let j = 0; j < currentPage.length; j++) {
@@ -119,9 +119,9 @@ const ImageGrid = ({ type }: { type: string }) => {
 
     setGridInit(true);
 
-    return () => {
-      setGrid(null);
-    };
+    // return () => {
+    //   setGrid(null);
+    // };
   }, [containerWidth, imageDataPages, setGrid]);
 
   // 컨테이너 리사이즈 옵저버
@@ -147,7 +147,9 @@ const ImageGrid = ({ type }: { type: string }) => {
 
   // 그리드 페이지 스크롤 복원
   useEffect(() => {
-    if (!gridInit || !grid) return;
+    if (!gridInit || !grid) {
+      return;
+    }
 
     const storedScroll = sessionStorage.getItem(pathname);
     const storedPrevPath = sessionStorage.getItem("prevPath");
@@ -190,7 +192,7 @@ const ImageGrid = ({ type }: { type: string }) => {
             minHeight: grid!.height,
           }}
         >
-          <ImageGridCols imageDataPages={imageDataPages} />
+          <ImageGridCols imageDataPages={imageDataPages} type={type} />
         </div>
       )}
     </div>

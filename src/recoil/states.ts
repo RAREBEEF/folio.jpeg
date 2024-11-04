@@ -93,9 +93,15 @@ export const foldersState = atomFamily({
 });
 
 // grid 상태
-export const gridState = atom<Grid>({
+// export const gridState = atom<Grid>({
+//   key: "gridState",
+//   default: null,
+// });
+export const gridState = atomFamily({
   key: "gridState",
-  default: null,
+  default: (type: string): Grid | null => {
+    return null;
+  },
 });
 
 // alert(앱 내 오류, 경고, 작업 성공 등의 안내창)

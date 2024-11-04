@@ -99,7 +99,7 @@ export async function generateMetadata(
     title: `${folderName} - ${user?.displayName}님의 폴더`,
     description:
       `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
-      "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+      "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
     keywords: [
       "SNS",
       "소셜 네트워크 서비스",
@@ -118,7 +118,7 @@ export async function generateMetadata(
       title: `${folderName} - ${user?.displayName}님의 폴더`,
       description:
         `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
-        "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+        "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
       siteName: "folio.JPEG",
       images: thumbnailURLs.map((url) => ({ url })),
     },
@@ -127,7 +127,7 @@ export async function generateMetadata(
       title: `${folderName} - ${user?.displayName}님의 폴더`,
       description:
         `${folderName}는 ${user?.displayName}님이 생성한 폴더입니다. ${user?.displayName}님이 저장한 이미지들을 확인해 보세요. ` +
-        "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+        "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
       images: thumbnailURLs,
     },
   };

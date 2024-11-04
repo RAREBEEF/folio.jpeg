@@ -19,9 +19,8 @@ import useHandleAuthError from "@/hooks/useHandleAuthError";
 import { useSetRecoilState } from "recoil";
 import { alertsState, authStatusState, loginModalState } from "@/recoil/states";
 import _, { uniqueId } from "lodash";
-import { UserData } from "@/types";
 
-const SignInForm = () => {
+const SignInFormModal = () => {
   const handleAuthError = useHandleAuthError();
   const setLoginModal = useSetRecoilState(loginModalState);
   const setAuthStatus = useSetRecoilState(authStatusState);
@@ -163,6 +162,20 @@ const SignInForm = () => {
       return;
     }
 
+    if (!pwReset && !pw) {
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "warning",
+          createdAt: Date.now(),
+          text: "비밀번호를 입력해 주세요.",
+        },
+      ]);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -285,7 +298,7 @@ const SignInForm = () => {
               />
             </label>
           )}
-          <div className="itmes-center flex justify-center gap-2 text-center text-sm text-astronaut-200 text-astronaut-700">
+          <div className="flex items-center justify-center gap-2 text-center text-sm text-astronaut-200 text-astronaut-700">
             <button
               type="button"
               onClick={onCovertSignInUpClick}
@@ -358,4 +371,4 @@ const SignInForm = () => {
   );
 };
 
-export default SignInForm;
+export default SignInFormModal;

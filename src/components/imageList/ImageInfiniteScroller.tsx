@@ -22,7 +22,7 @@ const ImageInfiniteScroller = ({
   folder?: Folder; // 저장한 이미지 중 삭제된 이미지 찾을 때 사용
 }) => {
   const loadRef = useRef<HTMLDivElement>(null);
-  const grid = useRecoilValue(gridState);
+  const grid = useRecoilValue(gridState(type));
   const { getImages, isLoading, lastPage, isError } = useGetImages({
     gridType: type,
   });

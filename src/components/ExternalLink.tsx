@@ -1,3 +1,5 @@
+"use client";
+
 import InstagramSvg from "@/icons/instagram.svg";
 import GlobeSVG from "@/icons/globe-solid.svg";
 import TiktokSVG from "@/icons/tiktok.svg";

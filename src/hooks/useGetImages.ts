@@ -17,12 +17,14 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import _ from "lodash";
+import _, { uniqueId } from "lodash";
 import { Filter } from "@/types";
 import useErrorAlert from "./useErrorAlert";
 import useSettleImageDataState from "@/hooks/useSettleImageDataState";
 import useFetchWithRetry from "./useFetchWithRetry";
 import useTypeGuards from "./useTypeGuards";
+import defaultAdImage1 from "@/images/default-ad-image-1.png";
+import defaultAdImage2 from "@/images/default-ad-image-2.png";
 
 const useGetImages = ({ gridType }: { gridType: string }) => {
   const { isImageDocData } = useTypeGuards();
@@ -43,9 +45,9 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
 
   // 다른 타입이 들어오면 lastPage를 초기화한다.
   useEffect(() => {
-    if (lastVisible === null) {
-      setLastPage(false);
-    }
+    // if (lastVisible === null) {
+    setLastPage(false);
+    // }
   }, [gridType, lastVisible]);
 
   // 로딩에 딜레이 발생시키기
@@ -116,9 +118,86 @@ const useGetImages = ({ gridType }: { gridType: string }) => {
         return newLv;
       });
 
+      const adItem1 = {
+        ad: true,
+        id: "ad-" + uniqueId(),
+        adURL:
+          "https://chromewebstore.google.com/detail/instagram-followback-scan/ioapdbeebenampepgjabpjinndcoagcf",
+        createdAt: Date.now(),
+        uid: "",
+        fileName: "",
+        originalName: "",
+        byte: 0,
+        URL: defaultAdImage1.src,
+        size: {
+          width: defaultAdImage1.width,
+          height: defaultAdImage1.height,
+        },
+        imgTags: [],
+        contentTags: [],
+        tags: [],
+        feedback: { detail: "", summary: { good: "", improve: "" } },
+        likes: [],
+        themeColor: "white",
+        popularity: 0,
+        metadata: {
+          make: null,
+          model: null,
+          lensMake: null,
+          lensModel: null,
+          shutterSpeed: null,
+          fNumber: null,
+          ISO: null,
+          focalLength: null,
+          createDate: null,
+        },
+      };
+      const adItem2 = {
+        ad: true,
+        id: "ad-" + uniqueId(),
+        adURL:
+          "https://chromewebstore.google.com/detail/strange-astronaut-mouse-c/fhbjpkjhalgkhlfbhcbnejkgbnjnmjmn",
+        createdAt: Date.now(),
+        uid: "",
+        fileName: "",
+        originalName: "",
+        byte: 0,
+        URL: defaultAdImage2.src,
+        size: {
+          width: defaultAdImage2.width,
+          height: defaultAdImage2.height,
+        },
+        imgTags: [],
+        contentTags: [],
+        tags: [],
+        feedback: { detail: "", summary: { good: "", improve: "" } },
+        likes: [],
+        themeColor: "white",
+        popularity: 0,
+        metadata: {
+          make: null,
+          model: null,
+          lensMake: null,
+          lensModel: null,
+          shutterSpeed: null,
+          fNumber: null,
+          ISO: null,
+          focalLength: null,
+          createDate: null,
+        },
+      };
+
       // 이미지 데이터 페이지 업데이트
       setImageDataPages((prev) => {
-        const newImageDataPages = Array.from(new Set([...prev, imgs]));
+        const newPage = [...imgs];
+        if (prev.length > 1 && (prev.length + 1) % 3 === 0) {
+          if ((prev.length + 1) % 2 === 0) {
+            newPage.push(adItem2);
+          } else {
+            newPage.push(adItem1);
+          }
+        }
+        const newImageDataPages = Array.from(new Set([...prev, newPage]));
         return newImageDataPages;
       });
     }

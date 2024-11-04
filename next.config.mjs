@@ -38,6 +38,9 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
   },
+  async redirects() {
+    return [{ source: "/login", destination: "/signin", permanent: true }];
+  },
 };
 
 export default pwa(nextConfig);

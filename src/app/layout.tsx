@@ -3,9 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import RecoilProvider from "@/recoil/recoilProvider";
 import LayoutHeader from "@/components/layouts/LayoutHeader";
-import LayoutFooter from "@/components/layouts/LaytoutFooter";
+import LayoutFooter from "@/components/layouts/LayoutFooter";
 import LayoutBody from "@/components/layouts/LayoutBody";
-import { Fragment, Suspense } from "react";
+import React, { Fragment, Suspense } from "react";
 import Init from "@/components/background/Init";
 import logo from "@/images/logo.png";
 
@@ -41,13 +41,13 @@ export const metadata: Metadata = {
   ],
   manifest: "/manifest.webManifest",
   description:
-    "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+    "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
   openGraph: {
     type: "website",
     url: "https://folio-jpeg.com",
     title: "folio.JPEG",
     description:
-      "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+      "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
     siteName: "folio.JPEG",
     images: [
       {
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "folio.JPEG",
     description:
-      "folio.JPEG에 이미지를 업로드하고 AI에게 분석을 요청하세요. 그리고 다른 사람들이 올린 다양한 이미지들을 확인해 보세요.",
+      "folio.JPEG는 사진 공유형 SNS입니다. 찍은 사진을 공유하고 다른 사람들이 올린 다양한 사진들도 확인해 보세요. 또 업로드한 사진을 AI에게 분석을 요청해보세요.",
     images: logo.src,
   },
   appleWebApp: {
@@ -307,14 +307,12 @@ export default function RootLayout({
       </head>
       <body className={inter.className + " flex min-h-lvh flex-col bg-white"}>
         <RecoilProvider>
-          <Suspense>
-            <Fragment>
-              <LayoutHeader />
-              <LayoutBody>{children}</LayoutBody>
-              <LayoutFooter />
-              <Init />
-            </Fragment>
-          </Suspense>
+          <Fragment>
+            <LayoutHeader />
+            <LayoutBody>{children}</LayoutBody>
+            <LayoutFooter />
+            <Init />
+          </Fragment>
         </RecoilProvider>
       </body>
     </html>

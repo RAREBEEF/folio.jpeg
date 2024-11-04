@@ -223,7 +223,22 @@ const ProfileForm = () => {
       setIsDisplayIdValid(false);
       setDisplayIdInvalidReason("입력 가능 문자 (알파벳, 숫자, ., _)");
       return false;
-    } else if (["edit", "image", "upload", "search"].includes(displayId)) {
+    } else if (
+      [
+        "edit",
+        "image",
+        "upload",
+        "search",
+        "signin",
+        "login",
+        "account",
+        "support",
+        "admin",
+        "privacypolicy",
+        "legalnotice",
+        "profile",
+      ].includes(displayId.toLowerCase())
+    ) {
       setIsDisplayIdValid(false);
       setDisplayIdInvalidReason("사용 불가능한 아이디");
       return false;

@@ -24,9 +24,13 @@ const HomeImageList = () => {
         : "all",
     [params, authStatus.status],
   );
-  const grid = useRecoilValue(gridState);
   const [orderBy, setOrderBy] = useState<"popularity" | "createdAt">(
     (params.get("orderBy") as "popularity" | "createdAt") || "createdAt",
+  );
+  const grid = useRecoilValue(
+    gridState(
+      (listType === "following" ? "following" : "home") + "-" + orderBy,
+    ),
   );
 
   const onOrderByChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -73,11 +77,13 @@ const HomeImageList = () => {
         </div>
       )}
       <ImageGrid
-        type={listType === "following" ? "following" : "home" + "-" + orderBy}
+        type={(listType === "following" ? "following" : "home") + "-" + orderBy}
       />
       {grid && (
         <ImageInfiniteScroller
-          type={listType === "following" ? "following" : "home" + "-" + orderBy}
+          type={
+            (listType === "following" ? "following" : "home") + "-" + orderBy
+          }
           filter={
             listType === "following"
               ? {
