@@ -149,7 +149,7 @@ const UserDetail = () => {
           </div>
 
           <div className="flex flex-col items-center justify-center gap-4 ">
-            {authStatus.data && authStatus.data?.uid !== userData.uid && (
+            {authStatus.data?.uid !== userData.uid && (
               <div className="text-sm">
                 <FollowBtn userData={userData} />
               </div>

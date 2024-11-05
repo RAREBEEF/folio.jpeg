@@ -10,10 +10,11 @@ import logo from "@/images/logo.png";
 import Image from "next/image";
 import Search from "../Search";
 import useDevicePushToken from "@/hooks/useDevicePushToken";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const LayoutHeader = () => {
   const { push } = useRouter();
+  const pathname = usePathname();
   const setLoginModal = useSetRecoilState(loginModalState);
   const [authStatus, setAuthStatus] = useRecoilState(authStatusState);
   const { deleteDeviceData } = useDevicePushToken();
@@ -63,14 +64,14 @@ const LayoutHeader = () => {
             </div>
           </button>
         ) : (
-          <button
-            onClick={onLoginClick}
+          <Link
+            href="/signin"
             className="mr-6 rounded-lg bg-white px-2 py-1 text-sm font-semibold"
           >
             <div className="whitespace-nowrap text-astronaut-600 hover:text-astronaut-800">
               로그인
             </div>
-          </button>
+          </Link>
         )}
       </div>
     </header>

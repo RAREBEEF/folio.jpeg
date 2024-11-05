@@ -14,7 +14,7 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 import { auth } from "@/fb";
-import { FormEvent, MouseEvent, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useState } from "react";
 import Loading from "@/components/loading/Loading";
 import useInput from "@/hooks/useInput";
 import useHandleAuthError from "@/hooks/useHandleAuthError";
@@ -26,7 +26,6 @@ import { useRouter } from "next/navigation";
 const SignInFormInPage = () => {
   const { push } = useRouter();
   const handleAuthError = useHandleAuthError();
-  const setLoginModal = useSetRecoilState(loginModalState);
   const setAuthStatus = useSetRecoilState(authStatusState);
   const setAlerts = useSetRecoilState(alertsState);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
@@ -43,6 +42,12 @@ const SignInFormInPage = () => {
     setValue: setPwCheck,
     onChange: onPwCheckChange,
   } = useInput("");
+  const [prevPath, setPrevPath] = useState<string>("/");
+
+  useEffect(() => {
+    const prevPath = sessionStorage.getItem("prevPath") || "/";
+    setPrevPath(prevPath);
+  }, []);
 
   const onGoogleSignInClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -60,6 +65,17 @@ const SignInFormInPage = () => {
         status: "pending",
         data: _.cloneDeep(user),
       });
+      push(prevPath);
+      setAlerts((prev) => [
+        ...prev,
+        {
+          id: uniqueId(),
+          show: true,
+          type: "success",
+          createdAt: Date.now(),
+          text: "로그인이 완료되었습니다.",
+        },
+      ]);
     } catch (error) {
       setAlerts((prev) => [
         ...prev,
@@ -89,6 +105,11 @@ const SignInFormInPage = () => {
         status: "pending",
         data: _.cloneDeep(user),
       });
+      setAuthStatus({
+        status: "pending",
+        data: _.cloneDeep(user),
+      });
+      push(prevPath);
     } catch (error) {
       setAlerts((prev) => [
         ...prev,
@@ -117,6 +138,11 @@ const SignInFormInPage = () => {
         status: "pending",
         data: _.cloneDeep(user),
       });
+      setAuthStatus({
+        status: "pending",
+        data: _.cloneDeep(user),
+      });
+      push(prevPath);
     } catch (error) {
       setAlerts((prev) => [
         ...prev,
@@ -210,7 +236,6 @@ const SignInFormInPage = () => {
           return;
         }
         await createUserWithEmailAndPassword(auth, email, pw);
-        setLoginModal({ show: false });
         setAlerts((prev) => [
           ...prev,
           {
@@ -221,11 +246,10 @@ const SignInFormInPage = () => {
             text: "회원가입이 완료되었습니다.",
           },
         ]);
-        push("/");
+        push(prevPath);
         // 로그인
       } else {
         await signInWithEmailAndPassword(auth, email, pw);
-        setLoginModal({ show: false });
         setAlerts((prev) => [
           ...prev,
           {
@@ -236,7 +260,7 @@ const SignInFormInPage = () => {
             text: "로그인 되었습니다.",
           },
         ]);
-        push("/");
+        push(prevPath);
       }
     } catch (error) {
       setAlerts((prev) => [

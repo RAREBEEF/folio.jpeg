@@ -143,18 +143,6 @@ const LayoutNav = () => {
       <nav
         className={`relative flex h-full shrink-0 flex-col overflow-x-visible bg-white text-astronaut-500 shadow-[10px_0_15px_-3px_rgb(0_0_0_/_0.1),4px_-0_6px_-4px_rgb(0_0_0_/_0.1)] transition-all xs:h-16 xs:shadow-[0_-10px_15px_-3px_rgb(0_0_0_/_0.1),0_-4px_6px_-4px_rgb(0_0_0_/_0.1)] xs:transition-none ${nav.show ? "w-[200px] xs:w-screen" : "w-[50px] xs:w-screen"}`}
       >
-        {/* <button
-          onClick={(e) => {
-            e.preventDefault();
-            setNav((prev) => ({ show: !prev.show }));
-          }}
-          className={`absolute right-[10px] top-[10px] h-[30px] w-[30px] transition-all xs:hidden ${
-            nav.show ? "scale-x-[-100%]" : "scale-x-100"
-          }`}
-        >
-          <Angles className="fill-astronaut-500" />
-        </button> */}
-
         <ul
           className={`absolute mt-4 flex w-full grow origin-top-left flex-col gap-4 pb-16 text-end text-lg font-bold xs:mt-0 xs:h-full xs:flex-row xs:items-center xs:px-8 xs:pb-0`}
         >

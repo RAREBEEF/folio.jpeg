@@ -10,7 +10,7 @@ const FollowBtn = ({ userData }: { userData: UserData }) => {
   return (
     <div>
       <Button onClick={alreadyFollowing ? unfollow : follow}>
-        <div>{alreadyFollowing ? "언팔로우" : "팔로우"}</div>
+        <div>{alreadyFollowing ? "팔로우 취소" : "팔로우"}</div>
       </Button>
     </div>
   );
