@@ -85,7 +85,6 @@ const ImageGridColsItem = ({
             />
           ) : (
             <Image
-              unoptimized={true}
               style={{
                 background: imageData.themeColor,
               }}
