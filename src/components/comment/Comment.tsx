@@ -15,8 +15,6 @@ import {
   usersDataState,
 } from "@/recoil/states";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import ProfileImage from "@/components/user/ProfileImage";
-import Link from "next/link";
 import useDateDiffNow from "@/hooks/useDateDiffNow";
 import useGetUserByUid from "@/hooks/useGetUserByUid";
 import useImagePopularity from "@/hooks/useImagePopularity";
@@ -33,7 +31,6 @@ const Comment = ({
   parentId?: string | null;
 }) => {
   const { deleteComment } = useDeleteComment({ imageId: imageData.id });
-  const { adjustPopularity } = useImagePopularity({ imageId: imageData.id });
   const isInitialMount = useRef(true);
   const { getUserByUid, isLoading: isAuthorLoading } = useGetUserByUid();
   const [summaryText, setSummaryText] = useState<string>(

@@ -97,7 +97,11 @@ const ProfileCard = ({
         )}
         {!onlyImg && (
           <span className="font-semibold">
-            {profile ? profile.displayId : profileData?.displayId || ""}
+            {profile
+              ? profile.displayId
+              : profileData?.displayId || (
+                  <span className="invisible">-----</span>
+                )}
           </span>
         )}
       </Link>

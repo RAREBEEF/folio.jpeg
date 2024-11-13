@@ -46,27 +46,28 @@
 
 _설명에 포함된 코드는 실제 코드에서 발췌해 설명에 용이하도록 일부 수정된 부분이 있을 수 있으며 앞뒤로 생략된 코드가 존재할 수 있습니다._
 
-1. Masonry Grid (세로 방향 정렬 그리드)
-   - 컨테이너 너비에 따라 그리드 초기화
-   - 그리드의 각 열에 이미지 추가하기
-2. 이미지 첨부 / 분석 / 업로드
-   1. 이미지 첨부
-   2. 이미지 업로드
-      - 이미지 압축
-      - 이미지 분석
-      - 이미지 업로드 상태창
-      - 업로드 중 이탈 방지
-3. 이미지 편집
-   1. 뷰포트에 맞게 캔버스 사이즈 조절
-   2. 리사이저 좌표 구하기
-   3. 편집 완료된 이미지 캡쳐
-4. 검색
-   1. 검색어 제안
-   2. 최근 검색 기록
-5. 알림
-   1. 인 앱 알림
-      - 같은 유형 알림 합치기
-   2. 웹 푸시 알림
+1. [Masonry Grid (세로 방향 정렬 그리드)](#1-masonry-grid-세로-방향-정렬-그리드)  
+   1-1. [컨테이너 너비에 따라 그리드 초기화](#1-1-컨테이너-너비에-따라-그리드-초기화)  
+   1-2. [그리드의 각 열에 이미지 추가하기](#1-2-그리드의-각-열에-이미지-추가하기)
+
+2. [이미지 첨부 / 분석 / 업로드](#2-이미지-첨부--분석--업로드)  
+   2-1. [이미지 첨부](#2-1-이미지-첨부)  
+   2-2. [이미지 업로드](#2-2-이미지-업로드)
+
+3. [이미지 편집](#3-이미지-편집)  
+   3-1. [뷰포트에 맞게 캔버스 사이즈 조절](#3-1-뷰포트에-맞게-캔버스-사이즈-조절)  
+   3-2. [리사이저 좌표 구하기](#3-2-리사이저-좌표-구하기)  
+   3-3. [편집 완료된 이미지 캡쳐](#3-3-편집-완료된-이미지-캡쳐)
+
+4. [검색](#4-검색)  
+   4-1. [검색어 제안](#4-1-검색어-제안)  
+   4-2. [최근 검색 기록](#4-2-최근-검색-기록)
+
+5. [알림](#5-알림)  
+   5-1. [인 앱 알림](#5-1-인-앱-알림)  
+   5-2. [웹 푸시 알림](#5-2-웹-푸시-알림)
+
+6. [댓글](#6-댓글)
 
 <br />
 <br />
@@ -1148,6 +1149,22 @@ export async function POST(req: Request) {
 
 <br />
 <br />
+
+# 6. 댓글
+
+<img alt="댓글과 답글" src="https://github.com/user-attachments/assets/7f9bf63e-929f-44cf-a627-d465bd13d599">
+
+이미지에 댓글을 남길 수 있으며 댓글에 대한 답글도 작성할 수 있습니다.
+
+댓글창의 UI는 css의 sticky 속성을 활용해 댓글 목록을 스크롤하는 동안 이미지와 댓글 작성란이 화면에 지속적으로 노출되도록 하였습니다. [예시 페이지 링크](https://folio-jpeg.com/image/e1504520-4545-4d31-8a9c-e841a0c9981f)
+
+<p align="center">
+  <img alt="댓글 스크롤" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDV0b2F6eXdxMXNtbjdnNWgxM2xjcmFwazJxYWluYm5nMWxwNWE2YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MTKCIMGKOoMJw0OLjD/giphy.gif">
+</p>
+<p align="center">
+  <img alt="댓글 스크롤 세로" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzI3ZzBvcjhqZDg1OTBlc3BzYWszYXN6ZjRvenE4dm84bGI2ZWFnYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/kGoOJIcEkXL6XupFet/giphy.gif">
+</p>
+
 <br />
 <br />
 <br />
